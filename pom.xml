@@ -14,7 +14,15 @@
 <junit.version>5.12.1</junit.version>  </properties>
 
   <dependencies>
-    <dependency>
+      <!-- TrasS-->
+      <dependency>
+          <groupId>sumo</groupId>
+          <artifactId>traas</artifactId>
+          <version>1.0</version>
+          <scope>system</scope>
+          <systemPath>${project.basedir}/lib/TraaS.jar</systemPath>
+      </dependency>
+      <dependency>
       <groupId>org.openjfx</groupId>
       <artifactId>javafx-controls</artifactId>
       <version>21.0.6</version>
