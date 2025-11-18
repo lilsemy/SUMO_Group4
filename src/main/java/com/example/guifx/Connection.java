@@ -13,7 +13,7 @@ public class Connection {
     public static void Connection() {
 
         String sumo_bin = "sumo-gui"; //Gibt Variable sumo_bin den Namen von Sumo-Gui
-        String config_file = "src\\main\\resources\\com\\example\\guifx\\SumoTest.sumocfg"; //Sumo Config Datei
+        String config_file = "src/main/resources/com/example/guifx/SumoTest.sumocfg"; //Sumo Config Datei
         double step_length = 0.1;
 
         new Thread(() -> {
