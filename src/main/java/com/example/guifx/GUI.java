@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import static com.example.guifx.Connection.conn;
 
 public class GUI {
+    private VehiclesMangagement vehiclesManager;
 
     private int id = 1;
 
