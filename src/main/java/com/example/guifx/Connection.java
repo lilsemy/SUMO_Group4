@@ -25,6 +25,8 @@ public class Connection {
                 conn.runServer();
                 conn.setOrder(1);
 
+                // do {conn.do_timestep(); } while ((int) conn.do_job_get(Vehicle.getIDCount())) > 0);
+                
                 for (int i = 0; i < 200000; i++) {
                     conn.do_timestep();
                     double timeSeconds = (double) conn.do_job_get(Simulation.getTime());
