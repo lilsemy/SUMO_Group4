@@ -7,31 +7,48 @@ import it.polito.appeal.traci.SumoTraciConnection;
 //TODO: for-each Schleife?
 
 public class Connection {
+    private TraciConnect simulation;
+    private VehiclesMangagement vehiclesManager;
 
-    public static SumoTraciConnection conn;
+    private GUI controller1;
+    public Connection() throws Exception {
+        simulation =new TraciConnect();
+        simulation.connect();
+        vehiclesManager = new VehiclesMangagement(simulation);
+        makeConnection();
+    }
+    //public static SumoTraciConnection conn;
 
-    public static void Connection() {
+    public VehiclesMangagement getVehiclesManager(){
+        return vehiclesManager;
+    }
+    public  void makeConnection()  {
 
-        String sumo_bin = "sumo-gui"; //Gibt Variable sumo_bin den Namen von Sumo-Gui
+
+
+
+
+        /*String sumo_bin = "sumo-gui"; //Gibt Variable sumo_bin den Namen von Sumo-Gui
         String config_file = "src/main/resources/com/example/guifx/SumoTest.sumocfg"; //Sumo Config Datei
-        double step_length = 0.1;
+        double step_length = 0.1;*/
 
         new Thread(() -> {
             try {
-                conn = new SumoTraciConnection(sumo_bin, config_file);
-                conn.addOption("step-length", step_length + "");
-                conn.addOption("start", "true");
 
-                conn.runServer();
-                conn.setOrder(1);
+
+
+
+
 
                 for (int i = 0; i < 200000; i++) {
-                    conn.do_timestep();
-                    double timeSeconds = (double) conn.do_job_get(Simulation.getTime());
-                    System.out.println("Current Time Stamp: " + timeSeconds);
+
+                    simulation.doStep();
+
+                    /*double timeSeconds = (double) conn.do_job_get(Simulation.getTime());
+                    System.out.println("Current Time Stamp: " + timeSeconds);*/
                 }
 
-                conn.close();
+                simulation.close();
             } catch (Exception ex) {
                 ex.printStackTrace();
             }

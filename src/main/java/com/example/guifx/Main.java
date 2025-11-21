@@ -10,14 +10,18 @@ import java.io.IOException;
 public class Main extends Application {
     @Override
 
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("SumoController");
         stage.setScene(scene);
         stage.show();
 
-        Connection.Connection();
+        GUI controller = fxmlLoader.getController();
+
+        Connection conn=new Connection();
+       controller.setVehiclesManager(conn.getVehiclesManager());
+       // Connection.makeConnection(controller);
     }
 
 
