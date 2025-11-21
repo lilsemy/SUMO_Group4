@@ -40,6 +40,9 @@ public class Connection {
 
 
 
+                // do {conn.do_timestep(); } while ((int) conn.do_job_get(Vehicle.getIDCount())) > 0);
+                // Auf Statistik Klasse zugreifen, die Methode zur Abfrage von Anzahl myVehicle Objekten in Simulation hat
+                
                 for (int i = 0; i < 200000; i++) {
 
                     simulation.doStep();
