@@ -11,6 +11,10 @@ import java.util.Map;
 // to hide the do job set...
 import de.tudresden.sumo.cmd.Gui;
 
+    /**
+    *VehiclesManagement is a
+    */
+
 public class VehiclesMangagement {
     private TraciConnect simulation4;
 
@@ -21,11 +25,21 @@ public class VehiclesMangagement {
     private Map<String, myVehicle> vehicles;
 
 
+    /**
+    *
+    *@param simulation
+    */
     public VehiclesMangagement(TraciConnect simulation) {
         this.simulation4 = simulation;
         this.vehicles = new HashMap<String, myVehicle>();
     }
 
+    
+    /**
+    *
+    *@param v
+    *@throws
+    */
     public void injectVehicle(myVehicle v) throws Exception {
         SumoTraciConnection conn = simulation4.getConn();
         conn.do_job_set(Vehicle.add(v.getId(), v.getTypeId(), v.getRouteId(), v.getDepart(), v.getPos(), v.getSpeed(), v.getLaneId()));
@@ -33,16 +47,31 @@ public class VehiclesMangagement {
         vehicles.put(v.getId(), v);
     }
 
-
+    
+    /**
+    *@return
+    *@param id
+    *@throws
+    */
     public double getVehicleSpeed(String id) throws Exception {
         SumoTraciConnection conn = simulation4.getConn();
         return (double) conn.do_job_get(Vehicle.getSpeed(id));
     }
 
+
+     /**
+    *@return
+    *@param id
+    */
     public myVehicle getVehicle(String id) {//what
         return vehicles.get(id);
     }
 
+     /**
+    *@return
+    *@param viwId, vehId
+    *@throws
+    */
     public void trackVehicle(String viwId, String vehId) throws Exception {
         SumoTraciConnection connection = simulation4.getConn();
         connection.do_job_set(Gui.trackVehicle(viwId, vehId));
