@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.Map;
 
 import static SumoTest.TraciConnect.conn;
+
+    /**
+    *Statistik is a class to calculate relevant metrics over the simulation
+    */
+
 public class Statistik {
 
     public static void main(String[] args) {
@@ -93,3 +98,4 @@ TODO:
 - Daten als Stream in CSV / PDF schreiben (charts, metrics and timestamps + including filters for car colors, edges etc.)
 
     */
+
