@@ -5,20 +5,38 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 //import static com.example.guifx.Connection.conn;
 
+/**
+*GUI is a
+*/
+
 public class GUI {
     // hier sollte aus connection kommen
     private VehiclesMangagement vehiclesManager1;
 
     private int id = 1;
 
+    /**
+    *
+    */
+    
     public void setVehiclesManager(VehiclesMangagement vehiclesManager){
         this.vehiclesManager1 = vehiclesManager;
     }
+    
+
+    /**
+    *Inserts a car
+    */
     @FXML
     public void InsertCar(ActionEvent e) {
         System.out.println("Button clicked!");
         String idf = "id" + id;
         byte lane1 = 0;
+        
+        /**
+        *@throws
+        */
+        
         try {
             myVehicle car = new myVehicle(idf,"car","route1",lane1);
             vehiclesManager1.injectVehicle(car);
