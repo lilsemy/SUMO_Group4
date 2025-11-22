@@ -19,7 +19,9 @@ public class Main extends Application {
     *starts scene
     *@throws Exception
     */
-    
+
+    //Test
+
     public void start(Stage stage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("hello-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
