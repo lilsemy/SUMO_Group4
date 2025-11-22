@@ -1,7 +1,7 @@
 package com.example.guifx;
 
     /**
-    *myVehicle is a
+    *myVehicle is a model class for Vehicles in the Simulation
     */
 
 public class myVehicle {
@@ -81,7 +81,7 @@ public class myVehicle {
     }
     
     /**
-    *@return depart
+    *@return Time of Departure of the Vehicle
     */
     public int getDepart(){
         return depart;
@@ -118,9 +118,5 @@ public class myVehicle {
     public void setSpeed(double speed){
         this.speed = speed;
     }
-
-
-
-
 
 }

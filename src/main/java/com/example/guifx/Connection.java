@@ -1,13 +1,7 @@
 package com.example.guifx;
 
-import de.tudresden.sumo.cmd.Simulation;
-import it.polito.appeal.traci.SumoTraciConnection;
-
-
-//TODO: for-each Schleife?
-
 /**
-* Connection is a
+* Connection is running the Simulation with SUMO
 */
 
 public class Connection {
@@ -18,11 +12,11 @@ public class Connection {
 
     /**
     *
-    *@throws
+    *@throws Exception
     */
     
     public Connection() throws Exception {
-        simulation =new TraciConnect();
+        simulation = new TraciConnect();
         simulation.connect();
         vehiclesManager = new VehiclesMangagement(simulation);
         makeConnection();
@@ -39,10 +33,6 @@ public class Connection {
     
     public  void makeConnection()  {
 
-
-
-
-
         /*String sumo_bin = "sumo-gui"; //Gibt Variable sumo_bin den Namen von Sumo-Gui
         String config_file = "src/main/resources/com/example/guifx/SumoTest.sumocfg"; //Sumo Config Datei
         double step_length = 0.1;*/
@@ -51,25 +41,16 @@ public class Connection {
             
             /**
             *
-            *@throws
+            *@throws Exception
             */
             try {
+                Statistik stat = new Statistik();
+                simulation.doStep();
+                stat.setVehicleIds(simulation, vehiclesManager);
 
-
-
-
-
-
-                // do {conn.do_timestep(); } while ((int) conn.do_job_get(Vehicle.getIDCount())) > 0);
-                // Auf Statistik Klasse zugreifen, die Methode zur Abfrage von Anzahl myVehicle Objekten in Simulation hat
-                
-                for (int i = 0; i < 200000; i++) {
-
+                do {
                     simulation.doStep();
-
-                    /*double timeSeconds = (double) conn.do_job_get(Simulation.getTime());
-                    System.out.println("Current Time Stamp: " + timeSeconds);*/
-                }
+                } while (stat.getCars() > 0);
 
                 simulation.close();
             } catch (Exception ex) {
@@ -80,3 +61,5 @@ public class Connection {
     }
 
 }
+//        Statistik stat = new Statistik();
+//        stat.getStatistik();

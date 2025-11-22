@@ -7,12 +7,13 @@ import de.tudresden.sumo.cmd.Vehicle;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 // to hide the do job set...
 import de.tudresden.sumo.cmd.Gui;
 
     /**
-    *VehiclesManagement is a
+    *VehiclesManagement is the class that controls the Vehicles in the simulation
     */
 
 public class VehiclesMangagement {
@@ -38,7 +39,7 @@ public class VehiclesMangagement {
     /**
     *
     *@param v
-    *@throws
+    *@throws Exception
     */
     public void injectVehicle(myVehicle v) throws Exception {
         SumoTraciConnection conn = simulation4.getConn();
@@ -49,9 +50,9 @@ public class VehiclesMangagement {
 
     
     /**
-    *@return
+    *@return Speed of Vehicle
     *@param id
-    *@throws
+    *@throws Exception
     */
     public double getVehicleSpeed(String id) throws Exception {
         SumoTraciConnection conn = simulation4.getConn();
@@ -60,7 +61,7 @@ public class VehiclesMangagement {
 
 
      /**
-    *@return
+    *@return vehicle
     *@param id
     */
     public myVehicle getVehicle(String id) {//what
@@ -68,9 +69,9 @@ public class VehiclesMangagement {
     }
 
      /**
-    *@return
+    *@return sets camera of sumo-gui on given vehicle
     *@param viwId, vehId
-    *@throws
+    *@throws Exception
     */
     public void trackVehicle(String viwId, String vehId) throws Exception {
         SumoTraciConnection connection = simulation4.getConn();
@@ -78,50 +79,16 @@ public class VehiclesMangagement {
 
     }
 
-
-    //old
-   /* private static int Idcounter = 1;
-    private VehiclesMangagement (){}
-
-    public static void injectCar(String givenRoutId, String givenTypeId) throws Exception{
-        SumoTraciConnection conn = TraciConnect.getConn();
-        String vehId = "V" + (Idcounter++);
-
-        String defaultType = "testcar";
-        String defaultRoute = "testroute ";
-
-
-        String typeId;
-        if (givenTypeId == null){
-            typeId = defaultType;
-        } else if (givenTypeId.isBlank()) {
-            typeId = defaultType;
-
-        }else {
-            typeId = givenTypeId;
-        }
-
-
-        String routeId;
-        if (givenRoutId == null){
-            routeId = defaultRoute;
-        } else if (givenRoutId.isBlank()) {
-            routeId= defaultRoute;
-
-        } else {
-            routeId = givenRoutId;
-        }
-
-        int depart= (int) (double) conn.do_job_get(de.tudresden.sumo.cmd.Simulation.getTime());
-        double pos = 0;
-        double speed= 0;
-        byte lane = 0;
-        conn.do_job_set(Vehicle.add(vehId,typeId,routeId,depart,pos,speed,lane));
-        System.out.println("Injected vehicle: " +vehId +", route: " + routeId );
-
-
+        /**
+         *
+         * @return IDs of all Vehicle in the simulation
+         * @throws Exception
+         */
+    public List<String> getIds() throws Exception{
+        SumoTraciConnection connection = simulation4.getConn();
+        List<String> IDList = (List<String>) connection.do_job_get(Vehicle.getIDList());
+        return IDList;
     }
-*/
 
 }
 

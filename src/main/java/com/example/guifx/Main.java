@@ -8,7 +8,7 @@ import java.io.IOException;
 
 
     /**
-    *Main is
+    *Main is the Initializer of the GUI
     *@see class Application
     */
 
@@ -17,7 +17,7 @@ public class Main extends Application {
 
     /**
     *starts scene
-    *@throws
+    *@throws Exception
     */
     
     public void start(Stage stage) throws Exception {
@@ -29,9 +29,9 @@ public class Main extends Application {
 
         GUI controller = fxmlLoader.getController();
 
-        Connection conn=new Connection();
-       controller.setVehiclesManager(conn.getVehiclesManager());
-       // Connection.makeConnection(controller);
+        Connection conn = new Connection();
+        controller.setVehiclesManager(conn.getVehiclesManager());
+        // Connection.makeConnection(controller);
     }
 
 

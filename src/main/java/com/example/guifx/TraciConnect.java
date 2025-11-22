@@ -5,7 +5,7 @@ package com.example.guifx;
 import it.polito.appeal.traci.SumoTraciConnection;
 
     /**
-    *TraciConnect is a
+    *TraciConnect is the actual Interface to SUMO
     */
 
 public class TraciConnect {
@@ -14,10 +14,9 @@ public class TraciConnect {
     private SumoTraciConnection conn;
     
     public TraciConnect(){}
-    //new code
     /**
     *Establishes new connection
-    *@throws
+    *@throws Exception
     */
     
     public void connect()throws Exception{
@@ -32,7 +31,7 @@ public class TraciConnect {
 
     /**
     *Does a timestep in the simulation
-    *@throws
+    *@throws Exception
     */
     public void doStep() throws Exception{
         conn.do_timestep();
@@ -41,7 +40,7 @@ public class TraciConnect {
     
     /**
     *Closes the connection
-    *@throws
+    *@throws Exception
     */
     public void close()throws Exception{
         if(conn != null){
@@ -50,7 +49,7 @@ public class TraciConnect {
     }
 
     /**
-    *
+    *Returns the Connection to SUMO
     */
     public SumoTraciConnection getConn() {
         return conn;

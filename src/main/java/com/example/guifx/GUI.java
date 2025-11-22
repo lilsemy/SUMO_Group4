@@ -6,7 +6,7 @@ import javafx.fxml.FXML;
 //import static com.example.guifx.Connection.conn;
 
 /**
-*GUI is a
+*GUI is the class that controls the JavaFX GUI
 */
 
 public class GUI {
@@ -16,7 +16,8 @@ public class GUI {
     private int id = 1;
 
     /**
-    *
+     * Sets the VehicleManager in order to insert Cars and change the view of the Sumo-GUI
+     * @param vehiclesManager
     */
     
     public void setVehiclesManager(VehiclesMangagement vehiclesManager){
@@ -25,7 +26,7 @@ public class GUI {
     
 
     /**
-    *Inserts a car
+    *Inserts a car and sets the view on it, when Button is clicked
     */
     @FXML
     public void InsertCar(ActionEvent e) {
@@ -34,7 +35,7 @@ public class GUI {
         byte lane1 = 0;
         
         /**
-        *@throws
+        *@throws Exception
         */
         
         try {
