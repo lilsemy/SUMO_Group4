@@ -1,6 +1,8 @@
 package com.example.guifx;
 
-
+    /**
+    *MapSumoConfig is a
+    */
 
 public class MapSumoConfig {
     private MapSumoConfig(){ } // no defaul constructor .. not changeable
