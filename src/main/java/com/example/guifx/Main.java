@@ -21,7 +21,7 @@ public class Main extends Application {
     */
 
     public void start(Stage stage) throws Exception {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("hello-view.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("GUI-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("SumoController");
         stage.setScene(scene);
