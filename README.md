@@ -3,7 +3,10 @@ This is the Source code of Java Project Group 4 on the Tuesdays Exercises. The f
 
 ---
 ## How to run the Program:
-To run the program, open the Project Folder in an IDE of your choice and Run the "Launcher" Class.
+1) Extract the .zip folder.
+2) Inside the extracted folder you find two folders: ".idea" and "SUMO_Group4-main". 
+3) Open the "SUMO_Group4-main" Folder (the second one), in an IDE of your choice.
+4) Run the "Launcher" Class.
 
 
 ### Dependencies:
