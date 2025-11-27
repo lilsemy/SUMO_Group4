@@ -1,18 +1,16 @@
 package com.example.guifx;
 
-
-
 import it.polito.appeal.traci.SumoTraciConnection;
 import de.tudresden.sumo.cmd.Vehicle;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
 // to hide the do job set...
 import de.tudresden.sumo.cmd.Gui;
+import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
 
-    /**
+/**
     *VehiclesManagement is the class that controls the Vehicles in the simulation
     */
 
@@ -56,7 +54,12 @@ public class VehiclesMangagement {
     */
     public double getVehicleSpeed(String id) throws Exception {
         SumoTraciConnection conn = simulation4.getConn();
-        return (double) conn.do_job_get(Vehicle.getSpeed(id));
+        if (getIds().contains(id)){
+            return (double) conn.do_job_get(Vehicle.getSpeed(id)); }
+        else {
+            System.out.println("Error! Car not found!");
+            return 0;
+        }
     }
 
 

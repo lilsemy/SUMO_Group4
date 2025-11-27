@@ -1,5 +1,19 @@
+# Sumo Live Simulation - Project Group 4
+This is the Source code of Java Project Group 4 on the Tuesdays Exercises. The following represent the progress till the first Milestone.
+
+---
+## How to run the Program:
 To run the program, open the Project Folder in an IDE of your choice and Run the "Launcher" Class.
 
-The .zip contains the following files:
+
+### Dependencies:
+- JDK 25 or higher
+- Sumo Version 1.20 or higher
+- "SUMO_HOME" should be set in PATH (on Windows normally done automatically by the installer. Linux instructions: https://sumo.dlr.de/docs/Basics/Basic_Computer_Skills.html)
+
+---
+## Further information
+
+The .zip contains also the following files:
 - Project Documentation (containing the declaration of authorship)
 - Program folder (src, lib, target)

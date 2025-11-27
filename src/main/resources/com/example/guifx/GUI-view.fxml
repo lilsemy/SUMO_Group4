@@ -51,5 +51,14 @@
             <Font name="System Italic" size="10.0" />
          </font>
       </Label>
+      <Button layoutX="240.0" layoutY="51.0" mnemonicParsing="false" onAction="#getCarSpeed" prefHeight="59.0" prefWidth="137.0" text="Get Speed">
+         <graphic>
+            <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@Speed.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
    </children>
 </AnchorPane>

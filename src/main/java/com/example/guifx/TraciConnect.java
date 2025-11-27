@@ -1,7 +1,5 @@
 package com.example.guifx;
 
-
-
 import it.polito.appeal.traci.SumoTraciConnection;
 
     /**
@@ -23,10 +21,7 @@ public class TraciConnect {
         conn = new SumoTraciConnection(MapSumoConfig.sumo_bin, MapSumoConfig.config_file);
         conn.addOption("start","true");
         conn.addOption("step-length",String.valueOf(MapSumoConfig.step_length));
-
         conn.runServer();
-
-
     }
 
     /**
@@ -54,8 +49,6 @@ public class TraciConnect {
     public SumoTraciConnection getConn() {
         return conn;
     }
-
-
 
 }
 

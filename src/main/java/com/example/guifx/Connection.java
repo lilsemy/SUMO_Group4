@@ -21,7 +21,6 @@ public class Connection {
         vehiclesManager = new VehiclesMangagement(simulation);
         makeConnection();
     }
-    //public static SumoTraciConnection conn;
     
     public VehiclesMangagement getVehiclesManager(){
         return vehiclesManager;
@@ -32,11 +31,6 @@ public class Connection {
     */
     
     public  void makeConnection()  {
-
-        /*String sumo_bin = "sumo-gui"; //Gibt Variable sumo_bin den Namen von Sumo-Gui
-        String config_file = "src/main/resources/com/example/guifx/SumoTest.sumocfg"; //Sumo Config Datei
-        double step_length = 0.1;*/
-
         new Thread(() -> {
             
             /**
@@ -56,7 +50,7 @@ public class Connection {
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
-        }).start();   // <<<<< WICHTIG
+        }).start();
 
     }
 
