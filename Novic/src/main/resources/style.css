@@ -1,0 +1,120 @@
+/* App-wide styles */
+.root {
+    -fx-font-family: "Segoe UI", Arial, sans-serif;
+    -fx-background-color: #f8f9fa;
+}
+
+.button {
+    -fx-background-color: #1976d2;
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-background-radius: 6;
+    -fx-padding: 6 18 6 18;
+    -fx-effect: dropshadow(gaussian, #1976d2, 2, 0.1, 0, 1);
+    -fx-border-color: #1565c0;
+    -fx-border-width: 1;
+}
+.button:hover {
+    -fx-background-color: #1565c0;
+}
+
+.label {
+    -fx-font-size: 13px;
+    -fx-text-fill: #222;
+}
+#tlsInfoBox {
+    -fx-background-color: #fff;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, #bbb, 6, 0.1, 0, 1);
+    -fx-padding: 16;
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 1;
+}
+#canvas {
+    -fx-border-color: #e0e0e0;
+    -fx-border-width: 2;
+    -fx-background-radius: 8;
+}
+
+/* Toolbar (top) */
+.toolbar {
+    -fx-padding: 8;
+    -fx-background-color: #23395d;
+}
+.toolbar > .button {
+    -fx-background-color: #f8f9fa;
+    -fx-text-fill: #23395d;
+    -fx-font-weight: bold;
+    -fx-border-radius: 4;
+    -fx-background-radius: 4;
+    -fx-padding: 6 18;
+    -fx-border-color: #23395d;
+    -fx-border-width: 1;
+}
+.toolbar > .button:hover {
+    -fx-background-color: #e9ecef;
+}
+
+/* Side panel */
+.side-panel {
+    -fx-background-color: #f8f9fa;
+    -fx-padding: 0;
+}
+
+/* Traffic Light Info Box */
+.tls-info-box {
+    -fx-padding: 10;
+    -fx-background-color: white;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, #e9ecef, 8, 0.1, 0, 2);
+    -fx-border-color: #e9ecef;
+    -fx-border-width: 1;
+    -fx-border-radius: 8;
+}
+
+.section-title {
+    -fx-font-size: 16px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #23395d;
+}
+.section-subtitle {
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #495057;
+}
+.label-note {
+    -fx-font-size: 10px;
+    -fx-text-fill: #6c757d;
+}
+.label-feedback {
+    -fx-text-fill: green;
+    -fx-font-size: 10px;
+}
+
+.phase-list-box {
+    -fx-background-color: #e9ecef;
+    -fx-padding: 5;
+    -fx-background-radius: 5;
+}
+.phase-header-row {
+    -fx-padding: 0 0 5 0;
+}
+.label-bold {
+    -fx-font-weight: bold;
+}
+.label-mono {
+    -fx-font-family: 'Courier New', monospace;
+}
+.label-grey {
+    -fx-text-fill: grey;
+}
+
+/* General */
+.scroll-pane {
+    -fx-background-color: transparent;
+}
+
+/* Hide scrollbars for side panel */
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
