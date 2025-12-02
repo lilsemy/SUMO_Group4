@@ -6,6 +6,10 @@ package com.example.guifx;
 
 public class myVehicle {
 
+    private  double x;
+    private double y;
+    private double angle;
+
     private String id;
     private String typeId;
     private String routeId;
@@ -30,6 +34,10 @@ public class myVehicle {
         this.depart = depart;
         this.pos = pos;
         this.speed = speed;
+
+        this.x = 0.0;
+        this.y = 0.0;
+        this.angle = 0.0;
     }
 
     // default constructor for depart, pos, speed
@@ -45,11 +53,27 @@ public class myVehicle {
         this.depart = 0;
         this.pos = 0.0;
         this.speed = 1.0;
+
+        this.x = 0.0;
+        this.y = 0.0;
+        this.angle = 0.0;
     }
 
+        public myVehicle(String id) {
+            this.id = id;
+            this.typeId = "car";
+            this.routeId = "";
+            this.laneId = -1;
+            this.depart = 0;
+            this.pos = 0.0;
+            this.speed = 1.0;
+            this.x = 0.0;
+            this.y = 0.0;
+            this.angle = 0.0;
+        }
 
 
-    //Getter
+        //Getter
 
     /**
     *@return id of car
@@ -102,6 +126,17 @@ public class myVehicle {
         return speed;
     }
 
+    public double getX(){
+        return x;
+    }
+
+    public double getY(){
+        return y;
+
+    }
+    public double getAngle(){
+        return angle;
+    }
     //Setter
     //i am not sure if we need setters for all
     
@@ -119,4 +154,11 @@ public class myVehicle {
         this.speed = speed;
     }
 
+    public void setPosition(double x, double y){
+        this.x =x;
+        this.y = y;
+    }
+    public void setAngle(double angle){
+        this.angle = angle;
+    }
 }

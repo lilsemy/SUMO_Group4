@@ -10,8 +10,9 @@ module com.example.guifx {
     requires org.kordamp.bootstrapfx.core;
     requires eu.hansolo.tilesfx;
     requires com.almasb.fxgl.all;
-    requires TraaS;
+
     requires java.desktop;
+    requires libtraci;
 
     opens com.example.guifx to javafx.fxml;
     exports com.example.guifx;

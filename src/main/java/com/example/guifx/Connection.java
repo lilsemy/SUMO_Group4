@@ -40,7 +40,7 @@ public class Connection {
             try {
                 Statistik stat = new Statistik();
                 simulation.doStep();
-                stat.setVehicleIds(simulation, vehiclesManager);
+                stat.setVehicleIds(vehiclesManager);
 
                 do {
                     simulation.doStep();

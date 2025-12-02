@@ -17,10 +17,10 @@
       <!-- TrasS-->
       <dependency>
           <groupId>sumo</groupId>
-          <artifactId>traas</artifactId>
+          <artifactId>libtraci</artifactId>
           <version>1.0</version>
           <scope>system</scope>
-          <systemPath>${project.basedir}/lib/TraaS.jar</systemPath>
+          <systemPath>${project.basedir}/lib/libtraci.jar</systemPath>
       </dependency>
       <dependency>
       <groupId>org.openjfx</groupId>

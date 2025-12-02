@@ -1,9 +1,9 @@
 package com.example.guifx;
 
-import de.tudresden.sumo.cmd.Vehicle;
-import de.tudresden.sumo.cmd.Edge;
-import de.tudresden.sumo.cmd.Simulation;
-import it.polito.appeal.traci.SumoTraciConnection;
+import org.eclipse.sumo.libtraci.Vehicle;
+import org.eclipse.sumo.libtraci.Simulation;
+import org.eclipse.sumo.libtraci.Edge;
+
 
 import java.io.IOException;
 import java.util.*;
@@ -16,7 +16,7 @@ import java.util.*;
 public class Statistik {
     private List<String> vehicleIDs;
 
-    public void setVehicleIds(TraciConnect conn, VehiclesMangagement vehiclesManager) throws Exception {
+    public void setVehicleIds(VehiclesMangagement vehiclesManager) throws Exception {
 
         List<String> vehicleIDs = vehiclesManager.getIds(); //gibt Liste mit allen IDs der sich in Simulation befindlichen Fahrzeuge
         this.vehicleIDs=vehicleIDs;

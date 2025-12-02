@@ -1,13 +1,14 @@
 package com.example.guifx;
 
-import it.polito.appeal.traci.SumoTraciConnection;
-import de.tudresden.sumo.cmd.Vehicle;
+import org.eclipse.sumo.libtraci.Vehicle;
+import org.eclipse.sumo.libtraci.GUI;
+import org.eclipse.sumo.libtraci.TraCIPosition;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-// to hide the do job set...
-import de.tudresden.sumo.cmd.Gui;
+
 import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
 
 /**
@@ -30,7 +31,7 @@ public class VehiclesMangagement {
     */
     public VehiclesMangagement(TraciConnect simulation) {
         this.simulation4 = simulation;
-        this.vehicles = new HashMap<String, myVehicle>();
+        this.vehicles = new HashMap<>();
     }
 
     
@@ -40,8 +41,8 @@ public class VehiclesMangagement {
     *@throws Exception
     */
     public void injectVehicle(myVehicle v) throws Exception {
-        SumoTraciConnection conn = simulation4.getConn();
-        conn.do_job_set(Vehicle.add(v.getId(), v.getTypeId(), v.getRouteId(), v.getDepart(), v.getPos(), v.getSpeed(), v.getLaneId()));
+        Vehicle.add()
+        Vehicle.add(v.getId(), v.getRouteId(), v.getTypeId(),String.valueOf(v.getDepart()),String.valueOf(v.getLaneId()), String.valueOf(v.getPos()), String.valueOf(v.getSpeed()), String.valueOf(v.getLaneId()));
         // save the vehicle in our map.
         vehicles.put(v.getId(), v);
     }
@@ -53,9 +54,9 @@ public class VehiclesMangagement {
     *@throws Exception
     */
     public double getVehicleSpeed(String id) throws Exception {
-        SumoTraciConnection conn = simulation4.getConn();
+
         if (getIds().contains(id)){
-            return (double) conn.do_job_get(Vehicle.getSpeed(id)); }
+            return Vehicle.getSpeed(id); }
         else {
             System.out.println("Error! Car not found!");
             return 0;
@@ -77,8 +78,8 @@ public class VehiclesMangagement {
     *@throws Exception
     */
     public void trackVehicle(String viwId, String vehId) throws Exception {
-        SumoTraciConnection connection = simulation4.getConn();
-        connection.do_job_set(Gui.trackVehicle(viwId, vehId));
+
+        GUI.trackVehicle(viwId, vehId);
 
     }
 
@@ -88,11 +89,32 @@ public class VehiclesMangagement {
          * @throws Exception
          */
     public List<String> getIds() throws Exception{
-        SumoTraciConnection connection = simulation4.getConn();
-        List<String> IDList = (List<String>) connection.do_job_get(Vehicle.getIDList());
+
+        List<String> IDList =  Vehicle.getIDList();
         return IDList;
     }
 
+    public void updateFromSimulation() throws Exception{
+
+        for (String id : Vehicle.getIDList()){
+            double speed = Vehicle.getSpeed(id);
+            TraCIPosition pos = Vehicle.getPosition(id,false);
+            double angle = Vehicle.getAngle(id);
+
+            // Get our local object OR create a new one if needed
+            myVehicle v = vehicles.getOrDefault(id , new myVehicle(id));
+
+            v.setSpeed(speed);
+            v.setPosition(pos.getX(),pos.getY());
+            v.setAngle(angle);
+
+            vehicles.put(id, v);
+
+        }
+
+
+
+    }
 }
 
 
