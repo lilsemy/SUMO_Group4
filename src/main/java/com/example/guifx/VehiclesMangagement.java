@@ -41,7 +41,7 @@ public class VehiclesMangagement {
     *@throws Exception
     */
     public void injectVehicle(myVehicle v) throws Exception {
-        Vehicle.add()
+
         Vehicle.add(v.getId(), v.getRouteId(), v.getTypeId(),String.valueOf(v.getDepart()),String.valueOf(v.getLaneId()), String.valueOf(v.getPos()), String.valueOf(v.getSpeed()), String.valueOf(v.getLaneId()));
         // save the vehicle in our map.
         vehicles.put(v.getId(), v);
