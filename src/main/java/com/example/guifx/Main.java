@@ -4,10 +4,9 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import java.io.IOException;
 
 
-    /**
+/**
     *Main is the Initializer of the GUI
     *@see class Application
     */
@@ -27,10 +26,10 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
-        GUI controller = fxmlLoader.getController();
+        GUI gui = fxmlLoader.getController();
 
-        Connection conn = new Connection();
-        controller.setVehiclesManager(conn.getVehiclesManager());
+        SimulationController simController = new SimulationController();
+        gui.setVehiclesManager(simController.getVehicleController());
         // Connection.makeConnection(controller);
     }
 

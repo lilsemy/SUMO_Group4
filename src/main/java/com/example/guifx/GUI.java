@@ -2,24 +2,23 @@ package com.example.guifx;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import java.util.List;
 
 /**
 *GUI is the class that controls the JavaFX GUI
 */
 
 public class GUI {
-    private VehiclesMangagement vehiclesManager1;
+    private VehicleController vehicleController;
 
     private int id = 0;
 
     /**
-     * Sets the VehicleManager in order to insert Cars and change the view of the Sumo-GUI
-     * @param vehiclesManager
+     * Sets the VehicleController in order to insert Cars and change the view of the Sumo-GUI
+     * @param vehicleController
     */
     
-    public void setVehiclesManager(VehiclesMangagement vehiclesManager){
-        this.vehiclesManager1 = vehiclesManager;
+    public void setVehiclesManager(VehicleController vehicleController){
+        this.vehicleController = vehicleController;
     }
 
     /**
@@ -37,9 +36,9 @@ public class GUI {
         */
         
         try {
-            myVehicle car = new myVehicle(idf,"car","route1",lane1);
-            vehiclesManager1.injectVehicle(car);
-            vehiclesManager1.trackVehicle("View #0",car.getId());
+            VehicleState car = new VehicleState(idf,"car","route1",lane1);
+            vehicleController.injectVehicle(car);
+            vehicleController.trackVehicle("View #0",car.getId());
             System.out.println("add a car: " + car.getId());
             /*conn.do_job_set(Vehicle.add(idf, "car", "route1", 0, 0.0, 1.0, lane1)); //Fügt Lastwagen hinzu. ACHTUNG: VehicleType "ev"/"tr" muss in dem .rou.xml File definiert werden.
             conn.do_job_set(Gui.trackVehicle("View #0", idf));*/
@@ -52,8 +51,8 @@ public class GUI {
         System.out.println("Button clicked!");
         String idf = "id" + id;
         try {
-            if (vehiclesManager1.getIds().contains(idf)){
-                System.out.println("Current Speed of vehicle " + idf + " is: " + vehiclesManager1.getVehicleSpeed(idf));
+            if (vehicleController.getIds().contains(idf)){
+                System.out.println("Current Speed of vehicle " + idf + " is: " + vehicleController.getVehicleSpeed(idf));
             }
             else {
                 System.out.println("Error: No car inserted yet / inserted car left the simulation!");

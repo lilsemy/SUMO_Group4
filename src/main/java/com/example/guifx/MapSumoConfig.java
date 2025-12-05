@@ -5,7 +5,7 @@ package com.example.guifx;
     */
 
 public class MapSumoConfig {
-    private MapSumoConfig(){ } // no defaul constructor .. not changeable
+    private MapSumoConfig(){ } // no default constructor .. not changeable
 
     public static final String sumo_bin = "sumo-gui";
     // The SUMO binary (can be "sumo" or "sumo-gui")

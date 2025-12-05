@@ -8,29 +8,19 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.List;
 
-
-import org.controlsfx.control.tableview2.filter.filtereditor.SouthFilter;
-
 /**
-    *VehiclesManagement is the class that controls the Vehicles in the simulation
+    *VehicleController is one of the sub controller classes that controls the vehicles in the simulation
     */
 
-public class VehiclesMangagement {
-    private TraciConnect simulation4;
-
-
+public class VehicleController {
     // for storing our vehicles in a map (dictionary);
     // key  = vehicle id
     // value = vehicle object
-    private Map<String, myVehicle> vehicles;
+    private Map<String, VehicleState> vehicles;
 
 
-    /**
-    *
-    *@param simulation
-    */
-    public VehiclesMangagement(TraciConnect simulation) {
-        this.simulation4 = simulation;
+    //removed Connection object, because it shouldn't see it
+    public VehicleController() {
         this.vehicles = new HashMap<>();
     }
 
@@ -40,7 +30,7 @@ public class VehiclesMangagement {
     *@param v
     *@throws Exception
     */
-    public void injectVehicle(myVehicle v) throws Exception {
+    public void injectVehicle(VehicleState v) throws Exception {
 
         Vehicle.add(v.getId(), v.getRouteId(), v.getTypeId(),String.valueOf(v.getDepart()),String.valueOf(v.getLaneId()), String.valueOf(v.getPos()), String.valueOf(v.getSpeed()), String.valueOf(v.getLaneId()));
         // save the vehicle in our map.
@@ -68,7 +58,7 @@ public class VehiclesMangagement {
     *@return vehicle
     *@param id
     */
-    public myVehicle getVehicle(String id) {//what
+    public VehicleState getVehicle(String id) {//what
         return vehicles.get(id);
     }
 
@@ -102,7 +92,7 @@ public class VehiclesMangagement {
             double angle = Vehicle.getAngle(id);
 
             // Get our local object OR create a new one if needed
-            myVehicle v = vehicles.getOrDefault(id , new myVehicle(id));
+            VehicleState v = vehicles.getOrDefault(id , new VehicleState(id));
 
             v.setSpeed(speed);
             v.setPosition(pos.getX(),pos.getY());

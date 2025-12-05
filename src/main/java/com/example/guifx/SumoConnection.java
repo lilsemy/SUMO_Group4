@@ -2,19 +2,15 @@ package com.example.guifx;
 
 import org.eclipse.sumo.libtraci.Simulation;
 import org.eclipse.sumo.libtraci.StringVector;
-
     /**
-    *TraciConnect is our object-oriented wrapper around the SUMO simulation.
+    *SumoConnection is our object-oriented wrapper around the SUMO simulation.
     */
+public class SumoConnection {
 
-public class TraciConnect {
-
-    // we track this so we do not start or close twice by accident , i think that was the problem before
+    // tracking if we have a connection or not
     private boolean connected = false;
 
-
-    
-    public TraciConnect(){}
+    public SumoConnection(){}
     /**
     *Establishes new connection
     *@throws Exception
@@ -30,14 +26,13 @@ public class TraciConnect {
 
         StringVector args = new StringVector(new String[]{
             MapSumoConfig.sumo_bin,
-          "-c",MapSumoConfig.config_file,
-          "--start",
-          "--step-length",String.valueOf(MapSumoConfig.step_length)});
+            "-c",MapSumoConfig.config_file,
+            "--start",
+            "--step-length",String.valueOf(MapSumoConfig.step_length)});
         //,"--time-to-teleport", "-1"
         Simulation.start(args);
         connected = true;
     }
-
     /**
     *Does a timestep in the simulation
     *@throws Exception
@@ -50,8 +45,6 @@ public class TraciConnect {
         }
         Simulation.step();
     }
-
-    
     /**
     *Closes the connection
     *@throws Exception
@@ -63,9 +56,6 @@ public class TraciConnect {
         Simulation.close();
         connected = false;
     }
-
-
-
     /**
      * @return true if the simulation is currently running (we called connect() and not close()).
     */

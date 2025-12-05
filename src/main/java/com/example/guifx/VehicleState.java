@@ -1,12 +1,12 @@
 package com.example.guifx;
 
     /**
-    *myVehicle is a model class for Vehicles in the Simulation
+    *VehicleState is a model class for Vehicles in the Simulation
     */
+//Renamed "myVehicle", since it only stores states, it is a much more fitting name
+public class VehicleState {
 
-public class myVehicle {
-
-    private  double x;
+    private double x;
     private double y;
     private double angle;
 
@@ -26,7 +26,7 @@ public class myVehicle {
     *@param id, typeId, routeId, laneId, depart, pos, speed
     */
     
-    public myVehicle(String id, String typeId, String routeId, byte laneId, int depart, double pos, double speed){
+    public VehicleState(String id, String typeId, String routeId, byte laneId, int depart, double pos, double speed){
         this.id =  id;
         this.typeId = typeId;
         this.routeId = routeId;
@@ -45,7 +45,7 @@ public class myVehicle {
     /**
     *@param id, typeId, routeId, laneId
     */
-    public myVehicle(String id, String typeId, String routeId, byte laneId ){
+    public VehicleState(String id, String typeId, String routeId, byte laneId ){
         this.id =  id;
         this.typeId = typeId;
         this.routeId = routeId;
@@ -59,7 +59,7 @@ public class myVehicle {
         this.angle = 0.0;
     }
 
-        public myVehicle(String id) {
+        public VehicleState(String id) {
             this.id = id;
             this.typeId = "car";
             this.routeId = "";
