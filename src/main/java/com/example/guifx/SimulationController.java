@@ -1,12 +1,17 @@
 package com.example.guifx;
 
 /**
-* Connection is running the Simulation with SUMO
+* SimulationController orchestrates the whole simulation
 */
 
 public class SimulationController {
     private final SumoConnection connection;
     private final VehicleController vehicleController;
+    //TODO
+    //private final TrafficLightController tlController;
+    //private final EdgeController edgeController;
+
+    private int id = 0; //temporarily stores IDs of cars, probably needs to move elsewhere in the future
     /**
     *
     *@throws Exception
@@ -16,7 +21,7 @@ public class SimulationController {
         this.connection.connect();
 
         vehicleController = new VehicleController();
-        makeConnection();
+        //makeConnection(); happens in main
     }
     /**
     * Establishes connection
@@ -63,6 +68,44 @@ public class SimulationController {
 //        }).start();
 //
 //    }
+
+    //Originally in GUI, but created a new abstraction, since the GUI should only see the main controller
+    public void spawnVehicle(){
+        id += 1;
+        String idf = "id" + id;
+        byte lane1 = 0;
+        /**
+         *@throws Exception
+         */
+
+        try {
+            //band-aid solution, only the vehicleController should create new Vehicle objects, not the main controller.
+            //needs to be redone in VehicleController class
+            VehicleState car = new VehicleState(idf,"car","route1",lane1);
+            vehicleController.injectVehicle(car);
+            vehicleController.trackVehicle("View #0",car.getId());
+            System.out.println("add a car: " + car.getId());
+            /*conn.do_job_set(Vehicle.add(idf, "car", "route1", 0, 0.0, 1.0, lane1)); //Fügt Lastwagen hinzu. ACHTUNG: VehicleType "ev"/"tr" muss in dem .rou.xml File definiert werden.
+            conn.do_job_set(Gui.trackVehicle("View #0", idf));*/
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+    }
+    //same story as with spawnVehicle
+    public void getVehicleSpeed(){
+        String idf = "id" + id;
+        try {
+            if (vehicleController.getIds().contains(idf)){
+                System.out.println("Current Speed of vehicle " + idf + " is: " + vehicleController.getVehicleSpeed(idf));
+            }
+            else {
+                System.out.println("Error: No car inserted yet / inserted car left the simulation!");
+            }
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+
+    }
 
     public VehicleController getVehicleController(){
         return vehicleController;

@@ -13,7 +13,7 @@
 
 <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="660.0" prefWidth="1085.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.guifx.GUI">
    <children>
-      <Button alignment="CENTER" layoutX="82.0" layoutY="51.0" mnemonicParsing="false" onAction="#InsertCar" prefHeight="59.0" prefWidth="137.0" text="Insert Car" textAlignment="CENTER">
+      <Button alignment="CENTER" layoutX="82.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandSpawnVehicle" prefHeight="59.0" prefWidth="137.0" text="Insert Car" textAlignment="CENTER">
          <graphic>
             <ImageView fitHeight="33.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -51,7 +51,7 @@
             <Font name="System Italic" size="10.0" />
          </font>
       </Label>
-      <Button layoutX="240.0" layoutY="51.0" mnemonicParsing="false" onAction="#getCarSpeed" prefHeight="59.0" prefWidth="137.0" text="Get Speed">
+      <Button layoutX="240.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandGetVehicleSpeed" prefHeight="59.0" prefWidth="137.0" text="Get Speed">
          <graphic>
             <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                <image>

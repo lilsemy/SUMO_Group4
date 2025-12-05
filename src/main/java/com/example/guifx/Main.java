@@ -29,8 +29,8 @@ public class Main extends Application {
         GUI gui = fxmlLoader.getController();
 
         SimulationController simController = new SimulationController();
-        gui.setVehiclesManager(simController.getVehicleController());
-        // Connection.makeConnection(controller);
+        gui.setSimulationController(simController);
+        simController.makeConnection();
     }
 
 
