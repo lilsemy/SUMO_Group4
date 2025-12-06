@@ -4,9 +4,7 @@ import org.eclipse.sumo.libtraci.Vehicle;
 import org.eclipse.sumo.libtraci.GUI;
 import org.eclipse.sumo.libtraci.TraCIPosition;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.List;
+import java.util.*;
 
 /**
     *VehicleController is one of the sub controller classes that controls the vehicles in the simulation
