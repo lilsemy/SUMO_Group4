@@ -7,7 +7,7 @@ package com.example.guifx;
 public class MapSumoConfig {
     private MapSumoConfig(){ } // no default constructor .. not changeable
 
-    public static final String sumo_bin = "sumo-gui";
+    public static final String SUMO_BIN = "sumo-gui";
     // The SUMO binary (can be "sumo" or "sumo-gui")
     public static final String config_file = "src/main/resources/com/example/guifx/SumoConfig/SumoTest.sumocfg";
     //This file defines the network, routes, and simulation parameters.
