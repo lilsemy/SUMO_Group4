@@ -26,9 +26,9 @@ public class SumoConnection {
 
         StringVector args = new StringVector(new String[]{
             MapSumoConfig.SUMO_BIN,
-            "-c",MapSumoConfig.config_file,
+            "-c",MapSumoConfig.CONFIG_FILE,
             "--start",
-            "--step-length",String.valueOf(MapSumoConfig.step_length)});
+            "--step-length",String.valueOf(MapSumoConfig.STEP_LENGTH)});
         //,"--time-to-teleport", "-1"
         Simulation.start(args);
         connected = true;
