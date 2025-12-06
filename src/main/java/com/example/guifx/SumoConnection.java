@@ -25,7 +25,7 @@ public class SumoConnection {
         Simulation.preloadLibraries();
 
         StringVector args = new StringVector(new String[]{
-            MapSumoConfig.sumo_bin,
+            MapSumoConfig.SUMO_BIN,
             "-c",MapSumoConfig.config_file,
             "--start",
             "--step-length",String.valueOf(MapSumoConfig.step_length)});
