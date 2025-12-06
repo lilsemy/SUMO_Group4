@@ -9,9 +9,9 @@ public class MapSumoConfig {
 
     public static final String SUMO_BIN = "sumo-gui";
     // The SUMO binary (can be "sumo" or "sumo-gui")
-    public static final String config_file = "src/main/resources/com/example/guifx/SumoConfig/SumoTest.sumocfg";
+    public static final String CONFIG_FILE = "src/main/resources/com/example/guifx/SumoConfig/SumoTest.sumocfg";
     //This file defines the network, routes, and simulation parameters.
-    public static final double step_length = 0.1;
+    public static final double STEP_LENGTH = 0.1;
     //time step in seconds (0.1 means 10 steps per second)
 
 
