@@ -37,8 +37,8 @@ public class SimulationController {
     public void makeConnection(){
         new Thread(() -> {
             try {
-                //Removed the statistics-bound loop, because this class should not have access to it
-                while(running){ //TODO: This is an endless loop at the moment. Better have a boolean variable set to true and a function that sets the boolean variable to false in order to stop simulation
+                
+                while(running){
                     connection.doStep();
                     //vehicleController.updateCars or similar method needs to be implemented (also for every other controller)
                 }
