@@ -39,7 +39,7 @@ public class VehicleController {
      *
      * @return List of Vehicles
      */
-    public Map<String, VehicleModel> getVehiclesList() {
+    public Map<String, VehicleModel> getVehiclesMap() {
         return vehiclesList;
     }
 

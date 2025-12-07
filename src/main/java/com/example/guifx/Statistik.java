@@ -25,7 +25,7 @@ public class Statistik {
     }
 
     public void updateVehicles(double currentTime) {
-        this.currentVehicles = simCon.getVehicleController().getVehiclesList(); //getVehicles() still needs to be implemented
+        this.currentVehicles = simCon.getVehicleController().getVehiclesMap(); //getVehicles() still needs to be implemented
 
         for (String id : currentVehicles.keySet()) {
             departureTimes.putIfAbsent(id, currentTime);
