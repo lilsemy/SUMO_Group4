@@ -1,0 +1,16 @@
+<routes>
+    <vType id="car" vClass="passenger" length="5" accel="3.5" decel="2.2" sigma="1.0" maxSpeed="10"/>
+    <route id="r1" edges="e1 e2"/>
+    <route id="r2" edges="e3 e4"/>
+    <!-- 5 xe đi từ n1 -> n3 và 5 xe đi từ n3 -> n1, đã sắp xếp theo depart tăng dần -->
+    <vehicle id="veh0" type="car" route="r1" depart="0"/>
+    <vehicle id="veh5" type="car" route="r2" depart="1"/>
+    <vehicle id="veh1" type="car" route="r1" depart="2"/>
+    <vehicle id="veh6" type="car" route="r2" depart="3"/>
+    <vehicle id="veh2" type="car" route="r1" depart="4"/>
+    <vehicle id="veh7" type="car" route="r2" depart="5"/>
+    <vehicle id="veh3" type="car" route="r1" depart="6"/>
+    <vehicle id="veh8" type="car" route="r2" depart="7"/>
+    <vehicle id="veh4" type="car" route="r1" depart="8"/>
+    <vehicle id="veh9" type="car" route="r2" depart="9"/>
+</routes>
