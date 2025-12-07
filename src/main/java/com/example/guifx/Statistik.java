@@ -14,18 +14,18 @@ import java.util.*;
 
 public class Statistik {
 
-    private final VehicleController vehicleController;
+    private final SimulationController simCon;
     
     private Map<String, VehicleModel> currentVehicles = new HashMap<>();    // All vehicles in simulation
     private Map<String, Double> departureTimes = new HashMap<>();           // Departure times of vehicles
     private Map<String, Integer> vehicleCountsPerEdge = new HashMap<>();    // Vehicles per Edge (density)
 
-    public Statistik(VehicleController vehicleController) {
-        this.vehicleController = vehicleController;
+    public Statistik(SimulationController simCon) {
+        this.simCon = simCon;
     }
 
     public void updateVehicles(double currentTime) {
-        this.currentVehicles = vehicleController.getVehicles(); //getVehicles() still needs to be implemented
+        this.currentVehicles = simCon.getVehicleController().getVehiclesList(); //getVehicles() still needs to be implemented
 
         for (String id : currentVehicles.keySet()) {
             departureTimes.putIfAbsent(id, currentTime);

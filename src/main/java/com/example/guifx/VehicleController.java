@@ -6,7 +6,7 @@ import org.eclipse.sumo.libtraci.TraCIPosition;
 
 import java.util.*;
 
-/**
+    /**
     *VehicleController is one of the sub controller classes that controls the vehicles in the simulation
     */
 
@@ -14,12 +14,12 @@ public class VehicleController {
     // for storing our vehicles in a map (dictionary);
     // key  = vehicle id
     // value = vehicle object
-    private Map<String, VehicleModel> vehicles;
+    private Map<String, VehicleModel> vehiclesList;
 
 
     //removed Connection object, because it shouldn't see it
     public VehicleController() {
-        this.vehicles = new HashMap<>();
+        this.vehiclesList = new HashMap<>();
     }
 
     
@@ -32,10 +32,17 @@ public class VehicleController {
 
         Vehicle.add(v.getId(), v.getRouteId(), v.getTypeId(),String.valueOf(v.getDepart()),String.valueOf(v.getLaneId()), String.valueOf(v.getPos()), String.valueOf(v.getSpeed()), String.valueOf(v.getLaneId()));
         // save the vehicle in our map.
-        vehicles.put(v.getId(), v);
+        vehiclesList.put(v.getId(), v);
     }
 
-    
+    /**
+     *
+     * @return List of Vehicles
+     */
+    public Map<String, VehicleModel> getVehiclesList() {
+        return vehiclesList;
+    }
+
     /**
     *@return Speed of Vehicle
     *@param id
@@ -44,7 +51,7 @@ public class VehicleController {
     public double getVehicleSpeed(String id) throws Exception {
 
         if (getIds().contains(id)){
-            return vehicles.get(id).getSpeed(); }
+            return vehiclesList.get(id).getSpeed(); }
         else {
             System.out.println("Error! Car not found!");
             return 0;
@@ -52,12 +59,13 @@ public class VehicleController {
     }
 
 
+
      /**
     *@return vehicle
     *@param id
     */
     public VehicleModel getVehicle(String id) {//what
-        return vehicles.get(id);
+        return vehiclesList.get(id);
     }
 
      /**
@@ -90,17 +98,18 @@ public class VehicleController {
             double angle = Vehicle.getAngle(id);
 
             // Get our local object OR create a new one if needed
-            VehicleModel v = vehicles.getOrDefault(id , new VehicleModel(id));
+            VehicleModel v = vehiclesList.getOrDefault(id , new VehicleModel(id));
 
             v.setSpeed(speed);
             v.setPosition(pos.getX(),pos.getY());
             v.setAngle(angle);
 
-            vehicles.put(id, v);
+            vehiclesList.put(id, v);
 
         }
 
     }
+
 }
 
 

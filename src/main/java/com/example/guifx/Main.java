@@ -32,6 +32,7 @@ public class Main extends Application {
         gui.setSimulationController(simController);
         simController.makeConnection();
 
+        Statistik stat = new Statistik(simController);
     }
 
 
