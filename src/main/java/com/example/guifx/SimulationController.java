@@ -16,6 +16,8 @@ public class SimulationController {
     //private final TrafficLightController tlController;
     //private final EdgeController edgeController;
 
+    private volatile boolean running = true;   // starts true (volatile booleans have multi-thread visibility)
+
     private int id = 0; //temporarily stores IDs of cars, probably needs to move elsewhere in the future
     /**
     *
@@ -36,7 +38,7 @@ public class SimulationController {
         new Thread(() -> {
             try {
                 //Removed the statistics-bound loop, because this class should not have access to it
-                while(true){ //TODO: This is an endless loop at the moment. Better have a boolean variable set to true and a function that sets the boolean variable to false in order to stop simulation
+                while(running){ //TODO: This is an endless loop at the moment. Better have a boolean variable set to true and a function that sets the boolean variable to false in order to stop simulation
                     connection.doStep();
                     //vehicleController.updateCars or similar method needs to be implemented (also for every other controller)
                 }
@@ -49,6 +51,23 @@ public class SimulationController {
                 connection.close();
             }
         }).start();
+    }
+
+    /**
+     * Stops the simulation loop cleanly.
+     */
+    public void stopSimulation() {
+        running = false;     // loop ends naturally
+    }
+
+    /**
+     * Restarts the simulation loop after stopping.
+     */
+    public void startSimulation() {
+        if (running) return; // already running
+
+        running = true;
+        makeConnection();    // start new thread
     }
 
     //Originally in GUI, but created a new abstraction, since the GUI should only see the main controller
