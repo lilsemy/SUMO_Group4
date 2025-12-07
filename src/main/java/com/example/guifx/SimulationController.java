@@ -57,7 +57,7 @@ public class SimulationController {
      * Stops the simulation loop cleanly.
      */
     public void stopSimulation() {
-        running = false;     // loop ends naturally
+        running = false;     // shutdown simulation
     }
 
     /**
