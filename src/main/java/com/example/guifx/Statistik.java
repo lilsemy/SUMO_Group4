@@ -19,6 +19,7 @@ public class Statistik {
     private Map<String, Integer> vehicleCountsPerEdge = new HashMap<>();    // Vehicles per Edge (density)
 
     // Interface for Controller -> both vehicles and current simulation time will be passed from outside
+    //TODO: from push to pull
     public void updateVehicles(Map<String, VehicleState> vehicles, double currentTime) {
         this.currentVehicles = new HashMap<>(vehicles);
 
@@ -89,3 +90,4 @@ public class Statistik {
     System.out.println("Travel times (for vehicles that have left the simulation): " + calculateTravelTimes(currentTime));
     }
 }
+
