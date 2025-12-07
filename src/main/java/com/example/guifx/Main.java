@@ -31,6 +31,7 @@ public class Main extends Application {
         SimulationController simController = new SimulationController();
         gui.setSimulationController(simController);
         simController.makeConnection();
+
     }
 
 

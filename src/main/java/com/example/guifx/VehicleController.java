@@ -14,7 +14,7 @@ public class VehicleController {
     // for storing our vehicles in a map (dictionary);
     // key  = vehicle id
     // value = vehicle object
-    private Map<String, VehicleState> vehicles;
+    private Map<String, VehicleModel> vehicles;
 
 
     //removed Connection object, because it shouldn't see it
@@ -28,7 +28,7 @@ public class VehicleController {
     *@param v
     *@throws Exception
     */
-    public void injectVehicle(VehicleState v) throws Exception {
+    public void injectVehicle(VehicleModel v) throws Exception {
 
         Vehicle.add(v.getId(), v.getRouteId(), v.getTypeId(),String.valueOf(v.getDepart()),String.valueOf(v.getLaneId()), String.valueOf(v.getPos()), String.valueOf(v.getSpeed()), String.valueOf(v.getLaneId()));
         // save the vehicle in our map.
@@ -44,7 +44,7 @@ public class VehicleController {
     public double getVehicleSpeed(String id) throws Exception {
 
         if (getIds().contains(id)){
-            return Vehicle.getSpeed(id); }
+            return vehicles.get(id).getSpeed(); }
         else {
             System.out.println("Error! Car not found!");
             return 0;
@@ -56,7 +56,7 @@ public class VehicleController {
     *@return vehicle
     *@param id
     */
-    public VehicleState getVehicle(String id) {//what
+    public VehicleModel getVehicle(String id) {//what
         return vehicles.get(id);
     }
 
@@ -90,7 +90,7 @@ public class VehicleController {
             double angle = Vehicle.getAngle(id);
 
             // Get our local object OR create a new one if needed
-            VehicleState v = vehicles.getOrDefault(id , new VehicleState(id));
+            VehicleModel v = vehicles.getOrDefault(id , new VehicleModel(id));
 
             v.setSpeed(speed);
             v.setPosition(pos.getX(),pos.getY());
@@ -99,8 +99,6 @@ public class VehicleController {
             vehicles.put(id, v);
 
         }
-
-
 
     }
 }

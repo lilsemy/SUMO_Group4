@@ -81,7 +81,7 @@ public class SimulationController {
         try {
             //band-aid solution, only the vehicleController should create new Vehicle objects, not the main controller.
             //needs to be redone in VehicleController class
-            VehicleState car = new VehicleState(idf,"car","route1",lane1);
+            VehicleModel car = new VehicleModel(idf,"car","route1",lane1);
             vehicleController.injectVehicle(car);
             vehicleController.trackVehicle("View #0",car.getId());
             System.out.println("add a car: " + car.getId());

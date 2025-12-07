@@ -14,13 +14,13 @@ import java.util.*;
 
 public class Statistik {
 
-    private Map<String, VehicleState> currentVehicles = new HashMap<>();    // All vehicles in simulation
+    private Map<String, VehicleModel> currentVehicles = new HashMap<>();    // All vehicles in simulation
     private Map<String, Double> departureTimes = new HashMap<>();           // Departure times of vehicles
     private Map<String, Integer> vehicleCountsPerEdge = new HashMap<>();    // Vehicles per Edge (density)
 
     // Interface for Controller -> both vehicles and current simulation time will be passed from outside
     //TODO: from push to pull
-    public void updateVehicles(Map<String, VehicleState> vehicles, double currentTime) {
+    public void updateVehicles(Map<String, VehicleModel> vehicles, double currentTime) {
         this.currentVehicles = new HashMap<>(vehicles);
 
         for (String id : vehicles.keySet()) {
@@ -36,7 +36,7 @@ public class Statistik {
         if (currentVehicles.isEmpty()) return 0;
 
         double sum = 0;
-        for (VehicleState v : currentVehicles.values()) {
+        for (VehicleModel v : currentVehicles.values()) {
             sum += v.getSpeed();
         }
         return sum / currentVehicles.size();
@@ -48,7 +48,7 @@ public class Statistik {
 
     public void updateVehicleDensity() {
         vehicleCountsPerEdge.clear();
-        for (VehicleState v : currentVehicles.values()) {
+        for (VehicleModel v : currentVehicles.values()) {
             String edgeId = v.getLaneId() + "";
             vehicleCountsPerEdge.putIfAbsent(edgeId, 0);
             vehicleCountsPerEdge.put(edgeId, vehicleCountsPerEdge.get(edgeId) + 1);
