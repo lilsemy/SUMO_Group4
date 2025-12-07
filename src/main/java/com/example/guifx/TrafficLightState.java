@@ -4,14 +4,14 @@ package com.example.guifx;
  * TrafficLightState is a model class for Traffic Lights
  */
 
-public class TrafficLightState {
+public class TrafficLightModel {
     private String id;
     private int duration;
     private char state;
     private int minDur;
     private int maxDur;
 
-    public TrafficLightState(){}
+    public TrafficLightModel(){}
 
     public String getId(){return id;}
     public char getState(String id){return state;}
