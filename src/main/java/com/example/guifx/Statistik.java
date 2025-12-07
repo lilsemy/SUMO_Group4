@@ -14,16 +14,20 @@ import java.util.*;
 
 public class Statistik {
 
+    private final VehicleController vehicleController;
+    
     private Map<String, VehicleModel> currentVehicles = new HashMap<>();    // All vehicles in simulation
     private Map<String, Double> departureTimes = new HashMap<>();           // Departure times of vehicles
     private Map<String, Integer> vehicleCountsPerEdge = new HashMap<>();    // Vehicles per Edge (density)
 
-    // Interface for Controller -> both vehicles and current simulation time will be passed from outside
-    //TODO: from push to pull
-    public void updateVehicles(Map<String, VehicleModel> vehicles, double currentTime) {
-        this.currentVehicles = new HashMap<>(vehicles);
+    public Statistik(VehicleController vehicleController) {
+        this.vehicleController = vehicleController;
+    }
 
-        for (String id : vehicles.keySet()) {
+    public void updateVehicles(double currentTime) {
+        this.currentVehicles = vehicleController.getVehicles(); //getVehicles() still needs to be implemented
+
+        for (String id : currentVehicles.keySet()) {
             departureTimes.putIfAbsent(id, currentTime);
         }
     }
@@ -90,4 +94,5 @@ public class Statistik {
     System.out.println("Travel times (for vehicles that have left the simulation): " + calculateTravelTimes(currentTime));
     }
 }
+
 
