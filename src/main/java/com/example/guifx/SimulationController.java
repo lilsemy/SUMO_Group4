@@ -50,29 +50,6 @@ public class SimulationController {
             }
         }).start();
     }
-//old method, feel free to delete
-//    public  void makeConnection()  {
-//        new Thread(() -> {
-//            /**
-//            *
-//            *@throws Exception
-//            */
-//            try {
-//                Statistik stat = new Statistik();
-//                connection.doStep();
-//                stat.setVehicleIds(vehicleController);
-//
-//                do {
-//                    connection.doStep();
-//                } while (stat.getCars() > 0);
-//
-//                connection.close();
-//            } catch (Exception ex) {
-//                ex.printStackTrace();
-//            }
-//        }).start();
-//
-//    }
 
     //Originally in GUI, but created a new abstraction, since the GUI should only see the main controller
     public void spawnVehicle(){
