@@ -28,8 +28,9 @@ public class SumoConnection {
             MapSumoConfig.SUMO_BIN,
             "-c",MapSumoConfig.CONFIG_FILE,
             "--start",
-            "--step-length",String.valueOf(MapSumoConfig.STEP_LENGTH)});
-        //,"--time-to-teleport", "-1"
+            "--step-length",String.valueOf(MapSumoConfig.STEP_LENGTH),
+                "--time-to-teleport", "-1"});
+
         Simulation.start(args);
         connected = true;
     }

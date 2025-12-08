@@ -38,6 +38,11 @@ public class GUI {
         simController.getVehicleSpeed();
     }
 
+    public void commandChangePhase(ActionEvent e){
+        System.out.println("Changing TrafficLight Phase!");
+        simController.changePhase();
+    }
+
 }
 
 

@@ -46,9 +46,9 @@
     </edge>
 
     <tlLogic id="n2" type="static" programID="0" offset="0">
-        <phase duration="80" state="GG"/>
+        <phase duration="8000000" state="GG"/>
         <phase duration="10"  state="yy"/>
-        <phase duration="50"  state="rr"/>
+        <phase duration="5000000"  state="rr"/>
     </tlLogic>
 
     <junction id="n1" type="priority" x="0.00" y="0.00" incLanes="e4_0" intLanes=":n1_0_0" shape="0.00,0.00 0.00,3.20 0.00,0.00">

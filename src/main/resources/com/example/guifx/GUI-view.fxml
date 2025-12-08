@@ -60,5 +60,14 @@
             </ImageView>
          </graphic>
       </Button>
+      <Button layoutX="398.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandChangePhase" prefHeight="59.0" prefWidth="137.0" text="ChangePhase">
+         <graphic>
+            <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@trafficlight.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
    </children>
 </AnchorPane>

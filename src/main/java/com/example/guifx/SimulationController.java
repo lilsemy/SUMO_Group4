@@ -12,8 +12,10 @@ public class SimulationController {
     }
 
     private final VehicleController vehicleController;
+
+    private final TrafficLightController tlController;
+
     //TODO
-    //private final TrafficLightController tlController;
     //private final EdgeController edgeController;
 
     private volatile boolean running = true;   // starts true (volatile booleans have multi-thread visibility)
@@ -28,6 +30,7 @@ public class SimulationController {
         this.connection.connect();
 
         vehicleController = new VehicleController();
+        tlController = new TrafficLightController();
         //makeConnection(); happens in main
     }
     /**
@@ -106,6 +109,10 @@ public class SimulationController {
             throw new RuntimeException(ex);
         }
 
+    }
+
+    public void changePhase(){
+        tlController.changePhase();
     }
 
     public VehicleController getVehicleController(){
