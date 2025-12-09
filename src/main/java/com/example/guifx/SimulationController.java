@@ -40,12 +40,14 @@ public class SimulationController {
                     //vehicleController.updateCars or similar method needs to be implemented (also for every other controller)
                 }
             } catch (Exception e) {
-                //eventually we need better error handling, fine for now
-                e.printStackTrace();
+                System.err.println("Error during simulation step: " + stepEx.getMessage());
+                stepEx.printStackTrace();
+                // Optionally: pause simulation or notify GUI
+                running = false;
             } finally {
                 //the finally block ALWAYS executes: if try finishes; catch triggers or not; exception is thrown
-                //It closes the thread cleanly, whatever happens. So no zombie simulation, leaky sumo process, or left open library
                 connection.close();
+                System.out.println("Simulation stopped cleanly.");
             }
         }).start();
     }
