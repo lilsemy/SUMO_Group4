@@ -116,6 +116,11 @@ public class Statistik {
      * Testing purposes -> Prints all statistics data.
      */
     public void printAllStatistics(double currentTime) {
+    
+    updateVehicles(currentTime);
+    updateVehicleDensity();
+    updateTrafficLights();    
+        
     System.out.println("=== Simulation Statistics ===");
     System.out.println("Total vehicles: " + currentVehicles.size());
     System.out.println("Average speed: " + getAverageSpeed() + " m/s");
@@ -124,3 +129,4 @@ public class Statistik {
     System.out.println("Traffic lights count per color: " + currentTrafficLightStates);
     }
 }
+
