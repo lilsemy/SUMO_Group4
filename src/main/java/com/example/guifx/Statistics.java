@@ -71,9 +71,12 @@ public class Statistics {
         Map<String, Double> travelTimes = new HashMap<>();
         List<String> finishedVehicles = new ArrayList<>();
 
-        for (String vehicleId : departureTimes.keySet()) {
+        for (Map.Entry<String, Double> entry : departureTimes.entrySet()) {
+            String vehicleId = entry.getKey();
+            double departureTime = entry.getValue();
+
             if (!currentVehicles.containsKey(vehicleId)) {
-                double travelTime = currentTime - departureTimes.get(vehicleId);
+                double travelTime = currentTime - departureTime;
                 travelTimes.put(vehicleId, travelTime);
                 finishedVehicles.add(vehicleId);
             }
