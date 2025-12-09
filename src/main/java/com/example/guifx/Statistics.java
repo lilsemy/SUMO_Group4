@@ -22,7 +22,6 @@ public class Statistics {
     private Map<String, Integer> vehicleCountsPerEdge = new HashMap<>();    // Vehicles per Edge (density)
 
     // Traffic Light Data Structure
-    private Map<String, TrafficLightModel> currentTrafficLights = new HashMap<>(); // All Traffic Lights
     private Map<String, Integer> currentTrafficLightStates = new HashMap<>(); // Count of Traffic lights per phase
     
     public Statistics(SimulationController simCon) {
@@ -92,15 +91,16 @@ public class Statistics {
     * Fetches the current state of all traffic lights from the simulation and counts how many are currently red, yellow, or green
     */
     public void updateTrafficLights() {
-    
-    this.currentTrafficLights = simCon.getTlController().getTlList();
+    Map<String, TrafficLightModel> currentTrafficLights;
+
+    currentTrafficLights = simCon.getTlController().getTlList();
 
     Map<String, Integer> counts = new HashMap<>();
     counts.put("R", 0);
     counts.put("Y", 0);
     counts.put("G", 0);
 
-    for (TrafficLightModel tl : this.currentTrafficLights.values()) {
+    for (TrafficLightModel tl : currentTrafficLights.values()) {
         String state = tl.getRedYellowGreenState().toUpperCase();
 
         if (state.contains("R")) counts.put("R", counts.get("R") + 1);
