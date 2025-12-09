@@ -6,13 +6,7 @@ package com.example.guifx;
 
 public class SimulationController {
     private final SumoConnection connection;
-
-    public SumoConnection getConnection() {
-        return connection;
-    }
-
     private final VehicleController vehicleController;
-
     private final TrafficLightController tlController;
 
     //TODO
@@ -117,6 +111,13 @@ public class SimulationController {
 
     public VehicleController getVehicleController(){
         return vehicleController;
+    }
+
+    public TrafficLightController getTlController() {
+        return tlController;
+    }
+    public SumoConnection getConnection() {
+        return connection;
     }
 
 }
