@@ -15,15 +15,23 @@ import java.util.*;
 public class Statistik {
 
     private final SimulationController simCon;
-    
+
+    //Vehicle Data Structure
     private Map<String, VehicleModel> currentVehicles = new HashMap<>();    // All vehicles in simulation
     private Map<String, Double> departureTimes = new HashMap<>();           // Departure times of vehicles
     private Map<String, Integer> vehicleCountsPerEdge = new HashMap<>();    // Vehicles per Edge (density)
 
+    // Traffic Light Data Structure
+    private Map<String, TrafficLightModel> currentTrafficLights = new HashMap<>(); // All Traffic Lights
+    private Map<String, Integer> currentTrafficLightStates = new HashMap<>(); // Count of Traffic lights per phase
+    
     public Statistik(SimulationController simCon) {
         this.simCon = simCon;
     }
 
+    /**
+    * Refresh vehicles list at a point in time of simulation
+    */
     public void updateVehicles(double currentTime) {
         this.currentVehicles = simCon.getVehicleController().getVehiclesMap(); //getVehicles() still needs to be implemented
 
@@ -35,7 +43,6 @@ public class Statistik {
     /**
      * Calculates global average speed of all vehicles.
      */
-
     public double getAverageSpeed() {
         if (currentVehicles.isEmpty()) return 0;
 
@@ -47,9 +54,8 @@ public class Statistik {
     }
 
     /**
-     * Calculates how man vehicles there are per edge
+     * Calculates how many vehicles there are per edge
      */
-
     public void updateVehicleDensity() {
         vehicleCountsPerEdge.clear();
         for (VehicleModel v : currentVehicles.values()) {
@@ -62,7 +68,6 @@ public class Statistik {
     /**
      * Calculates travel times for vehicles that have left the simulation
      */
-
     public Map<String, Double> calculateTravelTimes(double currentTime) {
         Map<String, Double> travelTimes = new HashMap<>();
         List<String> finishedVehicles = new ArrayList<>();
@@ -84,6 +89,30 @@ public class Statistik {
     }
 
     /**
+    * Fetches the current state of all traffic lights from the simulation and counts how many are currently red, yellow, or green
+    */
+    public void updateTrafficLights() {
+    
+    this.currentTrafficLights = simCon.getTrafficLightController().getTlList();
+
+    Map<String, Integer> counts = new HashMap<>();
+    counts.put("R", 0);
+    counts.put("Y", 0);
+    counts.put("G", 0);
+
+    for (TrafficLightModel tl : this.currentTrafficLights.values()) {
+        String state = tl.getRedYellowGreenState().toUpperCase();
+
+        if (state.contains("R")) counts.put("R", counts.get("R") + 1);
+        if (state.contains("Y")) counts.put("Y", counts.get("Y") + 1);
+        if (state.contains("G")) counts.put("G", counts.get("G") + 1);
+        }
+
+    this.currentTrafficLightStates = counts;
+    }
+
+
+    /**
      * Testing purposes -> Prints all statistics data.
      */
     public void printAllStatistics(double currentTime) {
@@ -92,7 +121,6 @@ public class Statistik {
     System.out.println("Average speed: " + getAverageSpeed() + " m/s");
     System.out.println("Vehicle density per edge: " + vehicleCountsPerEdge);
     System.out.println("Travel times (for vehicles that have left the simulation): " + calculateTravelTimes(currentTime));
+    System.out.println("Traffic lights count per color: " + currentTrafficLightStates);
     }
 }
-
-
