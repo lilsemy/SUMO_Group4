@@ -13,46 +13,38 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="660.0" prefWidth="1085.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.guifx.GUI">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" 
+            prefHeight="660.0" prefWidth="1085.0" 
+            styleClass="anchor-pane"
+            stylesheets="@simulation-style.css"
+            xmlns="http://javafx.com/javafx/25" 
+            xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.example.guifx.GUI">
    <children>
-      <Button alignment="CENTER" layoutX="82.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandSpawnVehicle" prefHeight="59.0" prefWidth="137.0" text="Insert Car" textAlignment="CENTER">
+      <!-- Simulation Controls Section -->
+      <Label layoutX="82.0" layoutY="14.0" styleClass="label-title" text="Simulation Controls:" 
+             AnchorPane.leftAnchor="82.0" AnchorPane.topAnchor="14.0" />
+      
+      <!-- Control Buttons -->
+      <Button alignment="CENTER" layoutX="82.0" layoutY="51.0" 
+              mnemonicParsing="false" onAction="#commandSpawnVehicle" 
+              prefHeight="59.0" prefWidth="137.0" 
+              text="Insert Car" textAlignment="CENTER"
+              AnchorPane.leftAnchor="82.0" AnchorPane.topAnchor="51.0">
          <graphic>
             <ImageView fitHeight="33.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@proxy-image.png" />
                </image>
             </ImageView>
-         </graphic></Button>
-      <LineChart layoutX="752.0" layoutY="202.0" prefHeight="230.0" prefWidth="306.0" AnchorPane.rightAnchor="27.0" AnchorPane.topAnchor="202.0">
-        <xAxis>
-          <CategoryAxis side="BOTTOM" />
-        </xAxis>
-        <yAxis>
-          <NumberAxis side="LEFT" />
-        </yAxis>
-      </LineChart>
-      <Label layoutX="768.0" layoutY="191.0" text="Car Speed (last 30sec.)" AnchorPane.rightAnchor="180.0" AnchorPane.topAnchor="191.0" />
-      <Label layoutX="82.0" layoutY="14.0" text="Simulation Controls:">
-         <font>
-            <Font name="System Bold" size="24.0" />
-         </font>
-      </Label>
-      <Label layoutX="82.0" layoutY="121.0" text="Live Simulation (Mock¹):">
-         <font>
-            <Font name="System Bold" size="24.0" />
-         </font>
-      </Label>
-      <Label layoutX="768.0" layoutY="156.0" text="Statistics:" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="156.0">
-         <font>
-            <Font name="System Bold" size="24.0" />
-         </font>
-      </Label>
-      <Label layoutX="82.0" layoutY="628.0" text="¹Rendering of Live Simulation is currently handled by the SUMO-GUI, which opens at start." AnchorPane.bottomAnchor="17.0" AnchorPane.leftAnchor="82.0" AnchorPane.rightAnchor="604.0">
-         <font>
-            <Font name="System Italic" size="10.0" />
-         </font>
-      </Label>
-      <Button layoutX="240.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandGetVehicleSpeed" prefHeight="59.0" prefWidth="137.0" text="Get Speed">
+         </graphic>
+      </Button>
+      
+      <Button layoutX="240.0" layoutY="51.0" 
+              mnemonicParsing="false" onAction="#commandGetVehicleSpeed" 
+              prefHeight="59.0" prefWidth="137.0" 
+              text="Get Speed"
+              AnchorPane.leftAnchor="240.0" AnchorPane.topAnchor="51.0">
          <graphic>
             <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -61,7 +53,12 @@
             </ImageView>
          </graphic>
       </Button>
-      <Button layoutX="398.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandChangePhase" prefHeight="59.0" prefWidth="137.0" text="ChangePhase">
+      
+      <Button layoutX="398.0" layoutY="51.0" 
+              mnemonicParsing="false" onAction="#commandChangePhase" 
+              prefHeight="59.0" prefWidth="137.0" 
+              text="ChangePhase"
+              AnchorPane.leftAnchor="398.0" AnchorPane.topAnchor="51.0">
          <graphic>
             <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -70,13 +67,53 @@
             </ImageView>
          </graphic>
       </Button>
-      <StackPane id="mapContainer" fx:id="mapContainer" layoutX="82.0" layoutY="161.0" prefHeight="456.0" prefWidth="669.0" AnchorPane.bottomAnchor="43.0" AnchorPane.leftAnchor="82.0" AnchorPane.rightAnchor="334.0" AnchorPane.topAnchor="161.0" style="-fx-background-color: white; -fx-border-color: lightgrey;">
+      
+      <!-- Live Simulation Section -->
+      <Label layoutX="82.0" layoutY="121.0" styleClass="label-section" text="Live Simulation (Mock¹):"
+             AnchorPane.leftAnchor="82.0" AnchorPane.topAnchor="121.0" />
+      
+      <!-- Map Container with Layers -->
+      <StackPane fx:id="mapContainer" 
+                 layoutX="82.0" layoutY="161.0" 
+                 prefHeight="456.0" prefWidth="669.0" 
+                 AnchorPane.bottomAnchor="43.0" 
+                 AnchorPane.leftAnchor="82.0" 
+                 AnchorPane.rightAnchor="334.0" 
+                 AnchorPane.topAnchor="161.0">
          <children>
-            <Canvas id="backgroundCanvas" fx:id="backgroundCanvas" height="456.0" width="669.0" />
-            <Pane id="carLayer" fx:id="carLayer" prefHeight="456.0" prefWidth="669.0" />
-            <Pane id="trafficLightLayer" fx:id="trafficLightLayer" prefHeight="456.0" prefWidth="669.0" />
-            <Pane id="laneLayer" fx:id="laneLayer" prefHeight="456.0" prefWidth="669.0" />
+            <Canvas fx:id="backgroundCanvas" height="456.0" width="669.0" />
+            <Pane fx:id="laneLayer" prefHeight="456.0" prefWidth="669.0" />
+            <Pane fx:id="trafficLightLayer" prefHeight="456.0" prefWidth="669.0" />
+            <Pane fx:id="carLayer" prefHeight="456.0" prefWidth="669.0" />
+
          </children>
       </StackPane>
+      
+      <!-- Footer Note -->
+      <Label layoutX="82.0" layoutY="628.0" styleClass="label-note"
+             text="¹Rendering of Live Simulation is currently handled by the SUMO-GUI, which opens at start." 
+             AnchorPane.bottomAnchor="17.0" 
+             AnchorPane.leftAnchor="82.0" 
+             AnchorPane.rightAnchor="604.0" />
+      
+      <!-- Statistics Section -->
+      <Label layoutX="768.0" layoutY="156.0" styleClass="label-section" text="Statistics:" 
+             AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="156.0" />
+      
+      <Label layoutX="768.0" layoutY="191.0" styleClass="label-stat" text="Car Speed (last 30sec.)" 
+             AnchorPane.rightAnchor="180.0" AnchorPane.topAnchor="191.0" />
+      
+      <!-- Chart -->
+      <LineChart layoutX="752.0" layoutY="202.0" 
+                 prefHeight="230.0" prefWidth="306.0" 
+                 styleClass="chart"
+                 AnchorPane.rightAnchor="27.0" AnchorPane.topAnchor="202.0">
+        <xAxis>
+          <CategoryAxis side="BOTTOM" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis side="LEFT" />
+        </yAxis>
+      </LineChart>
    </children>
 </AnchorPane>
