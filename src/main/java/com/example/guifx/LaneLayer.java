@@ -1,4 +1,4 @@
-package novik;
+package com.example.guifx;
 
 // Import Point2D for 2D coordinates (x, y)
 // Import Point2D cho tọa độ 2 chiều (x, y)
@@ -17,7 +17,7 @@ import javafx.scene.shape.Polyline;
 import org.eclipse.sumo.libtraci.*;
 // Import MapUtil for coordinate transforms (was MapGraphics)
 // Import novik.MapUtil để chuyển đổi tọa độ (trước đây là MapGraphics)
-import novik.MapUtil;
+//import novik.MapUtil;
 
 // Import ArrayList and List for collections
 // Import ArrayList và List để quản lý danh sách

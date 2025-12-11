@@ -32,7 +32,25 @@ public class SimulationController {
     */
 
     public void makeConnection(){
-        new Thread(() -> {
+        /*
+         * EXPLANATION (Why this is commented out):
+         * Originally, this method started a separate background Thread to run the
+         * simulation loop continuously.
+         * However, when rendering the simulation in JavaFX (the GUI), we must update
+         * the screen on the "JavaFX Application Thread".
+         * If we have a background thread like this running 'while(running)', it often
+         * runs too fast or desynchronized from the screen refresh rate (60fps).
+         * Worse, updating UI elements from this background thread would cause
+         * "Not on FX Application Thread" errors.
+         *
+         * SOLUTION:
+         * We disable this loop. Instead, the 'GUI' class controls the loop using an
+         * 'AnimationTimer'.
+         * The GUI calls 'singleStep()' once per frame. This ensures the simulation
+         * advances exactly one step before we try to draw it.
+         */
+
+        /*new Thread(() -> {
             try {
                 
                 while(running){
@@ -40,8 +58,8 @@ public class SimulationController {
                     //vehicleController.updateCars or similar method needs to be implemented (also for every other controller)
                 }
             } catch (Exception e) {
-                System.err.println("Error during simulation step: " + stepEx.getMessage());
-                stepEx.printStackTrace();
+                //System.err.println("Error during simulation step: " + stepEx.getMessage());
+                //stepEx.printStackTrace();
                 // Optionally: pause simulation or notify GUI
                 running = false;
             } finally {
@@ -49,7 +67,19 @@ public class SimulationController {
                 connection.close();
                 System.out.println("Simulation stopped cleanly.");
             }
-        }).start();
+        }).start();*/
+    }
+    /**
+     * EXPLANATION:
+     * This method advances the simulation by exactly one step (0.05s).
+     * It is called by the GUI's AnimationTimer loop.
+     * Useing this instead of the while-loop in makeConnection so the GUI stays
+     * responsive and synchronized.
+     */
+    public void singleStep() throws Exception{
+        if (running && connection.isConnected()){
+            connection.doStep();
+        }
     }
 
     /**

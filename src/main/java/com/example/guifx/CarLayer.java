@@ -1,4 +1,4 @@
-package novik;
+package com.example.guifx;
 
 // Import 2D point class from JavaFX for x, y coordinates
 // Import tọa độ x y từ JavaFX
@@ -22,7 +22,7 @@ import javafx.scene.image.ImageView;
 // Xử lí danh sách
 import java.util.*;
 // Import MapUtil for coordinate transforms (was MapGraphics)
-import novik.MapUtil;
+//import novik.MapUtil;
 
 
 public class CarLayer {
@@ -40,6 +40,7 @@ public class CarLayer {
     // Constructor: receives the Pane where cars will be displayed
     // Hàm khởi tạo: nhận Pane để hiển thị xe
     CarLayer(Pane carLayerPane) {
+
         carImageViews = new HashMap<>();
         this.carLayerPane = carLayerPane;
         // If carLayerPane is null, clear its children (defensive, but should not happen)
@@ -51,13 +52,25 @@ public class CarLayer {
     // Load the car image from resources
     // Load hình xe từ thư mục resources
     private Image loadCarImage() {
-        String absolutePath = getClass().getResource("/carblack.png").toExternalForm();
-        Image img = new Image(absolutePath);
-        return img;
-    }     
+
+        // problem ...
+        String resourcePath = "/carblack.png";
+        try {
+            String absolutePath = getClass().getResource(resourcePath).toExternalForm();
+            Image img = new Image(absolutePath);
+            return img;
+        } catch (NullPointerException e) {
+            System.err.println("Failed to load image: " + resourcePath);
+            return null;
+        }
+    }
     // Create a new car appearance and add it to the pane
     // Tạo hình xe mới và thêm vào pane
     private void createCarImageView(String carID) {
+            // problem
+        if (carImage  == null) {
+            return;}
+
         ImageView carView = new ImageView(carImage);
         carView.setFitWidth(15);
         carView.setFitHeight(30);

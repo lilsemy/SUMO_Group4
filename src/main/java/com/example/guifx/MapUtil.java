@@ -1,4 +1,4 @@
-package novik;
+package com.example.guifx;
 
 // Import Point2D for 2D coordinates (x, y)
 // Import Point2D cho tọa độ 2 chiều (x, y)

@@ -76,7 +76,8 @@ public class VehicleController {
     public void trackVehicle(String viwId, String vehId) throws Exception {
 
         if (getIds().contains(vehId)){
-            GUI.trackVehicle(viwId, vehId);
+            //problem
+            //GUI.trackVehicle(viwId, vehId);
         }
         else {
             System.out.println("Warning! Car left the Map or was deleted.");
