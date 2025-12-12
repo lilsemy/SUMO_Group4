@@ -30,9 +30,20 @@ public class VehicleController {
     */
     public void injectVehicle(VehicleModel v) throws Exception {
 
-        Vehicle.add(v.getId(), v.getRouteId(), v.getTypeId(),String.valueOf(v.getDepart()),String.valueOf(v.getLaneId()), String.valueOf(v.getPos()), String.valueOf(v.getSpeed()), String.valueOf(v.getLaneId()));
+        try {
+        Vehicle.add(v.getId(), v.getRouteId(), v.getTypeId(),
+                    String.valueOf(v.getDepart()),
+                    String.valueOf(v.getLaneId()),
+                    String.valueOf(v.getPos()),
+                    String.valueOf(v.getSpeed()),
+                    String.valueOf(v.getLaneId()));
         // save the vehicle in our map.
         vehiclesList.put(v.getId(), v);
+        System.out.println("Injected vehicle: " + v.getId());
+            
+        } catch(Exception e) {
+            System.err.println("Failed to inject vehicle " + v.getId() + ": " + e.getMessage());
+        }
     }
 
     /**
