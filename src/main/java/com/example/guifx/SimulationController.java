@@ -1,4 +1,4 @@
-package com.example.guifx.controller;
+package com.example.guifx;
 
 /**
 * SimulationController orchestrates the whole simulation
