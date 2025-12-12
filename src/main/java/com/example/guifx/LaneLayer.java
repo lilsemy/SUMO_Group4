@@ -113,4 +113,3 @@ public class LaneLayer {
         buildLanePolylines();
     }
 }
-
