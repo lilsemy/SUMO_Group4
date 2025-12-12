@@ -1,5 +1,9 @@
-package com.example.guifx;
+package com.example.guifx.controller;
 
+import com.example.guifx.util.MapUtil;
+import com.example.guifx.view.LaneLayer;
+import com.example.guifx.view.CarLayer;
+import com.example.guifx.view.TrafficLightLayer;
 import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -138,8 +142,17 @@ public class GUI {
     //Moved it to the simulation controller
     @FXML
     public void commandGetVehicleSpeed(ActionEvent e){
-        System.out.println("Fetching the speed of vehicle!");
-        simController.getVehicleSpeed();
+        String lastId = simController.getVehicleController().getLastVehicleId();
+        if (lastId != null) {
+            try {
+                double speed = simController.getVehicleController().getVehicleSpeed(lastId);
+                System.out.println("Speed of last vehicle " + lastId + ": " + speed);
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        } else {
+            System.out.println("No vehicles in simulation!");
+        }
     }
 
     public void commandChangePhase(ActionEvent e){
@@ -148,5 +161,3 @@ public class GUI {
     }
 
 }
-
-
