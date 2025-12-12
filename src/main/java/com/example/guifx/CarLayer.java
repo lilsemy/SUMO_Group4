@@ -122,15 +122,20 @@ public class CarLayer {
                 );
                 double w = carView.getFitWidth();
                 double h = carView.getFitHeight();
-                // Center the car image at the car's position
-                // Đặt hình xe sao cho tâm hình trùng với vị trí xe
-                carView.setLayoutX(javaPos.getX() - w / 2.0);
-                carView.setLayoutY(javaPos.getY() - h / 2.0);
-
                 // Get the car's angle from SUMO and rotate the image accordingly
                 // Lấy góc quay của xe từ SUMO và xoay hình xe cho đúng hướng
                 double angle = Vehicle.getAngle(carId);
                 carView.setRotate(angle);
+
+                double radAngle = Math.toRadians(angle);
+                // Calculate offset to position the car image correctly
+                // Tính toán độ lệch để đặt hình xe đúng vị trí
+                double offsetX = h / 2 * Math.sin(radAngle);
+                double offsetY = -(h / 2) * Math.cos(radAngle);
+                // Center the car image at the car's top position
+                // Đặt hình xe sao cho tâm hình trùng với vị trí đầu xe
+                carView.setLayoutX(javaPos.getX() - w / 2.0 - offsetX);
+                carView.setLayoutY(javaPos.getY() - h / 2.0 - offsetY);
             } else {
                 // 6. If the car no longer exists in SUMO, remove it from the pane and map
                 // 6. Nếu xe không còn trong mô phỏng, xóa khỏi pane và khỏi carMap
