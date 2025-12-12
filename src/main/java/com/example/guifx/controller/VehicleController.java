@@ -1,5 +1,6 @@
-package com.example.guifx;
+package com.example.guifx.controller;
 
+import com.example.guifx.model.VehicleModel;
 import org.eclipse.sumo.libtraci.Vehicle;
 import org.eclipse.sumo.libtraci.GUI;
 import org.eclipse.sumo.libtraci.TraCIPosition;

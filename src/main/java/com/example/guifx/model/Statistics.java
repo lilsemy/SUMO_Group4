@@ -1,5 +1,6 @@
-package com.example.guifx;
+package com.example.guifx.model;
 
+import com.example.guifx.controller.SimulationController;
 /*
 Controller needs to pass SUMO simulation time from outside
 import org.eclipse.sumo.libtraci.Simulation;

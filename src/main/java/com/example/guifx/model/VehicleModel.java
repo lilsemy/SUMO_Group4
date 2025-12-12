@@ -1,4 +1,4 @@
-package com.example.guifx;
+package com.example.guifx.model;
 
     /**
     *VehicleState is a model class for Vehicles in the Simulation

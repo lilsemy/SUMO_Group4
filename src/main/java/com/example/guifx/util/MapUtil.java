@@ -1,4 +1,4 @@
-package com.example.guifx;
+package com.example.guifx.util;
 
 // Import Point2D for 2D coordinates (x, y)
 // Import Point2D cho tọa độ 2 chiều (x, y)

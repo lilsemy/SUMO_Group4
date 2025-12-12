@@ -1,5 +1,6 @@
-package com.example.guifx;
+package com.example.guifx.view;
 
+import com.example.guifx.util.MapUtil;
 // Import Point2D for 2D coordinates (x, y)
 // Import Point2D cho tọa độ 2 chiều (x, y)
 import javafx.geometry.Point2D;
@@ -42,7 +43,7 @@ public class LaneLayer {
      * Must be called from Controller after FXML is loaded and MapGraphics.setup() has run.
      * Hàm này phải được gọi từ Controller sau khi FXML đã load và MapGraphics.setup() đã chạy.
      */
-    LaneLayer(Pane laneLayer) {
+    public LaneLayer(Pane laneLayer) {
         this.laneLayer = laneLayer;
         lanePolylines.clear();
         this.laneLayer.getChildren().clear();

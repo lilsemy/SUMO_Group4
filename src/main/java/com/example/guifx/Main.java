@@ -1,5 +1,8 @@
 package com.example.guifx;
 
+import com.example.guifx.controller.SimulationController;
+import com.example.guifx.model.Statistics;
+import com.example.guifx.controller.GUI;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;

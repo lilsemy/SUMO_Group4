@@ -1,10 +1,12 @@
-package com.example.guifx;
+package com.example.guifx.service;
 
+import com.example.guifx.config.MapSumoConfig;
 import org.eclipse.sumo.libtraci.Simulation;
 import org.eclipse.sumo.libtraci.StringVector;
-    /**
-    *SumoConnection is our object-oriented wrapper around the SUMO simulation.
-    */
+
+/**
+ * SumoConnection is our object-oriented wrapper around the SUMO simulation.
+ */
 public class SumoConnection {
 
     // tracking if we have a connection or not

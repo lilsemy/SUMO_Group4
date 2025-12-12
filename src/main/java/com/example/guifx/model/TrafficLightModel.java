@@ -1,4 +1,4 @@
-package com.example.guifx;
+package com.example.guifx.model;
 
 /**
  * TrafficLightState is a model class for Traffic Lights

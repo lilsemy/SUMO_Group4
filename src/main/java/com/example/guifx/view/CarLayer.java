@@ -1,5 +1,7 @@
-package com.example.guifx;
+package com.example.guifx.view;
 
+import com.example.guifx.util.MapUtil;
+import com.example.guifx.model.VehicleModel;
 // Import 2D point class from JavaFX for x, y coordinates
 // Import tọa độ x y từ JavaFX
 import javafx.geometry.Point2D;
@@ -33,47 +35,109 @@ public class CarLayer {
     // Pane để hiển thị tất cả các node xe
     private final Pane carLayerPane;
 
-    // The image used for all cars, loaded once
-    // Hình ảnh dùng cho tất cả xe, chỉ load một lần
-    private final Image carImage = loadCarImage();
+    // Images for different vehicle types
+    // Hình ảnh cho các loại xe khác nhau
+    private final Image carImage;
+    private final Image busImage;
+    private final Image truckImage;
 
     // Constructor: receives the Pane where cars will be displayed
     // Hàm khởi tạo: nhận Pane để hiển thị xe
-    CarLayer(Pane carLayerPane) {
+    public CarLayer(Pane carLayerPane) {
 
         carImageViews = new HashMap<>();
         this.carLayerPane = carLayerPane;
+        
+        // Load all vehicle images
+        // Load tất cả hình ảnh xe
+        this.carImage = loadVehicleImage("/carblack.png");
+        this.busImage = loadVehicleImage("/bus.png");
+        this.truckImage = loadVehicleImage("/truck.png");
+        
         // If carLayerPane is null, clear its children (defensive, but should not happen)
         // Nếu carLayerPane là null, xóa hết các node con (phòng trường hợp lỗi, nhưng thường không xảy ra)
         if (carLayerPane == null) {
             this.carLayerPane.getChildren().clear();
         }
     }
-    // Load the car image from resources
+    
+    // Load a vehicle image from resources
     // Load hình xe từ thư mục resources
-    private Image loadCarImage() {
-
-        // problem ...
-        String resourcePath = "/carblack.png";
+    private Image loadVehicleImage(String imagePath) {
         try {
-            String absolutePath = getClass().getResource(resourcePath).toExternalForm();
+            String absolutePath = getClass().getResource(imagePath).toExternalForm();
             Image img = new Image(absolutePath);
+            System.out.println("✅ Loaded image: " + imagePath);
             return img;
         } catch (NullPointerException e) {
-            System.err.println("Failed to load image: " + resourcePath);
+            System.err.println("❌ Failed to load image: " + imagePath);
             return null;
         }
+    }
+    
+    // Lấy hình ảnh phù hợp cho xe dựa vào loại xe (người viết dễ hiểu)
+    private Image getImageForVehicle(String vehicleId) {
+        // Lấy thông tin loại xe và nhóm xe từ SUMO
+        String typeId = Vehicle.getTypeID(vehicleId);
+        String classId = Vehicle.getVehicleClass(vehicleId);
+        String type = typeId == null ? "" : typeId.toLowerCase();
+        String vclass = classId == null ? "" : classId.toLowerCase();
+
+        // Nếu là xe buýt
+        if (vclass.contains("bus") || type.contains("bus")) {
+            if (busImage != null) return busImage;
+            // Nếu không có hình bus thì dùng hình xe con
+            return carImage;
+        }
+        // Nếu là xe tải hoặc xe kéo
+        if (vclass.contains("truck") || vclass.contains("trailer") || type.contains("truck") || type.contains("trailer")) {
+            if (truckImage != null) return truckImage;
+            return carImage;
+        }
+        // Còn lại là xe con
+        return carImage;
+    }
+
+    // Lấy kích thước phù hợp cho xe (người viết dễ hiểu)
+    private double[] getSizeForVehicle(String vehicleId) {
+        String typeId = Vehicle.getTypeID(vehicleId);
+        String classId = Vehicle.getVehicleClass(vehicleId);
+        String type = typeId == null ? "" : typeId.toLowerCase();
+        String vclass = classId == null ? "" : classId.toLowerCase();
+
+        // Nếu là bus thì to nhất
+        if (vclass.contains("bus") || type.contains("bus")) {
+            // Xe buýt: rộng 18, cao 40
+            return new double[]{18, 40};
+        }
+        // Nếu là truck hoặc trailer thì trung bình
+        if (vclass.contains("truck") || vclass.contains("trailer") || type.contains("truck") || type.contains("trailer")) {
+            // Xe tải: rộng 16, cao 35
+            return new double[]{16, 35};
+        }
+        // Xe con nhỏ nhất
+        return new double[]{15, 30};
     }
     // Create a new car appearance and add it to the pane
     // Tạo hình xe mới và thêm vào pane
     private void createCarImageView(String carID) {
-            // problem
-        if (carImage  == null) {
-            return;}
+        // Get the appropriate image for this vehicle type
+        // Lấy hình ảnh phù hợp cho loại xe này
+        Image vehicleImage = getImageForVehicle(carID);
+        
+        if (vehicleImage == null) {
+            System.err.println("❌ No image available for vehicle: " + carID);
+            return;
+        }
 
-        ImageView carView = new ImageView(carImage);
-        carView.setFitWidth(15);
-        carView.setFitHeight(30);
+        ImageView carView = new ImageView(vehicleImage);
+        
+        // Get the appropriate size for this vehicle type
+        // Lấy kích thước phù hợp cho loại xe này
+        double[] size = getSizeForVehicle(carID);
+        carView.setFitWidth(size[0]);
+        carView.setFitHeight(size[1]);
+        
         // Keep aspect ratio
         // Giữ tỷ lệ khung hình
         carView.setPreserveRatio(true);

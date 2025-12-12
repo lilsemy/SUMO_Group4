@@ -1,5 +1,7 @@
-package com.example.guifx;
+package com.example.guifx.view;
 
+import com.example.guifx.util.MapUtil;
+import com.example.guifx.model.TrafficLightModel;
 // Import Point2D for 2D coordinates (x, y)
 // Import Point2D cho tọa độ 2 chiều (x, y)
 import javafx.geometry.Point2D;

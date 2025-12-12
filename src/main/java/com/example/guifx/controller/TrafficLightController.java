@@ -1,5 +1,6 @@
-package com.example.guifx;
+package com.example.guifx.controller;
 
+import com.example.guifx.model.TrafficLightModel;
 import java.util.*;
 
 import org.eclipse.sumo.libtraci.Junction;

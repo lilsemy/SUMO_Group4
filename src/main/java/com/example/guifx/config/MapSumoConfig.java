@@ -1,4 +1,4 @@
-package com.example.guifx;
+package com.example.guifx.config;
 
     /**
     *MapSumoConfig is holding the Configuration Files for SUMO Simulation
