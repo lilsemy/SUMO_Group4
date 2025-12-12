@@ -1,8 +1,5 @@
 package com.example.guifx.controller;
 
-import com.example.guifx.model.VehicleModel;
-import com.example.guifx.service.SumoConnection;
-
 /**
 * SimulationController orchestrates the whole simulation
 */
