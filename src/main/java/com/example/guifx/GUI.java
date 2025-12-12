@@ -1,9 +1,5 @@
-package com.example.guifx.controller;
+package com.example.guifx;
 
-import com.example.guifx.util.MapUtil;
-import com.example.guifx.view.LaneLayer;
-import com.example.guifx.view.CarLayer;
-import com.example.guifx.view.TrafficLightLayer;
 import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
