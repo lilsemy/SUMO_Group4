@@ -13,8 +13,11 @@
    BUTTONS
    ============================================ */
 
+/*
 .button {
-    -fx-background-color: #4a6fa5;   /* xanh trung tính, không gradient */
+    -fx-background-color: #4a6fa5;   */
+/* xanh trung tính, không gradient *//*
+
     -fx-text-fill: white;
     -fx-font-weight: 600;
     -fx-font-size: 13px;
@@ -22,7 +25,9 @@
     -fx-padding: 10px 18px;
     -fx-cursor: hand;
     -fx-border-color: transparent;
-    -fx-effect: none;    /* bỏ shadow cho sạch */
+    -fx-effect: none;    */
+/* bỏ shadow cho sạch *//*
+
 }
 
 .button:hover {
@@ -33,6 +38,7 @@
     -fx-background-color: #36547f;
     -fx-translate-y: 1px;
 }
+*/
 
 /* ============================================
    LABELS
@@ -84,7 +90,7 @@
 /* ============================================
    CHARTS
    ============================================ */
-
+/*
 .chart {
     -fx-background-color: white;
     -fx-border-color: #dcdcdc;
@@ -107,7 +113,7 @@
 
 .axis-label {
     -fx-text-fill: #666;
-}
+}*/
 
 /* ============================================
    LAYOUT SECTIONS

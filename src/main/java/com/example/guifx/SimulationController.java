@@ -78,6 +78,7 @@ public class SimulationController {
     public void singleStep() throws Exception{
         if (running && connection.isConnected()){
             connection.doStep();
+            vehicleController.updateFromSimulation();
         }
     }
 

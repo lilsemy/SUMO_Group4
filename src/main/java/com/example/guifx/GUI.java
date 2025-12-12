@@ -4,9 +4,15 @@ import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.XYChart;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 
+import javafx.scene.control.Labeled;
+
+import javafx.scene.control.Label;
+import java.util.List;
 /**
 *GUI is the class that controls the JavaFX GUI
 */
@@ -34,23 +40,36 @@ public class GUI {
     @FXML private Pane trafficLightLayer;
     @FXML private Pane carLayer;
 
+
+    @FXML private Label realTimeSpeedLabel;
+    @FXML private Label avgSpeedLabel;
+    @FXML private Label vehicleCountLabel;
+
+    @FXML private LineChart<Number, Number> speedChart;
+    @FXML private Label statusLabel;
+
+
     /*
      * These instances manage the logic for drawing their respective layers.
      * They were ported from the Novic project.
      */
-
+    private XYChart.Series<Number, Number> speedSeries;
     private CarLayer carLayerInstance;
     private TrafficLightLayer trafficLightLayerInstance;
+    private LaneLayer laneLayerInstance;
+    private AnimationTimer timer;
 
-
+    private String trackedVehicleId = null;
+    private Statistics statistics;
 
     /**
      * Sets the SimulationController in order to insert Cars and change the view of the Sumo-GUI
      * @param simulationController
     */
-    
+
     public void setSimulationController(SimulationController simulationController){
         this.simController = simulationController;
+        this.statistics = new Statistics(simController);
         // EXPLANATION: We must initialize the visual components once the controller is set.
         initVisuals();
 
@@ -71,6 +90,14 @@ public class GUI {
             LaneLayer laneLayerInstance = new LaneLayer(laneLayer);
             trafficLightLayerInstance = new TrafficLightLayer(trafficLightLayer, null);
             carLayerInstance = new CarLayer(carLayer);
+
+            //chart
+            speedSeries = new XYChart.Series<>();
+
+            speedSeries.setName("Avg Speed");
+            speedChart.getData().add(speedSeries);
+            speedChart.setCreateSymbols(false); // for optimization
+
 
             startLoop();
 
@@ -98,7 +125,8 @@ public class GUI {
 
     private void startLoop() {
 
-        AnimationTimer timer = new AnimationTimer() {
+        //AnimationTimer timer = new AnimationTimer() {
+        timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
                 try {
@@ -113,6 +141,23 @@ public class GUI {
                         if (trafficLightLayerInstance != null) {
                             trafficLightLayerInstance.updateTrafficLightStates();
                         }
+                    }
+                    // statistics
+                    if(statistics!=null){
+                        double time = org.eclipse.sumo.libtraci.Simulation.getTime();
+                        statistics.updateVehicles(time);
+
+                        double avgSpeed = statistics.getAverageSpeed();
+                        int count = simController.getVehicleController().getVehiclesMap().size();
+                        java.text.DecimalFormat df = new java.text.DecimalFormat("#.##");
+
+                        avgSpeedLabel.setText("Avg Speed: " + df.format(avgSpeed)+ "ms");
+                        vehicleCountLabel.setText("Vehicles: " +count);
+
+
+                        speedSeries.getData().add(new XYChart.Data<>(time, avgSpeed));
+
+
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -140,7 +185,8 @@ public class GUI {
         if (lastId != null) {
             try {
                 double speed = simController.getVehicleController().getVehicleSpeed(lastId);
-                System.out.println("Speed of last vehicle " + lastId + ": " + speed);
+
+                statusLabel.setText("Speed of last vehicle " + lastId + ": " + speed);
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
