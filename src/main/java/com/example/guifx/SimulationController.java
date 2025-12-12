@@ -103,10 +103,8 @@ public class SimulationController {
         try {
             // Delegate vehicle creation and injection entirely to VehicleController
             VehicleModel car = vehicleController.createAndInjectVehicle("car", "r1", (byte)0);
-
             // Optionally track the vehicle in SUMO GUI
             vehicleController.trackVehicle("View #0", car.getId());
-
             System.out.println("Added a car: " + car.getId());
         } catch (Exception ex) {
             ex.printStackTrace();

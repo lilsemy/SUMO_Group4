@@ -106,15 +106,15 @@ public class CarLayer {
         // Nếu là bus thì to nhất
         if (vclass.contains("bus") || type.contains("bus")) {
             // Xe buýt: rộng 18, cao 40
-            return new double[]{18, 40};
+            return new double[]{9, 20};
         }
         // Nếu là truck hoặc trailer thì trung bình
         if (vclass.contains("truck") || vclass.contains("trailer") || type.contains("truck") || type.contains("trailer")) {
             // Xe tải: rộng 16, cao 35
-            return new double[]{16, 35};
+            return new double[]{8, 17};
         }
         // Xe con nhỏ nhất
-        return new double[]{15, 30};
+        return new double[]{7, 15};
     }
     // Create a new car appearance and add it to the pane
     // Tạo hình xe mới và thêm vào pane

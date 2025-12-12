@@ -37,17 +37,20 @@ public class TrafficLightController {
     }
 
     public void changePhase(){
-        TrafficLightModel tl1 = tlList.get("n2"); //--> Currently only Traffic Light we have.
-        int currentPhase = tl1.getPhase();
-        if (currentPhase == 0) { //Phase 0 = green
-            tl1.setPhase(2); //Phase 2 == red
-            TrafficLight.setPhase(tl1.getId(), 2);
+        for (String id : tlIds){
+            TrafficLightModel tl1 = tlList.get(id); //--> Currently only Traffic Light we have.
+            int currentPhase = tl1.getPhase();
+            if (currentPhase == 0) { //Phase 0 = green
+                tl1.setPhase(2); //Phase 2 == red
+                TrafficLight.setPhase(tl1.getId(), 2);
+            }
+            else if (currentPhase == 2)
+            {
+                tl1.setPhase(0);
+                TrafficLight.setPhase(tl1.getId(), 0);
+            }
         }
-        else if (currentPhase == 2)
-        {
-            tl1.setPhase(0);
-            TrafficLight.setPhase(tl1.getId(), 0);
-        }
+
     }
 
     //TraCIPosition might also be an own class (ToDo for later)
