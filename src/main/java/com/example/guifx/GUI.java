@@ -6,7 +6,10 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
@@ -46,7 +49,7 @@ public class GUI {
     @FXML
     private Pane carLayer;
 
-    // ========== Info Panel Components ==========
+    // Info Panel Components
     @FXML
     private VBox hoverInfoBox;
     @FXML
@@ -63,6 +66,29 @@ public class GUI {
     private Label statusLabel;
     @FXML
     private LineChart<Number, Number> speedChart;
+
+    // Alarm Button
+    @FXML
+    private Button alarmButton;
+    @FXML
+    private ImageView alarmIcon;
+
+    private boolean alarmActive = false;
+
+    @FXML
+    public void commandTurnOnAlarms(ActionEvent e) {
+        if (!alarmActive) {
+            alarmIcon.setImage(new Image(getClass().getResourceAsStream("/alarm.gif")));
+            alarmActive = true;
+            alarmButton.setText("Stop Alarms");
+            // simController.startStressTest(); // Gọi logic tạo nhiều xe ở controller
+        } else {
+            alarmIcon.setImage(new Image(getClass().getResourceAsStream("/alarm.png")));
+            alarmActive = false;
+            alarmButton.setText("Turn On Alarms");
+            // simController.stopStressTest(); // Dừng tạo xe nếu cần
+        }
+    }
 
     /*
      * These instances manage the logic for drawing their respective layers.
@@ -115,18 +141,20 @@ public class GUI {
         try {
             contentWidth = mapContainer.getPrefWidth();
             contentHeight = mapContainer.getPrefHeight();
-            
+
             // Fallback sizes
-            if (contentWidth <= 0) contentWidth = 800;
-            if (contentHeight <= 0) contentHeight = 600;
-            
+            if (contentWidth <= 0)
+                contentWidth = 800;
+            if (contentHeight <= 0)
+                contentHeight = 600;
+
             // Setup canvas
             backgroundCanvas.setWidth(contentWidth);
             backgroundCanvas.setHeight(contentHeight);
             var gc = backgroundCanvas.getGraphicsContext2D();
             gc.setFill(javafx.scene.paint.Color.web("#1a1a1a"));
             gc.fillRect(0, 0, contentWidth, contentHeight);
-            
+
             // Setup layers
             laneLayer.setPrefSize(contentWidth, contentHeight);
             trafficLightLayer.setPrefSize(contentWidth, contentHeight);
@@ -154,15 +182,16 @@ public class GUI {
             setupZoomAndDrag();
             setupChart();
             startLoop();
-            
-            if (statusLabel != null) statusLabel.setText("Simulation started");
+
+            if (statusLabel != null)
+                statusLabel.setText("Simulation started");
 
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Failed to initialize visuals: " + e.getMessage());
         }
     }
-    
+
     private void setupChart() {
         speedSeries = new XYChart.Series<>();
         speedSeries.setName("Avg Speed");
@@ -179,7 +208,7 @@ public class GUI {
             startTranslateX = zoomGroup.getTranslateX();
             startTranslateY = zoomGroup.getTranslateY();
         });
-        
+
         mapContainer.setOnMouseDragged(event -> {
             double offsetX = event.getSceneX() - dragStartX;
             double offsetY = event.getSceneY() - dragStartY;
@@ -227,7 +256,7 @@ public class GUI {
         clampTranslation();
         updateZoomLabel();
     }
-    
+
     private void updateZoomLabel() {
         if (zoomLabel != null) {
             zoomLabel.setText(String.format("Zoom: %.0f%%", scale * 100));
@@ -292,7 +321,7 @@ public class GUI {
     private void startLoop() {
         AnimationTimer timer = new AnimationTimer() {
             private int frameCount = 0;
-            
+
             @Override
             public void handle(long now) {
                 try {
@@ -306,7 +335,7 @@ public class GUI {
                         if (trafficLightLayerInstance != null) {
                             trafficLightLayerInstance.updateTrafficLightStates();
                         }
-                        
+
                         // Update stats every 10 frames
                         frameCount++;
                         if (frameCount >= 10) {
@@ -322,12 +351,12 @@ public class GUI {
         };
         timer.start();
     }
-    
+
     private void updateStatistics() {
         try {
             double simTime = org.eclipse.sumo.libtraci.Simulation.getTime();
             int vehicleCount = simController.getVehicleController().getVehiclesMap().size();
-            
+
             if (statistics != null) {
                 statistics.updateVehicles(simTime);
             }

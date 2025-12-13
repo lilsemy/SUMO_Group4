@@ -54,7 +54,15 @@
                     </ImageView>
                 </graphic>
             </Button>
-            
+
+            <Button fx:id="alarmButton" onAction="#commandTurnOnAlarms" styleClass="toolbar-btn" text="Turn On Alarms">
+                <graphic>
+                    <ImageView fx:id="alarmIcon" fitHeight="18" fitWidth="18" preserveRatio="true">
+                        <image><Image url="@alarm.png"/></image>
+                    </ImageView>
+                </graphic>
+            </Button>
+
             <Pane HBox.hgrow="ALWAYS"/>
             
             <Label fx:id="zoomLabel" text="Zoom: 100%" styleClass="zoom-label"/>
