@@ -14,6 +14,12 @@ public class SimulationController {
 
     private volatile boolean running = true;   // starts true (volatile booleans have multi-thread visibility)
 
+    //Stress test counters
+    private int stressVehiclesRemaining = 0;
+    private int stepCounter = 0;
+    private int injectionStepInterval = 10; // every 10 steps -> 10*0.05s/step = every 0.5s
+    private boolean stressTestActive = false;
+
     /**
     *
     *@throws Exception
@@ -74,12 +80,51 @@ public class SimulationController {
      * It is called by the GUI's AnimationTimer loop.
      * Useing this instead of the while-loop in makeConnection so the GUI stays
      * responsive and synchronized.
+     *
      */
     public void singleStep() throws Exception{
         if (running && connection.isConnected()){
             connection.doStep();
+            stepCounter++;
+
+            //stress testing only triggers when stressTestActive == true
+            if (stressTestActive &&
+                    stressVehiclesRemaining > 0 &&
+                    stepCounter % injectionStepInterval == 0) {
+
+                try {
+                    vehicleController.createAndInjectVehicle(
+                            "car", "r1", (byte) 0
+                    );
+
+                    stressVehiclesRemaining--;
+
+                    if (stressVehiclesRemaining == 0) {
+                        stressTestActive = false;
+                    }
+
+                } catch (Exception e) {
+                    System.err.println(
+                            "Stress test injection failed, remaining="
+                                    + stressVehiclesRemaining
+                    );
+                    e.printStackTrace();
+                }
+            }
+
             vehicleController.updateFromSimulation();
         }
+    }
+
+    /**
+     * Method that lets the user perform a stress test
+     * @param count the amount of cars for the stress test
+     */
+
+    public void startStressTest(int count) {
+        stressVehiclesRemaining = count;
+        stressTestActive = true;
+        stepCounter = 0;
     }
 
     /**
@@ -111,6 +156,7 @@ public class SimulationController {
             ex.printStackTrace();
         }
     }
+
 
     public void changePhase(){
         tlController.changePhase();
