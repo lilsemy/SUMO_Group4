@@ -17,6 +17,7 @@ import javafx.scene.Group;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
+import javafx.scene.layout.BorderPane;
 
 /**
  * GUI is the class that controls the JavaFX GUI
@@ -76,15 +77,20 @@ public class GUI {
     private boolean alarmActive = false;
 
     @FXML
+    private BorderPane rootPane;
+
+    @FXML
     public void commandTurnOnAlarms(ActionEvent e) {
         if (!alarmActive) {
             alarmIcon.setImage(new Image(getClass().getResourceAsStream("/alarm.gif")));
             alarmActive = true;
+            rootPane.getStyleClass().add("alarm-blink");
             alarmButton.setText("Stop Alarms");
             // simController.startStressTest(); // Gọi logic tạo nhiều xe ở controller
         } else {
             alarmIcon.setImage(new Image(getClass().getResourceAsStream("/alarm.png")));
             alarmActive = false;
+            rootPane.getStyleClass().remove("alarm-blink");
             alarmButton.setText("Turn On Alarms");
             // simController.stopStressTest(); // Dừng tạo xe nếu cần
         }
@@ -186,6 +192,10 @@ public class GUI {
             if (statusLabel != null)
                 statusLabel.setText("Simulation started");
 
+            // Set initial alarm icon
+            if (alarmIcon != null) {
+                alarmIcon.setImage(new Image(getClass().getResourceAsStream("/alarm.png")));
+            }
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Failed to initialize visuals: " + e.getMessage());
