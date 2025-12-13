@@ -6,16 +6,14 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Label;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
 import javafx.scene.Group;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
-import javafx.scene.control.Labeled;
-import javafx.scene.control.Label;
-
-import java.util.List;
 
 /**
  * GUI is the class that controls the JavaFX GUI
@@ -48,31 +46,34 @@ public class GUI {
     @FXML
     private Pane carLayer;
 
+    // ========== Info Panel Components ==========
     @FXML
-    private Label realTimeSpeedLabel;
+    private VBox hoverInfoBox;
     @FXML
-    private Label avgSpeedLabel;
+    private Label hoverInfoLabel;
     @FXML
     private Label vehicleCountLabel;
     @FXML
-    private LineChart<Number, Number> speedChart;
+    private Label avgSpeedLabel;
+    @FXML
+    private Label simTimeLabel;
+    @FXML
+    private Label zoomLabel;
     @FXML
     private Label statusLabel;
+    @FXML
+    private LineChart<Number, Number> speedChart;
 
     /*
      * These instances manage the logic for drawing their respective layers.
      * They were ported from the Novic project.
      */
 
-    private XYChart.Series<Number, Number> speedSeries;
-
     private LaneLayer laneLayerInstance;
     private CarLayer carLayerInstance;
     private TrafficLightLayer trafficLightLayerInstance;
-    private AnimationTimer timer;
-
-    private String trackedVehicleId = null;
     private Statistics statistics;
+    private XYChart.Series<Number, Number> speedSeries;
 
     // Zooming and Panning
     private Group zoomGroup = new Group();
@@ -99,10 +100,7 @@ public class GUI {
     public void setSimulationController(SimulationController simulationController) {
         this.simController = simulationController;
         this.statistics = new Statistics(simController);
-        // EXPLANATION: We must initialize the visual components once the controller is
-        // set.
         initVisuals();
-
     }
 
     /*
@@ -117,6 +115,22 @@ public class GUI {
         try {
             contentWidth = mapContainer.getPrefWidth();
             contentHeight = mapContainer.getPrefHeight();
+            
+            // Fallback sizes
+            if (contentWidth <= 0) contentWidth = 800;
+            if (contentHeight <= 0) contentHeight = 600;
+            
+            // Setup canvas
+            backgroundCanvas.setWidth(contentWidth);
+            backgroundCanvas.setHeight(contentHeight);
+            var gc = backgroundCanvas.getGraphicsContext2D();
+            gc.setFill(javafx.scene.paint.Color.web("#1a1a1a"));
+            gc.fillRect(0, 0, contentWidth, contentHeight);
+            
+            // Setup layers
+            laneLayer.setPrefSize(contentWidth, contentHeight);
+            trafficLightLayer.setPrefSize(contentWidth, contentHeight);
+            carLayer.setPrefSize(contentWidth, contentHeight);
 
             MapUtil.setup(contentWidth, contentHeight, 15);
 
@@ -124,35 +138,36 @@ public class GUI {
             trafficLightLayerInstance = new TrafficLightLayer(trafficLightLayer, null);
             carLayerInstance = new CarLayer(carLayer);
 
-            // chart
-            speedSeries = new XYChart.Series<>();
-            speedSeries.setName("Avg Speed");
-            speedChart.getData().add(speedSeries);
-            speedChart.setCreateSymbols(false); // for optimization
-
-            // Move layers to zoomGroup
+            // Setup zoom group
             mapContainer.getChildren().clear();
+            zoomGroup.getChildren().clear();
             zoomGroup.getChildren().addAll(backgroundCanvas, laneLayer, trafficLightLayer, carLayer);
-
-            // Use Scale transform with pivot at (0,0) - much easier to calculate!
             zoomGroup.getTransforms().add(scaleTransform);
             mapContainer.getChildren().add(zoomGroup);
 
-            // Clip to prevent overflow
+            // Clip
             Rectangle clip = new Rectangle();
             clip.widthProperty().bind(mapContainer.widthProperty());
             clip.heightProperty().bind(mapContainer.heightProperty());
             mapContainer.setClip(clip);
 
             setupZoomAndDrag();
-
+            setupChart();
             startLoop();
+            
+            if (statusLabel != null) statusLabel.setText("Simulation started");
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Failed to initialize visuals" + e.getMessage());
-
+            System.err.println("Failed to initialize visuals: " + e.getMessage());
         }
+    }
+    
+    private void setupChart() {
+        speedSeries = new XYChart.Series<>();
+        speedSeries.setName("Avg Speed");
+        speedChart.getData().clear();
+        speedChart.getData().add(speedSeries);
     }
 
     private void setupZoomAndDrag() {
@@ -164,7 +179,7 @@ public class GUI {
             startTranslateX = zoomGroup.getTranslateX();
             startTranslateY = zoomGroup.getTranslateY();
         });
-
+        
         mapContainer.setOnMouseDragged(event -> {
             double offsetX = event.getSceneX() - dragStartX;
             double offsetY = event.getSceneY() - dragStartY;
@@ -179,14 +194,11 @@ public class GUI {
      */
     private void zoomAtMouse(ScrollEvent event) {
         event.consume();
-
         double delta = event.getDeltaY();
         if (delta == 0)
             return;
-
         double zoomFactor = delta > 0 ? 1.1 : 0.9;
         double newScale = scale * zoomFactor;
-
         // Clamp scale
         if (newScale < MIN_SCALE)
             newScale = MIN_SCALE;
@@ -195,32 +207,31 @@ public class GUI {
         if (newScale == scale)
             return;
         // Mouse position relative to mapContainer
-
         double mouseX = event.getX();
         double mouseY = event.getY();
-
         // Point in content coordinates (before scaling)
         // Since we use Scale with pivot (0,0), the math is simple:
         // screenX = contentX * scale + translateX
         // contentX = (screenX - translateX) / scale
         double contentX = (mouseX - zoomGroup.getTranslateX()) / scale;
         double contentY = (mouseY - zoomGroup.getTranslateY()) / scale;
-
         // Update scale
-        double oldScale = scale;
         scale = newScale;
         scaleTransform.setX(scale);
         scaleTransform.setY(scale);
-
         // After scaling, adjust translate so the point under mouse stays fixed
-        // mouseX = contentX * newScale + newTranslateX
-        // newTranslateX = mouseX - contentX * newScale
         double newTranslateX = mouseX - contentX * scale;
         double newTranslateY = mouseY - contentY * scale;
         zoomGroup.setTranslateX(newTranslateX);
         zoomGroup.setTranslateY(newTranslateY);
-
         clampTranslation();
+        updateZoomLabel();
+    }
+    
+    private void updateZoomLabel() {
+        if (zoomLabel != null) {
+            zoomLabel.setText(String.format("Zoom: %.0f%%", scale * 100));
+        }
     }
 
     /**
@@ -229,13 +240,11 @@ public class GUI {
     private void clampTranslation() {
         double containerWidth = mapContainer.getWidth();
         double containerHeight = mapContainer.getHeight();
-
         // Scaled content size
         double scaledWidth = contentWidth * scale;
         double scaledHeight = contentHeight * scale;
         double tx = zoomGroup.getTranslateX();
         double ty = zoomGroup.getTranslateY();
-
         // With Scale pivot at (0,0), content occupies:
         // X: [tx, tx + scaledWidth]
         // Y: [ty, ty + scaledHeight]
@@ -252,7 +261,6 @@ public class GUI {
                 tx = containerWidth - scaledWidth;
             }
         }
-
         if (scaledHeight <= containerHeight) {
             // Content smaller than container - center it
             ty = (containerHeight - scaledHeight) / 2;
@@ -264,7 +272,6 @@ public class GUI {
                 ty = containerHeight - scaledHeight;
             }
         }
-
         zoomGroup.setTranslateX(tx);
         zoomGroup.setTranslateY(ty);
     }
@@ -283,13 +290,13 @@ public class GUI {
      */
 
     private void startLoop() {
-        // AnimationTimer timer = new AnimationTimer() {
-        timer = new AnimationTimer() {
+        AnimationTimer timer = new AnimationTimer() {
+            private int frameCount = 0;
+            
             @Override
             public void handle(long now) {
                 try {
                     if (simController != null) {
-
                         simController.singleStep();
 
                         if (carLayerInstance != null) {
@@ -299,29 +306,45 @@ public class GUI {
                         if (trafficLightLayerInstance != null) {
                             trafficLightLayerInstance.updateTrafficLightStates();
                         }
-                    }
-                    // statistics
-
-                    if(statistics!=null){
-                        double time = org.eclipse.sumo.libtraci.Simulation.getTime();
-                        statistics.updateVehicles(time);
-
-                        double avgSpeed = statistics.getAverageSpeed();
-                        int count = simController.getVehicleController().getVehiclesMap().size();
-                        java.text.DecimalFormat df = new java.text.DecimalFormat("#.##");
                         
-                        avgSpeedLabel.setText("Avg Speed: " + df.format(avgSpeed)+ "ms");
-                        vehicleCountLabel.setText("Vehicles: " +count);
-                        speedSeries.getData().add(new XYChart.Data<>(time, avgSpeed));
+                        // Update stats every 10 frames
+                        frameCount++;
+                        if (frameCount >= 10) {
+                            frameCount = 0;
+                            updateStatistics();
+                        }
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    stop(); // stop animation on error
+                    stop();
                 }
             }
         };
-
         timer.start();
+    }
+    
+    private void updateStatistics() {
+        try {
+            double simTime = org.eclipse.sumo.libtraci.Simulation.getTime();
+            int vehicleCount = simController.getVehicleController().getVehiclesMap().size();
+            
+            if (statistics != null) {
+                statistics.updateVehicles(simTime);
+            }
+            double avgSpeed = statistics != null ? statistics.getAverageSpeed() : 0;
+
+            vehicleCountLabel.setText(String.valueOf(vehicleCount));
+            avgSpeedLabel.setText(String.format("%.1f m/s", avgSpeed));
+            simTimeLabel.setText(String.format("%.1fs", simTime));
+
+            // Update chart
+            if (speedSeries.getData().size() > 100) {
+                speedSeries.getData().remove(0);
+            }
+            speedSeries.getData().add(new XYChart.Data<>(simTime, avgSpeed));
+        } catch (Exception e) {
+            // Ignore if SUMO not ready
+        }
     }
 
     /**
@@ -330,29 +353,29 @@ public class GUI {
     // Moved it to the simulation controller
     @FXML
     public void commandSpawnVehicle(ActionEvent e) {
-        System.out.println("Spawning new vehicle!");
         simController.spawnVehicle();
+        statusLabel.setText("Vehicle spawned");
     }
 
-    // Moved it to the simulation controller
     @FXML
     public void commandGetVehicleSpeed(ActionEvent e) {
         String lastId = simController.getVehicleController().getLastVehicleId();
         if (lastId != null) {
             try {
                 double speed = simController.getVehicleController().getVehicleSpeed(lastId);
-                System.out.println("Speed of last vehicle " + lastId + ": " + speed);
+                statusLabel.setText(String.format("Vehicle %s: %.1f m/s", lastId, speed));
             } catch (Exception ex) {
-                ex.printStackTrace();
+                statusLabel.setText("Error getting speed");
             }
         } else {
-            System.out.println("No vehicles in simulation!");
+            statusLabel.setText("No vehicles in simulation");
         }
     }
 
+    @FXML
     public void commandChangePhase(ActionEvent e) {
-        System.out.println("Changing TrafficLight Phase!");
         simController.changePhase();
+        statusLabel.setText("Traffic light phase changed");
     }
 
 }
