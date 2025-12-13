@@ -8,6 +8,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
@@ -87,13 +88,27 @@ public class GUI {
     private Timeline alarmTimeline;
 
     @FXML
+    private TextField alarmVehicleCountField;
+
+    @FXML
     public void commandTurnOnAlarms(ActionEvent e) {
         if (!alarmActive) {
             alarmIcon.setImage(new Image(getClass().getResourceAsStream("/alarm.gif")));
             alarmActive = true;
             alarmButton.setText("Stop Alarms");
-            // simController.startStressTest(); // Gọi logic tạo nhiều xe ở controller
-
+            int count = 0;
+            try {
+                String text = alarmVehicleCountField.getText();
+                count = Integer.parseInt(text);
+                if (count <= 0) throw new NumberFormatException();
+            } catch (Exception ex) {
+                statusLabel.setText("Nhập số xe hợp lệ!");
+                alarmActive = false;
+                alarmButton.setText("Turn On Alarms");
+                alarmIcon.setImage(new Image(getClass().getResourceAsStream("/alarm.png")));
+                return;
+            }
+            simController.startStressTest(count); // Gọi logic tạo nhiều xe ở controller
             // Animation for alarm button - value blink is =)))
             alarmTimeline = new Timeline(
                     new KeyFrame(Duration.seconds(0.20040108), evt -> toggleAlarmColor())); 
@@ -103,8 +118,7 @@ public class GUI {
             alarmIcon.setImage(new Image(getClass().getResourceAsStream("/alarm.png")));
             alarmActive = false;
             alarmButton.setText("Turn On Alarms");
-            // simController.stopStressTest(); // Dừng tạo xe nếu cần
-
+            simController.stopStressTest(); // Dừng tạo xe nếu cần
             // Animation for alarm button
             if (alarmTimeline != null) {
                 alarmTimeline.stop();
