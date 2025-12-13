@@ -26,6 +26,13 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
+        /** Because I set the stage to maximized
+        * First it appear correctly but after load the all the layer it start to bug 
+        * The info panel is overflow to the right
+        * This is a quick fix - call maximized later
+        */
+        javafx.application.Platform.runLater(() -> stage.setMaximized(true));
+
         GUI gui = fxmlLoader.getController();
 
         SimulationController simController = new SimulationController();
@@ -34,15 +41,4 @@ public class Main extends Application {
 
         Statistics stat = new Statistics(simController);
     }
-
-
-
-
-
-
-
-
-
-
-
 }
