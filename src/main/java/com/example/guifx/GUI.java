@@ -18,6 +18,10 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Scale;
 import javafx.scene.layout.BorderPane;
+// Animation for alarm button
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.util.Duration;
 
 /**
  * GUI is the class that controls the JavaFX GUI
@@ -79,21 +83,47 @@ public class GUI {
     @FXML
     private BorderPane rootPane;
 
+    // Animation for alarm button
+    private Timeline alarmTimeline;
+
     @FXML
     public void commandTurnOnAlarms(ActionEvent e) {
         if (!alarmActive) {
             alarmIcon.setImage(new Image(getClass().getResourceAsStream("/alarm.gif")));
             alarmActive = true;
-            rootPane.getStyleClass().add("alarm-blink");
             alarmButton.setText("Stop Alarms");
             // simController.startStressTest(); // Gọi logic tạo nhiều xe ở controller
+
+            // Animation for alarm button - value blink is =)))
+            alarmTimeline = new Timeline(
+                    new KeyFrame(Duration.seconds(0.20040108), evt -> toggleAlarmColor())); 
+            alarmTimeline.setCycleCount(Timeline.INDEFINITE);
+            alarmTimeline.play();
         } else {
             alarmIcon.setImage(new Image(getClass().getResourceAsStream("/alarm.png")));
             alarmActive = false;
-            rootPane.getStyleClass().remove("alarm-blink");
             alarmButton.setText("Turn On Alarms");
             // simController.stopStressTest(); // Dừng tạo xe nếu cần
+
+            // Animation for alarm button
+            if (alarmTimeline != null) {
+                alarmTimeline.stop();
+            }
+            // Reset alarm blink effect
+            rootPane.getStyleClass().remove("alarm-blink");
         }
+    }
+
+    private boolean isRed = false;
+
+    // Alarm color toggle
+    private void toggleAlarmColor() {
+        if (isRed) {
+            rootPane.getStyleClass().remove("alarm-blink");
+        } else {
+            rootPane.getStyleClass().add("alarm-blink");
+        }
+        isRed = !isRed;
     }
 
     /*

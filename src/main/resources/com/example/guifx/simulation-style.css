@@ -1,143 +1,190 @@
 /* ============================================
-   SUMO Traffic Simulation - Professional Dark Theme
-   ============================================ */
+    SUMO Traffic Simulation - Professional Dark Theme
+    ============================================ */
 
 /* ROOT */
 .root {
-    -fx-font-family: "Segoe UI", Arial, sans-serif;
-    -fx-font-size: 13px;
-    -fx-background-color: #1e1e1e;
+  -fx-font-family: "Segoe UI", Arial, sans-serif;
+  -fx-font-size: 13px;
+  -fx-background-color: #1e1e1e;
 }
 
 .root-pane {
-    -fx-background-color: #1e1e1e;
+  -fx-background-color: #1e1e1e;
 }
 
 /* TOOLBAR */
 .toolbar {
-    -fx-background-color: #2d2d2d;
-    -fx-border-color: #3d3d3d;
-    -fx-border-width: 0 0 1 0;
+  -fx-background-color: #2d2d2d;
+  -fx-border-color: #3d3d3d;
+  -fx-border-width: 0 0 1 0;
 }
 
 .app-title {
-    -fx-text-fill: #e0e0e0;
-    -fx-font-size: 16px;
-    -fx-font-weight: bold;
+  -fx-text-fill: #e0e0e0;
+  -fx-font-size: 16px;
+  -fx-font-weight: bold;
 }
 
 .toolbar-btn {
-    -fx-background-color: transparent;
-    -fx-text-fill: #b0b0b0;
-    -fx-font-size: 12px;
-    -fx-padding: 8 14;
-    -fx-background-radius: 4;
-    -fx-cursor: hand;
-    -fx-graphic-text-gap: 8;
+  -fx-background-color: transparent;
+  -fx-text-fill: #b0b0b0;
+  -fx-font-size: 12px;
+  -fx-padding: 8 14;
+  -fx-background-radius: 4;
+  -fx-cursor: hand;
+  -fx-graphic-text-gap: 8;
 }
 
 .toolbar-btn:hover {
-    -fx-background-color: #3d3d3d;
-    -fx-text-fill: #ffffff;
+  -fx-background-color: #3d3d3d;
+  -fx-text-fill: #ffffff;
 }
 
 .toolbar-btn:pressed {
-    -fx-background-color: #4d4d4d;
+  -fx-background-color: #4d4d4d;
 }
 
 .zoom-label {
-    -fx-text-fill: #808080;
-    -fx-font-size: 12px;
+  -fx-text-fill: #808080;
+  -fx-font-size: 12px;
 }
 
 /* MAP CONTAINER */
 .map-container {
-    -fx-background-color: #1a1a1a;
+  -fx-background-color: #1a1a1a;
 }
 
 /* INFO PANEL */
 .info-panel {
-    -fx-background-color: #252526;
-    -fx-border-color: #3d3d3d;
-    -fx-border-width: 0 0 0 1;
+  -fx-background-color: #252526;
+  -fx-border-color: #3d3d3d;
+  -fx-border-width: 0 0 0 1;
 }
 
 .panel-title {
-    -fx-text-fill: #808080;
-    -fx-font-size: 11px;
-    -fx-font-weight: bold;
+  -fx-text-fill: #808080;
+  -fx-font-size: 11px;
+  -fx-font-weight: bold;
 }
 
 .panel-separator .line {
-    -fx-border-color: #3d3d3d;
-    -fx-border-width: 1 0 0 0;
+  -fx-border-color: #3d3d3d;
+  -fx-border-width: 1 0 0 0;
 }
 
 .info-box {
-    -fx-padding: 8 0;
+  -fx-padding: 8 0;
 }
 
 .info-label {
-    -fx-text-fill: #808080;
-    -fx-font-size: 13px;
+  -fx-text-fill: #808080;
+  -fx-font-size: 13px;
 }
 
 .info-value {
-    -fx-text-fill: #e0e0e0;
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
+  -fx-text-fill: #e0e0e0;
+  -fx-font-size: 13px;
+  -fx-font-weight: bold;
 }
 
 .info-placeholder {
-    -fx-text-fill: #606060;
-    -fx-font-size: 12px;
-    -fx-font-style: italic;
+  -fx-text-fill: #606060;
+  -fx-font-size: 12px;
+  -fx-font-style: italic;
 }
 
 /* CHART */
 .speed-chart {
-    -fx-background-color: transparent;
+  -fx-background-color: transparent;
 }
 
 .speed-chart .chart-plot-background {
-    -fx-background-color: #1e1e1e;
+  -fx-background-color: #1e1e1e;
 }
 
 .speed-chart .chart-vertical-grid-lines,
 .speed-chart .chart-horizontal-grid-lines {
-    -fx-stroke: #333333;
+  -fx-stroke: #333333;
 }
 
 .speed-chart .axis {
-    -fx-tick-label-fill: #808080;
+  -fx-tick-label-fill: #808080;
 }
 
 .speed-chart .axis-label {
-    -fx-text-fill: #808080;
-    -fx-font-size: 10px;
+  -fx-text-fill: #808080;
+  -fx-font-size: 10px;
 }
 
 .speed-chart .chart-series-line {
-    -fx-stroke: #4fc3f7;
-    -fx-stroke-width: 2px;
+  -fx-stroke: #4fc3f7;
+  -fx-stroke-width: 2px;
 }
 
 /* STATUS BAR */
 .status-bar {
-    -fx-background-color: #007acc;
+  -fx-background-color: #007acc;
 }
 
 .status-text {
-    -fx-text-fill: #ffffff;
-    -fx-font-size: 12px;
+  -fx-text-fill: #ffffff;
+  -fx-font-size: 12px;
 }
 
 .status-hint {
-    -fx-text-fill: rgba(255,255,255,0.7);
-    -fx-font-size: 11px;
+  -fx-text-fill: rgba(255, 255, 255, 0.7);
+  -fx-font-size: 11px;
 }
 
 /* SEPARATOR */
 .separator .line {
-    -fx-border-color: #3d3d3d;
+  -fx-border-color: #3d3d3d;
+}
+
+/* ============================================
+       ALARM BLINKING STYLE
+       ============================================ */
+
+/* Toolbar */
+.alarm-blink .toolbar {
+  -fx-background-color: #b00020 !important;
+}
+
+/* Toolbar buttons & labels */
+.alarm-blink .toolbar .button,
+.alarm-blink .toolbar .label {
+  -fx-text-fill: white !important;
+}
+
+/* button pressed/armed turn orange */
+.alarm-blink .toolbar .button:armed,
+.alarm-blink .toolbar .button:pressed,
+.alarm-blink .toolbar .button:hover {
+  -fx-background-color: #ff5722 !important; /* orange */
+  -fx-text-fill: white !important;
+}
+
+/* Info panel */
+.alarm-blink .info-panel {
+  -fx-background-color: #b00020 !important;
+}
+
+/* Info text */
+.alarm-blink .info-panel .label {
+  -fx-text-fill: white !important;
+}
+
+/* Status bar */
+.alarm-blink .status-bar {
+  -fx-background-color: #b00020 !important;
+}
+
+.alarm-blink .status-bar .label {
+  -fx-text-fill: white !important;
+}
+
+/* Map – EXPLICITLY DO NOTHING */
+.alarm-blink .map-container {
+  -fx-background-color: #1a1a1a !important;
 }
