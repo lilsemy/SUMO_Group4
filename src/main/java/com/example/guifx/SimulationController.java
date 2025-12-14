@@ -157,37 +157,39 @@ public class SimulationController {
     makeConnection(); // start new thread
   }
 
-  // Originally in GUI, but created a new abstraction, since the GUI should only
-  // see the main controller
-  public void spawnVehicle() {
-    // Delegate vehicle creation and injection entirely to VehicleController
-    VehicleModel car = vehicleController.createAndInjectVehicle("car", "r1", (byte) 0);
-    if (car != null) {
-      // Optionally track the vehicle in SUMO GUI
-      try {
-        vehicleController.trackVehicle("View #0", car.getId());
-      } catch (Exception e) {
-        // Ignore tracking errors
-      }
-      System.out.println("Added a car: " + car.getId());
-    } else {
-      System.out.println("Failed to spawn vehicle - spawn point may be blocked");
+    // Originally in GUI, but created a new abstraction, since the GUI should only
+    // see the main controller
+    public void spawnVehicle() {
+        // Delegate vehicle creation and injection entirely to VehicleController
+        // Uses random vehicle type instead of fixed "car"
+        VehicleModel car = vehicleController.createAndInjectRandomVehicle();
+        if (car != null) {
+            // Optionally track the vehicle in SUMO GUI
+            try {
+                vehicleController.trackVehicle("View #0", car.getId());
+            } catch (Exception e) {
+                // Ignore tracking errors
+            }
+            System.out.println("Added a vehicle: " + car.getId() + " [" + car.getTypeId() + "]");
+        } else {
+            System.out.println("Failed to spawn vehicle - spawn point may be blocked");
+        }
     }
-  }
 
-  public void changePhase() {
-    tlController.changePhase();
-  }
+    public void changePhase() {
+        tlController.changePhase();
+    }
 
-  public VehicleController getVehicleController() {
-    return vehicleController;
-  }
+    public VehicleController getVehicleController() {
+        return vehicleController;
+    }
 
-  public TrafficLightController getTlController() {
-    return tlController;
-  }
+    public TrafficLightController getTlController() {
+        return tlController;
+    }
 
-  public SumoConnection getConnection() {
-    return connection;
-  }
+    public SumoConnection getConnection() {
+        return connection;
+    }
+
 }
