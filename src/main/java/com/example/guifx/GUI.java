@@ -342,12 +342,13 @@ public class GUI {
             try {
                 double speed = simController.getVehicleController().getVehicleSpeed(lastId);
               java.text.DecimalFormat dv = new java.text.DecimalFormat("#.##");
-                statusLabel.setText("Speed of last vehicle " + lastId + ": " +  dv.format(speed));
+              statusLabel.setText("Speed of last vehicle " + lastId + ": " +  dv.format(speed));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         } else {
             System.out.println("No vehicles in simulation!");
+
         }
     }
 
@@ -358,6 +359,7 @@ public class GUI {
 
     public void commandStressTest(ActionEvent e){
         System.out.println("Starting Stress Test");
+        statusLabel.setText("Starting Stress Test");
         simController.startStressTest(50);
     }
 
