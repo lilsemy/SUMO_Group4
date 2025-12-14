@@ -53,7 +53,7 @@
       <Label layoutX="82.0" layoutY="127.0" styleClass="label-section" text="Live Simulation:" AnchorPane.leftAnchor="82.0" AnchorPane.topAnchor="127.0" />
       
       <!-- Map Container with Layers -->
-      <StackPane fx:id="mapContainer" layoutX="82.0" layoutY="161.0" prefHeight="456.0" prefWidth="669.0" AnchorPane.bottomAnchor="43.0" AnchorPane.leftAnchor="82.0" AnchorPane.rightAnchor="334.0" AnchorPane.topAnchor="161.0">
+      <StackPane fx:id="mapContainer" layoutX="67.0" layoutY="193.0" prefHeight="443.0" prefWidth="671.0" AnchorPane.bottomAnchor="39.0" AnchorPane.leftAnchor="52.0" AnchorPane.rightAnchor="362.0" AnchorPane.topAnchor="178.0">
          <children>
             <Canvas fx:id="backgroundCanvas" height="456.0" width="669.0" />
             <Pane fx:id="laneLayer" prefHeight="456.0" prefWidth="669.0" />
@@ -79,6 +79,7 @@
          </yAxis>
       </LineChart>
       <Label fx:id="statusLabel" layoutX="773.0" layoutY="492.0" prefHeight="28.0" prefWidth="261.0" text="Status:" />
+      <Button layoutX="563.0" layoutY="66.0" mnemonicParsing="false" prefHeight="59.0" prefWidth="137.0" text="StreesTest" />
 
    </children>
    <styleClass>

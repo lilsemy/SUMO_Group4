@@ -341,7 +341,8 @@ public class GUI {
         if (lastId != null) {
             try {
                 double speed = simController.getVehicleController().getVehicleSpeed(lastId);
-                statusLabel.setText("Speed of last vehicle " + lastId + ": " + speed);
+              java.text.DecimalFormat dv = new java.text.DecimalFormat("#.##");
+                statusLabel.setText("Speed of last vehicle " + lastId + ": " +  dv.format(speed));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
