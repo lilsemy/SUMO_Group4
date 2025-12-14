@@ -19,6 +19,7 @@ import org.eclipse.sumo.libtraci.TraCIPosition;
 // Import Vehicle class to interact with SUMO vehicles
 // Lấy thông tin xe từ SUMO qua TraCI
 import org.eclipse.sumo.libtraci.Vehicle;
+
 // Import Image class for car image
 // Hình ảnh đại diện cho xe
 
