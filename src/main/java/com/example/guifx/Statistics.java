@@ -29,15 +29,20 @@ public class Statistics {
 
   /** Refresh vehicles list at a point in time of simulation */
   public void updateVehicles(double currentTime) {
-    this.currentVehicles =
-        simCon
-            .getVehicleController()
-            .getVehiclesMap(); // getVehicles() still needs to be implemented
+    Map<String, VehicleModel> latest =
+            simCon.getVehicleController().getVehiclesMap();
+
+    currentVehicles = new HashMap<>(latest);
 
     for (String id : currentVehicles.keySet()) {
       departureTimes.putIfAbsent(id, currentTime);
     }
   }
+
+  public int getCurrentVehiclesSize() {
+    return currentVehicles.size();
+  }
+
 
   /** Calculates global average speed of all vehicles. */
   public double getAverageSpeed() {
