@@ -127,24 +127,23 @@ public class VehicleController {
         return IDList;
     }
 
-    public void updateFromSimulation() throws Exception{
+    public void updateFromSimulation() throws Exception {
+    List<String> liveIds = Vehicle.getIDList();
 
-        for (String id : Vehicle.getIDList()){
-            double speed = Vehicle.getSpeed(id);
-            TraCIPosition pos = Vehicle.getPosition(id,false);
-            double angle = Vehicle.getAngle(id);
+    vehiclesList.keySet().retainAll(liveIds);
 
-            // Get our local object OR create a new one if needed
-            VehicleModel v = vehiclesList.getOrDefault(id , new VehicleModel(id));
+    for (String id : liveIds) {
+        double speed = Vehicle.getSpeed(id);
+        TraCIPosition pos = Vehicle.getPosition(id, false);
+        double angle = Vehicle.getAngle(id);
 
-            v.setSpeed(speed);
-            v.setPosition(pos.getX(),pos.getY());
-            v.setAngle(angle);
+        // VehicleModel existiert bereits? Sonst neu erstellen
+        VehicleModel v = vehiclesList.getOrDefault(id, new VehicleModel(id));
 
-            vehiclesList.put(id, v);
+        v.setSpeed(speed);
+        v.setPosition(pos.getX(), pos.getY());
+        v.setAngle(angle);
 
-        }
-
+        vehiclesList.put(id, v);
     }
-
 }
