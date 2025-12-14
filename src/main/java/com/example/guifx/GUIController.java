@@ -329,18 +329,18 @@ public class GUIController {
   private void updateStatistics() {
     try {
       double simTime = org.eclipse.sumo.libtraci.Simulation.getTime();
-      int vehicleCount = simController.getVehicleController().getVehiclesMap().size();
 
       if (statistics != null) {
         statistics.updateVehicles(simTime);
       }
-      double avgSpeed = statistics != null ? statistics.getAverageSpeed() : 0;
+
+      int vehicleCount = statistics.getCurrentVehiclesSize();
+      double avgSpeed = statistics.getAverageSpeed();
 
       view.getVehicleCountLabel().setText(String.valueOf(vehicleCount));
       view.getAvgSpeedLabel().setText(String.format("%.1f m/s", avgSpeed));
       view.getSimTimeLabel().setText(String.format("%.1fs", simTime));
 
-      // Update chart
       if (speedSeries.getData().size() > 100) {
         speedSeries.getData().remove(0);
       }
