@@ -3,6 +3,7 @@ package com.example.guifx;
 import org.eclipse.sumo.libtraci.Vehicle;
 import org.eclipse.sumo.libtraci.GUI;
 import org.eclipse.sumo.libtraci.TraCIPosition;
+import org.eclipse.sumo.libtraci.Simulation;
 
 import java.util.*;
 
@@ -36,10 +37,11 @@ public class VehicleController {
             vehicleCounter++;
             String id = "id" + vehicleCounter;
 
-            VehicleModel vehicle = new VehicleModel(id, typeId, routeId, laneId);
-            // inject it into SUMO
+            double currentTime = Simulation.getTime();
+
+            VehicleModel vehicle = new VehicleModel(id, typeId, routeId, laneId, currentTime);
+
             injectVehicle(vehicle);
-            // return for GUI to track it
             return vehicle;
         }
 
