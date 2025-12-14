@@ -148,10 +148,41 @@ public class SimulationController {
     public void spawnVehicle() {
         try {
             // Delegate vehicle creation and injection entirely to VehicleController
-            VehicleModel car = vehicleController.createAndInjectVehicle("car", "r1", (byte)0);
-            // Optionally track the vehicle in SUMO GUI
-            vehicleController.trackVehicle("View #0", car.getId());
-            System.out.println("Added a car: " + car.getId());
+            if (vehicleController.getVehicle(vehicleController.getLastVehicleId()) != null){
+                VehicleModel cv = vehicleController.getVehicle(vehicleController.getLastVehicleId());
+                String route = cv.getRouteId();
+                switch(route) {
+                    case "r1":
+                        VehicleModel car = vehicleController.createAndInjectVehicle("car", "r2", (byte) 0);
+                        // Optionally track the vehicle in SUMO GUI
+                        vehicleController.trackVehicle("View #0", car.getId());
+                        System.out.println("Added a car: " + car.getId());
+                        break;
+                    case "r2":
+                        VehicleModel car2 = vehicleController.createAndInjectVehicle("car", "r3", (byte) 0);
+                        // Optionally track the vehicle in SUMO GUI
+                        vehicleController.trackVehicle("View #0", car2.getId());
+                        System.out.println("Added a car: " + car2.getId());
+                        break;
+                    case "r3":
+                        VehicleModel car3 = vehicleController.createAndInjectVehicle("car", "r1", (byte) 0);
+                        // Optionally track the vehicle in SUMO GUI
+                        vehicleController.trackVehicle("View #0", car3.getId());
+                        System.out.println("Added a car: " + car3.getId());
+                        break;
+                    default:
+                        VehicleModel car4 = vehicleController.createAndInjectVehicle("car", "r1", (byte) 0);
+                        // Optionally track the vehicle in SUMO GUI
+                        vehicleController.trackVehicle("View #0", car4.getId());
+                        System.out.println("Added a car: " + car4.getId());
+                }
+            }
+            else {
+                VehicleModel car = vehicleController.createAndInjectVehicle("car", "r1", (byte) 0);
+                // Optionally track the vehicle in SUMO GUI
+                vehicleController.trackVehicle("View #0", car.getId());
+                System.out.println("Added a car: " + car.getId());
+            }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
