@@ -57,7 +57,7 @@
                 </graphic>
             </Button>
 
-            <Button fx:id="alarmButton" onAction="#commandTurnOnAlarms" styleClass="toolbar-btn" text="Turn On Alarms -->">
+            <Button fx:id="alarmButton" onAction="#commandTurnOnAlarms" styleClass="toolbar-btn" text="Start Stress Test">
                 <graphic>
                     <ImageView fx:id="alarmIcon" fitHeight="18" fitWidth="18" preserveRatio="true">
                         <image><Image url="@alarm.png"/></image>

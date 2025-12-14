@@ -126,7 +126,7 @@ public class GUIController {
     if (!alarmActive) {
       view.getAlarmIcon().setImage(new Image(getClass().getResourceAsStream("/alarm.gif")));
       alarmActive = true;
-      view.getAlarmButton().setText("Stop Alarms");
+      view.getAlarmButton().setText("Stop Stress Test");
 
       // Get vehicle count from TextField
       int count = 0;
@@ -137,7 +137,7 @@ public class GUIController {
       } catch (Exception ex) {
         view.getStatusLabel().setText("add a valid vehicle number!");
         alarmActive = false;
-        view.getAlarmButton().setText("Turn On Alarms");
+        view.getAlarmButton().setText("Start Stress Test");
         view.getAlarmIcon().setImage(new Image(getClass().getResourceAsStream("/alarm.png")));
         return;
       }
@@ -151,7 +151,7 @@ public class GUIController {
     } else {
       view.getAlarmIcon().setImage(new Image(getClass().getResourceAsStream("/alarm.png")));
       alarmActive = false;
-      view.getAlarmButton().setText("Turn On Alarms");
+      view.getAlarmButton().setText("Start Stress Test");
       simController.stopStressTest(); // stop stress test logic in controller
       // Animation for alarm button
       if (alarmTimeline != null) {
