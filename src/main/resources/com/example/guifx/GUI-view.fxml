@@ -115,6 +115,42 @@
                 </HBox>
             </VBox>
             
+            <!-- Vehicle Type Stats -->
+            <Label text="VEHICLE TYPES" styleClass="panel-title">
+                <VBox.margin><Insets top="16"/></VBox.margin>
+            </Label>
+            <Separator styleClass="panel-separator"/>
+            <VBox styleClass="info-box" spacing="8">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="🚗 Cars:" styleClass="info-label" minWidth="80"/>
+                    <Label fx:id="carCountLabel" text="0" styleClass="info-value"/>
+                </HBox>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="🚌 Buses:" styleClass="info-label" minWidth="80"/>
+                    <Label fx:id="busCountLabel" text="0" styleClass="info-value"/>
+                </HBox>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="🚚 Trucks:" styleClass="info-label" minWidth="80"/>
+                    <Label fx:id="truckCountLabel" text="0" styleClass="info-value"/>
+                </HBox>
+            </VBox>
+            
+            <!-- Stress Test Progress -->
+            <Label text="STRESS TEST" styleClass="panel-title">
+                <VBox.margin><Insets top="16"/></VBox.margin>
+            </Label>
+            <Separator styleClass="panel-separator"/>
+            <VBox styleClass="info-box" spacing="8">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Status:" styleClass="info-label" minWidth="80"/>
+                    <Label fx:id="stressStatusLabel" text="Inactive" styleClass="info-value"/>
+                </HBox>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Remaining:" styleClass="info-label" minWidth="80"/>
+                    <Label fx:id="stressRemainingLabel" text="0" styleClass="info-value"/>
+                </HBox>
+            </VBox>
+            
             <!-- Speed Chart -->
             <Label text="SPEED CHART" styleClass="panel-title">
                 <VBox.margin><Insets top="16"/></VBox.margin>
