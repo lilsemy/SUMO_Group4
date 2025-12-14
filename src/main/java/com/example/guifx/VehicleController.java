@@ -137,7 +137,6 @@ public class VehicleController {
         TraCIPosition pos = Vehicle.getPosition(id, false);
         double angle = Vehicle.getAngle(id);
 
-        // VehicleModel existiert bereits? Sonst neu erstellen
         VehicleModel v = vehiclesList.getOrDefault(id, new VehicleModel(id));
 
         v.setSpeed(speed);
