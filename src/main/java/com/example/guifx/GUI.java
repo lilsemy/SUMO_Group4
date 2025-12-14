@@ -356,4 +356,9 @@ public class GUI {
         simController.changePhase();
     }
 
+    public void commandStressTest(ActionEvent e){
+        System.out.println("Starting Stress Test");
+        simController.startStressTest(50);
+    }
+
 }

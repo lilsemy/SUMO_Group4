@@ -79,7 +79,15 @@
          </yAxis>
       </LineChart>
       <Label fx:id="statusLabel" layoutX="773.0" layoutY="492.0" prefHeight="28.0" prefWidth="261.0" text="Status:" />
-      <Button layoutX="563.0" layoutY="66.0" mnemonicParsing="false" prefHeight="59.0" prefWidth="137.0" text="StreesTest" />
+      <Button layoutX="569.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandStressTest" prefHeight="59.0" prefWidth="137.0" text="Stress Test">
+         <graphic>
+            <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@alarm.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
 
    </children>
    <styleClass>
