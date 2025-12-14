@@ -8,36 +8,43 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.*;
 
-
+/**
+ * CarLayer is responsible for displaying vehicles in the simulation on a JavaFX Pane
+ */
 public class CarLayer {
-    // Map to store cars with their ID and image view
+    // Map to store cars with their ID and ImageView
     private final Map<String, ImageView> carImageViews;
     // Pane to display all car nodes
     private final Pane carLayerPane;
-
     // Images for different vehicle types
     private final Image carImage;
     private final Image busImage;
     private final Image truckImage;
 
-    // Constructor: receives the Pane where cars will be displayed
+    /**
+     * Constructs a CarLayer and loads vehicle images
+     * 
+     * @param carLayerPane Pane to display vehicles
+     */
     CarLayer(Pane carLayerPane) {
-
         carImageViews = new HashMap<>();
         this.carLayerPane = carLayerPane;
-        
-        // Load all vehicle images
+
         this.carImage = loadVehicleImage("/carblack.png");
         this.busImage = loadVehicleImage("/bus.png");
         this.truckImage = loadVehicleImage("/truck.png");
-        
-        // If carLayerPane is null, clear its children (defensive, but should not happen)
+
         if (carLayerPane == null) {
             this.carLayerPane.getChildren().clear();
         }
     }
-    
-    // Load a vehicle image from resources
+
+    /**
+     * Loads a vehicle image from resources
+     * 
+     * @param imagePath path to image
+     * @return Image object or null if loading failed
+     */
     private Image loadVehicleImage(String imagePath) {
         try {
             String absolutePath = getClass().getResource(imagePath).toExternalForm();
@@ -49,7 +56,13 @@ public class CarLayer {
             return null;
         }
     }
-    
+
+    /**
+     * Returns the appropriate image for a vehicle
+     * 
+     * @param vehicleId vehicle ID
+     * @return Image for the vehicle
+     */
     private Image getImageForVehicle(String vehicleId) {
         String typeId = Vehicle.getTypeID(vehicleId);
         String classId = Vehicle.getVehicleClass(vehicleId);
@@ -67,6 +80,12 @@ public class CarLayer {
         return carImage;
     }
 
+    /**
+     * Returns the width and height for a vehicle
+     * 
+     * @param vehicleId vehicle ID
+     * @return array [width, height]
+     */
     private double[] getSizeForVehicle(String vehicleId) {
         String typeId = Vehicle.getTypeID(vehicleId);
         String classId = Vehicle.getVehicleClass(vehicleId);
@@ -81,97 +100,75 @@ public class CarLayer {
         }
         return new double[]{7, 15};
     }
-    // Create a new car appearance and add it to the pane
+
+    /**
+     * Creates a new car ImageView and adds it to the pane
+     * 
+     * @param carID vehicle ID
+     */
     private void createCarImageView(String carID) {
-        // Get the appropriate image for this vehicle type
         Image vehicleImage = getImageForVehicle(carID);
-        
         if (vehicleImage == null) {
             System.err.println("No image available for vehicle: " + carID);
             return;
         }
 
         ImageView carView = new ImageView(vehicleImage);
-        
-        // Get the appropriate size for this vehicle type
         double[] size = getSizeForVehicle(carID);
         carView.setFitWidth(size[0]);
         carView.setFitHeight(size[1]);
-        
-        // Keep aspect ratio
         carView.setPreserveRatio(true);
-        // Smooth image quality
         carView.setSmooth(true);
 
         carImageViews.put(carID, carView);
         carLayerPane.getChildren().add(carView);
     }
 
-    // Update all cars: add new, update position, remove disappeared
+    /**
+     * Updates all cars: adds new cars, updates positions and rotations, removes disappeared cars
+     */
     public void updateCars() {
-        // 1. Get the list of all vehicle IDs currently present in the SUMO simulation
         List<String> ids = Vehicle.getIDList();
-        // 2. Convert the list to a set for fast lookup (active cars)
         Set<String> activeCarIds = new HashSet<>(ids);
-        // 3. Create a set of new car IDs (will remove known cars later)
         Set<String> newCarIds = new HashSet<>(activeCarIds);
 
-        // 4. Iterate through all cars currently managed (displayed)
         Iterator<Map.Entry<String, ImageView>> it = carImageViews.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, ImageView> entry = it.next();
             String carId = entry.getKey();
             ImageView carView = entry.getValue();
 
-            // 5. If the car is still active in SUMO
             if (activeCarIds.contains(carId)) {
-                // Remove from newCarIds (not a new car)
                 newCarIds.remove(carId);
-                // Get the car's position from SUMO (TraCI)
                 TraCIPosition sumoPos = Vehicle.getPosition(carId, false);
-                // Convert SUMO world coordinates to JavaFX screen coordinates
-                Point2D javaPos = MapUtil.worldToScreen(
-                        new Point2D(sumoPos.getX(), sumoPos.getY())
-                );
+                Point2D javaPos = MapUtil.worldToScreen(new Point2D(sumoPos.getX(), sumoPos.getY()));
                 double w = carView.getFitWidth();
                 double h = carView.getFitHeight();
-                // Get the car's angle from SUMO and rotate the image accordingly
                 double angle = Vehicle.getAngle(carId);
                 carView.setRotate(angle);
 
                 double radAngle = Math.toRadians(angle);
-                // Calculate offset to position the car image correctly
                 double offsetX = h / 2 * Math.sin(radAngle);
                 double offsetY = -(h / 2) * Math.cos(radAngle);
-                // Center the car image at the car's top position
                 carView.setLayoutX(javaPos.getX() - w / 2.0 - offsetX);
                 carView.setLayoutY(javaPos.getY() - h / 2.0 - offsetY);
             } else {
-                // 6. If the car no longer exists in SUMO, remove it from the pane and map
                 carLayerPane.getChildren().remove(carView);
                 it.remove();
             }
         }
 
-        // 7. For each new car detected in SUMO, create its appearance and add to the pane
         for (String carId : newCarIds) {
             createCarImageView(carId);
             ImageView carView = carImageViews.get(carId);
-
             if (carView != null) {
-                // Get and convert position as above
                 TraCIPosition sumoPosition = Vehicle.getPosition(carId, false);
-                Point2D javaPosition = MapUtil.worldToScreen(
-                        new Point2D(sumoPosition.getX(), sumoPosition.getY())
-                );
+                Point2D javaPosition = MapUtil.worldToScreen(new Point2D(sumoPosition.getX(), sumoPosition.getY()));
                 double width = carView.getFitWidth();
                 double height = carView.getFitHeight();
                 carView.setLayoutX(javaPosition.getX() - width / 2.0);
                 carView.setLayoutY(javaPosition.getY() - height / 2.0);
-
-                // Set the car's rotation to match SUMO's angle
                 double angle = Vehicle.getAngle(carId);
-                // The car image should be aligned horizontally with the Ox axis
                 carView.setRotate(angle);
             }
         }
