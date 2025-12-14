@@ -173,19 +173,25 @@ public class VehicleController {
 
   public void updateFromSimulation() throws Exception {
 
-    for (String id : Vehicle.getIDList()) {
+    List<String> aliveIds = Vehicle.getIDList();
+
+    vehiclesList.keySet().retainAll(aliveIds);
+
+    for (String id : aliveIds) {
       double speed = Vehicle.getSpeed(id);
       TraCIPosition pos = Vehicle.getPosition(id, false);
       double angle = Vehicle.getAngle(id);
 
-      // Get our local object OR create a new one if needed
-      VehicleModel v = vehiclesList.getOrDefault(id, new VehicleModel(id));
+      VehicleModel v = vehiclesList.get(id);
+      if (v == null) {
+        v = new VehicleModel(id);
+        vehiclesList.put(id, v);
+      }
 
       v.setSpeed(speed);
       v.setPosition(pos.getX(), pos.getY());
       v.setAngle(angle);
-
-      vehiclesList.put(id, v);
     }
   }
+
 }
