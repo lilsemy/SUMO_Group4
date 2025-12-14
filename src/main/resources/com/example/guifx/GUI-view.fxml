@@ -57,15 +57,15 @@
                 </graphic>
             </Button>
 
-            <TextField fx:id="alarmVehicleCountField" promptText="number of vehicles" prefWidth="60" maxWidth="80"/>
-
-            <Button fx:id="alarmButton" onAction="#commandTurnOnAlarms" styleClass="toolbar-btn" text="Turn On Alarms">
+            <Button fx:id="alarmButton" onAction="#commandTurnOnAlarms" styleClass="toolbar-btn" text="Turn On Alarms -->">
                 <graphic>
                     <ImageView fx:id="alarmIcon" fitHeight="18" fitWidth="18" preserveRatio="true">
                         <image><Image url="@alarm.png"/></image>
                     </ImageView>
                 </graphic>
             </Button>
+
+            <TextField fx:id="alarmVehicleCountField" promptText="number of vehicles" prefWidth="60" maxWidth="80"/>
 
             <Pane HBox.hgrow="ALWAYS"/>
             

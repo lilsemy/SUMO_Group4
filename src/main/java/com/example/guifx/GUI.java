@@ -84,7 +84,7 @@ public class GUI {
         count = Integer.parseInt(text);
         if (count <= 0) throw new NumberFormatException();
       } catch (Exception ex) {
-        statusLabel.setText("Nhập số xe hợp lệ!");
+        statusLabel.setText("add a valid vehicle number!");
         alarmActive = false;
         alarmButton.setText("Turn On Alarms");
         alarmIcon.setImage(new Image(getClass().getResourceAsStream("/alarm.png")));
