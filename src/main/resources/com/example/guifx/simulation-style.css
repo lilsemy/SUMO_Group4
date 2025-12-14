@@ -1,153 +1,190 @@
 /* ============================================
-   SUMO Traffic Simulation - Minimal Clean Style
-   ============================================ */
+    SUMO Traffic Simulation - Professional Dark Theme
+    ============================================ */
 
-/* Root container */
+/* ROOT */
 .root {
-    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
-    -fx-font-size: 14px;
-    -fx-background-color: #f2f2f2;
+  -fx-font-family: "Segoe UI", Arial, sans-serif;
+  -fx-font-size: 13px;
+  -fx-background-color: #1e1e1e;
+}
+
+.root-pane {
+  -fx-background-color: #1e1e1e;
+}
+
+/* TOOLBAR */
+.toolbar {
+  -fx-background-color: #2d2d2d;
+  -fx-border-color: #3d3d3d;
+  -fx-border-width: 0 0 1 0;
+}
+
+.app-title {
+  -fx-text-fill: #e0e0e0;
+  -fx-font-size: 16px;
+  -fx-font-weight: bold;
+}
+
+.toolbar-btn {
+  -fx-background-color: transparent;
+  -fx-text-fill: #b0b0b0;
+  -fx-font-size: 12px;
+  -fx-padding: 8 14;
+  -fx-background-radius: 4;
+  -fx-cursor: hand;
+  -fx-graphic-text-gap: 8;
+}
+
+.toolbar-btn:hover {
+  -fx-background-color: #3d3d3d;
+  -fx-text-fill: #ffffff;
+}
+
+.toolbar-btn:pressed {
+  -fx-background-color: #4d4d4d;
+}
+
+.zoom-label {
+  -fx-text-fill: #808080;
+  -fx-font-size: 12px;
+}
+
+/* MAP CONTAINER */
+.map-container {
+  -fx-background-color: #1a1a1a;
+}
+
+/* INFO PANEL */
+.info-panel {
+  -fx-background-color: #252526;
+  -fx-border-color: #3d3d3d;
+  -fx-border-width: 0 0 0 1;
+}
+
+.panel-title {
+  -fx-text-fill: #808080;
+  -fx-font-size: 11px;
+  -fx-font-weight: bold;
+}
+
+.panel-separator .line {
+  -fx-border-color: #3d3d3d;
+  -fx-border-width: 1 0 0 0;
+}
+
+.info-box {
+  -fx-padding: 8 0;
+}
+
+.info-label {
+  -fx-text-fill: #808080;
+  -fx-font-size: 13px;
+}
+
+.info-value {
+  -fx-text-fill: #e0e0e0;
+  -fx-font-size: 13px;
+  -fx-font-weight: bold;
+}
+
+.info-placeholder {
+  -fx-text-fill: #606060;
+  -fx-font-size: 12px;
+  -fx-font-style: italic;
+}
+
+/* CHART */
+.speed-chart {
+  -fx-background-color: transparent;
+}
+
+.speed-chart .chart-plot-background {
+  -fx-background-color: #1e1e1e;
+}
+
+.speed-chart .chart-vertical-grid-lines,
+.speed-chart .chart-horizontal-grid-lines {
+  -fx-stroke: #333333;
+}
+
+.speed-chart .axis {
+  -fx-tick-label-fill: #808080;
+}
+
+.speed-chart .axis-label {
+  -fx-text-fill: #808080;
+  -fx-font-size: 10px;
+}
+
+.speed-chart .chart-series-line {
+  -fx-stroke: #4fc3f7;
+  -fx-stroke-width: 2px;
+}
+
+/* STATUS BAR */
+.status-bar {
+  -fx-background-color: #007acc;
+}
+
+.status-text {
+  -fx-text-fill: #ffffff;
+  -fx-font-size: 12px;
+}
+
+.status-hint {
+  -fx-text-fill: rgba(255, 255, 255, 0.7);
+  -fx-font-size: 11px;
+}
+
+/* SEPARATOR */
+.separator .line {
+  -fx-border-color: #3d3d3d;
 }
 
 /* ============================================
-   BUTTONS
-   ============================================ */
+       ALARM BLINKING STYLE
+       ============================================ */
 
-/*
-.button {
-    -fx-background-color: #4a6fa5;   */
-/* xanh trung tính, không gradient *//*
-
-    -fx-text-fill: white;
-    -fx-font-weight: 600;
-    -fx-font-size: 13px;
-    -fx-background-radius: 6px;
-    -fx-padding: 10px 18px;
-    -fx-cursor: hand;
-    -fx-border-color: transparent;
-    -fx-effect: none;    */
-/* bỏ shadow cho sạch *//*
-
+/* Toolbar */
+.alarm-blink .toolbar {
+  -fx-background-color: #b00020 !important;
 }
 
-.button:hover {
-    -fx-background-color: #3f5f8f;
+/* Toolbar buttons & labels */
+.alarm-blink .toolbar .button,
+.alarm-blink .toolbar .label {
+  -fx-text-fill: white !important;
 }
 
-.button:pressed {
-    -fx-background-color: #36547f;
-    -fx-translate-y: 1px;
-}
-*/
-
-/* ============================================
-   LABELS
-   ============================================ */
-
-.label {
-    -fx-text-fill: #2f2f2f;
-    -fx-font-size: 14px;
+/* button pressed/armed turn orange */
+.alarm-blink .toolbar .button:armed,
+.alarm-blink .toolbar .button:pressed,
+.alarm-blink .toolbar .button:hover {
+  -fx-background-color: #ff5722 !important; /* orange */
+  -fx-text-fill: white !important;
 }
 
-.label-title {
-    -fx-font-size: 22px;
-    -fx-font-weight: bold;
+/* Info panel */
+.alarm-blink .info-panel {
+  -fx-background-color: #b00020 !important;
 }
 
-.label-section {
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
+/* Info text */
+.alarm-blink .info-panel .label {
+  -fx-text-fill: white !important;
 }
 
-.label-note {
-    -fx-font-size: 11px;
-    -fx-text-fill: #7a7a7a;
-    -fx-font-style: italic;
+/* Status bar */
+.alarm-blink .status-bar {
+  -fx-background-color: #b00020 !important;
 }
 
-/* ============================================
-   MAP CONTAINER
-   ============================================ */
-
-#mapContainer {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #d0d0d0;
-    -fx-border-width: 1px;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
+.alarm-blink .status-bar .label {
+  -fx-text-fill: white !important;
 }
 
-#backgroundCanvas {
-    -fx-background-color: #f7f7f7;
+/* Map – EXPLICITLY DO NOTHING */
+.alarm-blink .map-container {
+  -fx-background-color: #1a1a1a !important;
 }
-
-#carLayer,
-#trafficLightLayer,
-#laneLayer {
-    -fx-background-color: transparent;
-}
-
-/* ============================================
-   CHARTS
-   ============================================ */
-/*
-.chart {
-    -fx-background-color: white;
-    -fx-border-color: #dcdcdc;
-    -fx-border-width: 1px;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
-    -fx-padding: 8px;
-}
-
-.chart-title {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #333;
-}
-
-.axis {
-    -fx-tick-label-fill: #555;
-    -fx-font-size: 11px;
-}
-
-.axis-label {
-    -fx-text-fill: #666;
-}*/
-
-/* ============================================
-   LAYOUT SECTIONS
-   ============================================ */
-
-.control-section,
-.simulation-section,
-.statistics-section {
-    -fx-background-color: white;
-    -fx-padding: 15px;
-    -fx-spacing: 10px;
-    -fx-border-color: #e4e4e4;
-    -fx-border-width: 0 0 1px 0;
-}
-
-/* ============================================
-   ANCHOR PANE
-   ============================================ */
-
-.anchor-pane {
-    -fx-background-color: #f2f2f2;
-}
-
-/* ============================================
-   ALIGNMENT + SPACING
-   ============================================ */
-
-.center-align { -fx-alignment: center; }
-.top-align { -fx-alignment: top-center; }
-
-.spacing-small { -fx-spacing: 5px; }
-.spacing-medium { -fx-spacing: 10px; }
-.spacing-large { -fx-spacing: 20px; }
-
-.padding-small { -fx-padding: 5px; }
-.padding-medium { -fx-padding: 10px; }
-.padding-large { -fx-padding: 20px; }
