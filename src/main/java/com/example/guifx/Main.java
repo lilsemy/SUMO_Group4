@@ -4,10 +4,9 @@ import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import java.io.IOException;
 
 
-    /**
+/**
     *Main is the Initializer of the GUI
     *@see class Application
     */
@@ -24,14 +23,17 @@ public class Main extends Application {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("GUI-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
         stage.setTitle("SumoController");
+        stage.setMaximized(true);
         stage.setScene(scene);
         stage.show();
 
-        GUI controller = fxmlLoader.getController();
+        GUI gui = fxmlLoader.getController();
 
-        Connection conn = new Connection();
-        controller.setVehiclesManager(conn.getVehiclesManager());
-        // Connection.makeConnection(controller);
+        SimulationController simController = new SimulationController();
+        gui.setSimulationController(simController);
+        simController.makeConnection();
+
+        Statistics stat = new Statistics(simController);
     }
 
 

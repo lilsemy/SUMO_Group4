@@ -1,0 +1,153 @@
+/* ============================================
+   SUMO Traffic Simulation - Minimal Clean Style
+   ============================================ */
+
+/* Root container */
+.root {
+    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #f2f2f2;
+}
+
+/* ============================================
+   BUTTONS
+   ============================================ */
+
+/*
+.button {
+    -fx-background-color: #4a6fa5;   */
+/* xanh trung tính, không gradient *//*
+
+    -fx-text-fill: white;
+    -fx-font-weight: 600;
+    -fx-font-size: 13px;
+    -fx-background-radius: 6px;
+    -fx-padding: 10px 18px;
+    -fx-cursor: hand;
+    -fx-border-color: transparent;
+    -fx-effect: none;    */
+/* bỏ shadow cho sạch *//*
+
+}
+
+.button:hover {
+    -fx-background-color: #3f5f8f;
+}
+
+.button:pressed {
+    -fx-background-color: #36547f;
+    -fx-translate-y: 1px;
+}
+*/
+
+/* ============================================
+   LABELS
+   ============================================ */
+
+.label {
+    -fx-text-fill: #2f2f2f;
+    -fx-font-size: 14px;
+}
+
+.label-title {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+}
+
+.label-section {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+}
+
+.label-note {
+    -fx-font-size: 11px;
+    -fx-text-fill: #7a7a7a;
+    -fx-font-style: italic;
+}
+
+/* ============================================
+   MAP CONTAINER
+   ============================================ */
+
+#mapContainer {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #d0d0d0;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+}
+
+#backgroundCanvas {
+    -fx-background-color: #f7f7f7;
+}
+
+#carLayer,
+#trafficLightLayer,
+#laneLayer {
+    -fx-background-color: transparent;
+}
+
+/* ============================================
+   CHARTS
+   ============================================ */
+/*
+.chart {
+    -fx-background-color: white;
+    -fx-border-color: #dcdcdc;
+    -fx-border-width: 1px;
+    -fx-border-radius: 6px;
+    -fx-background-radius: 6px;
+    -fx-padding: 8px;
+}
+
+.chart-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333;
+}
+
+.axis {
+    -fx-tick-label-fill: #555;
+    -fx-font-size: 11px;
+}
+
+.axis-label {
+    -fx-text-fill: #666;
+}*/
+
+/* ============================================
+   LAYOUT SECTIONS
+   ============================================ */
+
+.control-section,
+.simulation-section,
+.statistics-section {
+    -fx-background-color: white;
+    -fx-padding: 15px;
+    -fx-spacing: 10px;
+    -fx-border-color: #e4e4e4;
+    -fx-border-width: 0 0 1px 0;
+}
+
+/* ============================================
+   ANCHOR PANE
+   ============================================ */
+
+.anchor-pane {
+    -fx-background-color: #f2f2f2;
+}
+
+/* ============================================
+   ALIGNMENT + SPACING
+   ============================================ */
+
+.center-align { -fx-alignment: center; }
+.top-align { -fx-alignment: top-center; }
+
+.spacing-small { -fx-spacing: 5px; }
+.spacing-medium { -fx-spacing: 10px; }
+.spacing-large { -fx-spacing: 20px; }
+
+.padding-small { -fx-padding: 5px; }
+.padding-medium { -fx-padding: 10px; }
+.padding-large { -fx-padding: 20px; }

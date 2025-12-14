@@ -1,0 +1,6 @@
+<configuration>
+    <input>
+        <net-file value="complex.net.xml"/>
+        <route-files value="complex.rou.xml"/>
+    </input>
+</configuration>
