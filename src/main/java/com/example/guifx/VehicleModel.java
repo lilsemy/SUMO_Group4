@@ -13,7 +13,7 @@ public class VehicleModel {
   private String routeId;
   private byte laneId;
 
-  private int depart;
+  private double depart;
   private double pos;
   private double speed;
 
@@ -42,12 +42,12 @@ public class VehicleModel {
   /**
    * @param id, typeId, routeId, laneId
    */
-  public VehicleModel(String id, String typeId, String routeId, byte laneId) {
+  public VehicleModel(String id, String typeId, String routeId, byte laneId, double depart) {
     this.id = id;
     this.typeId = typeId;
     this.routeId = routeId;
     this.laneId = laneId;
-    this.depart = 0;
+    this.depart = depart;
     this.pos = 0.0;
     this.speed = 1.0;
 
@@ -102,7 +102,7 @@ public class VehicleModel {
   /**
    * @return Time of Departure of the Vehicle
    */
-  public int getDepart() {
+  public double getDepart() {
     return depart;
   }
 
