@@ -3,6 +3,7 @@ package com.example.guifx;
 import java.util.*;
 import org.eclipse.sumo.libtraci.TraCIPosition;
 import org.eclipse.sumo.libtraci.Vehicle;
+import org.eclipse.sumo.libtraci.Simulation;
 
 /**
  * VehicleController is one of the sub controller classes that controls the vehicles in the
@@ -68,7 +69,9 @@ public class VehicleController {
     vehicleCounter++;
     String id = "id" + vehicleCounter;
 
-    VehicleModel vehicle = new VehicleModel(id, typeId, routeId, laneId);
+    double currentTime = Simulation.getTime();
+
+    VehicleModel vehicle = new VehicleModel(id, typeId, routeId, laneId, currentTime);
     // inject it into SUMO
     boolean success = injectVehicle(vehicle);
 
