@@ -20,6 +20,11 @@ import javafx.scene.control.Label;
 public class GUI {
     private SimulationController simController;
 
+    /**
+     * Constructor for GUI.
+     *
+     * @throws Exception if initialization fails
+     */
     public GUI() throws Exception {
     }
 
