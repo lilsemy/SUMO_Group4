@@ -13,8 +13,4 @@ public class MapSumoConfig {
     //This file defines the network, routes, and simulation parameters.
     public static final double STEP_LENGTH = 0.05;
     //time step in seconds (0.1 means 10 steps per second)
-
-
-
-
 }

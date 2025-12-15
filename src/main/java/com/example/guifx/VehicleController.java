@@ -1,36 +1,77 @@
 package com.example.guifx;
 
+import java.util.*;
 import org.eclipse.sumo.libtraci.Vehicle;
-import org.eclipse.sumo.libtraci.GUI;
 import org.eclipse.sumo.libtraci.TraCIPosition;
 import org.eclipse.sumo.libtraci.Simulation;
 
-import java.util.*;
-
 /**
- * VehicleController controls vehicles in the simulation
+ * VehicleController is one of the sub controller classes that controls the
+ * vehicles in the simulation
  */
+
 public class VehicleController {
+    // for storing our vehicles in a map (dictionary);
+    // key = vehicle id
+    // value = vehicle object
     private Map<String, VehicleModel> vehiclesList;
     private int vehicleCounter = 0;
 
-    /**
-     * Constructs a VehicleController
-     */
+    // Available vehicle types and routes for random injection
+    private static final String[] VEHICLE_TYPES = {
+            "carblack", "carblue", "carred",
+            "bus",
+            "truck", "truckwhite", "truckyellow",
+            "supercargrey", "supercarwhite"
+    };
+    private static final String[] ROUTES = { "r1", "r2", "r3" };
+    private final Random random = new Random();
+
+    // removed Connection object, because it shouldn't see it
     public VehicleController() {
         this.vehiclesList = new HashMap<>();
     }
 
     /**
-     * Creates and injects a vehicle into the simulation
+     * Creates and injects a vehicle with random type and random route
      * 
-     * @param typeId  vehicle type ID
-     * @param routeId route ID
-     * @param laneId  lane index
-     * @return VehicleModel created
-     * @throws Exception if injection fails
+     * @return the created VehicleModel if successful, null if injection failed
      */
-    public VehicleModel createAndInjectVehicle(String typeId, String routeId, byte laneId) throws Exception {
+    public VehicleModel createAndInjectRandomVehicle() {
+        String randomType = VEHICLE_TYPES[random.nextInt(VEHICLE_TYPES.length)];
+        String randomRoute = ROUTES[random.nextInt(ROUTES.length)];
+        byte randomLane = (byte) random.nextInt(2); // lane 0 or 1
+
+        return createAndInjectVehicle(randomType, randomRoute, randomLane);
+    }
+
+    /**
+     * Gets the available vehicle types
+     * 
+     * @return array of vehicle type IDs
+     */
+    public static String[] getVehicleTypes() {
+        return VEHICLE_TYPES;
+    }
+
+    /**
+     * Gets the available routes
+     * 
+     * @return array of route IDs
+     */
+    public static String[] getRoutes() {
+        return ROUTES;
+    }
+
+    /**
+     * Creates and injects a vehicle
+     * 
+     * @param typeId  vehicle type
+     * @param routeId route ID
+     * @param laneId  lane ID
+     * @return the created VehicleModel if successful, null if injection failed
+     */
+    public VehicleModel createAndInjectVehicle(String typeId, String routeId, byte laneId) {
         vehicleCounter++;
         String id = "id" + vehicleCounter;
 
@@ -38,19 +79,26 @@ public class VehicleController {
 
         VehicleModel vehicle = new VehicleModel(id, typeId, routeId, laneId, currentTime);
 
-        injectVehicle(vehicle);
-        return vehicle;
+        // inject it into SUMO
+        boolean success = injectVehicle(vehicle);
+
+        if (success) {
+            return vehicle;
+        } else {
+            return null; // injection failed
+        }
     }
 
     /**
-     * Injects a vehicle into the SUMO simulation
-     * 
-     * @param vehicle VehicleModel to inject
-     * @throws Exception if injection fails
+     *
+     * @param vehicle
+     * @return true if injection succeeded, false otherwise
      */
-    public void injectVehicle(VehicleModel vehicle) throws Exception {
+    public boolean injectVehicle(VehicleModel vehicle) {
         try {
-            Vehicle.add(vehicle.getId(), vehicle.getRouteId(), vehicle.getTypeId(),
+            Vehicle.add(vehicle.getId(),
+                    vehicle.getRouteId(),
+                    vehicle.getTypeId(),
                     String.valueOf(vehicle.getDepart()),
                     String.valueOf(vehicle.getLaneId()),
                     String.valueOf(vehicle.getPos()),
@@ -58,19 +106,23 @@ public class VehicleController {
                     String.valueOf(vehicle.getLaneId()));
 
             vehiclesList.put(vehicle.getId(), vehicle);
-            System.out.println("Injected vehicle: " + vehicle.getId());
+            System.out.println("Injected vehicle: " + vehicle.getId() + " [" + vehicle.getTypeId() + "] on route "
+                    + vehicle.getRouteId());
+            return true;
         } catch (Exception e) {
             System.err.println("Failed to inject vehicle " + vehicle.getId() + ": " + e.getMessage());
+            // Rollback counter since injection failed
+            vehicleCounter--;
+            return false;
         }
     }
 
     /**
-     * Returns the speed of a vehicle
-     * 
-     * @param vehicleId ID of the vehicle
-     * @return speed of vehicle or 0 if not found
-     * @throws Exception if retrieval fails
+     * @return Speed of Vehicle
+     * @param vehicleId
+     * @throws Exception
      */
+
     public double getVehicleSpeed(String vehicleId) throws Exception {
         if (vehiclesList.containsKey(vehicleId)) {
             return vehiclesList.get(vehicleId).getSpeed();
@@ -80,83 +132,77 @@ public class VehicleController {
         }
     }
 
-    /**
-     * Returns the last created vehicle ID
-     * 
-     * @return last vehicle ID or null
-     */
     public String getLastVehicleId() {
-        if (vehiclesList.isEmpty()) return null;
-        return "id" + vehicleCounter;
+        if (vehiclesList.isEmpty())
+            return null;
+        return "id" + vehicleCounter; // letzte erzeugte ID
     }
 
     /**
-     * Returns a map of all vehicles
+     * Gets all vehicles as an unmodifiable map (OOP encapsulation)
      * 
-     * @return Map of vehicle IDs to VehicleModel
+     * @return unmodifiable map of vehicles
      */
     public Map<String, VehicleModel> getVehiclesMap() {
-        return vehiclesList;
+        return Collections.unmodifiableMap(vehiclesList);
     }
 
     /**
-     * Returns the vehicle with the given ID
-     * 
-     * @param id vehicle ID
-     * @return VehicleModel or null if not found
+     * @return vehicle
+     * @param id
      */
-    public VehicleModel getVehicle(String id) {
+    public VehicleModel getVehicle(String id) {// what
         return vehiclesList.get(id);
     }
 
     /**
-     * Sets the camera to track a specific vehicle
-     * 
-     * @param viwId view ID
-     * @param vehId vehicle ID
-     * @throws Exception if tracking fails
+     * @return sets camera of sumo-gui on given vehicle
+     * @param viwId, vehId
+     * @throws Exception
      */
     public void trackVehicle(String viwId, String vehId) throws Exception {
+
         if (getIds().contains(vehId)) {
-            // GUI.trackVehicle(viwId, vehId); // commented out
+            // problem
+            // GUI.trackVehicle(viwId, vehId);
         } else {
             System.out.println("Warning! Car left the Map or was deleted.");
         }
     }
 
     /**
-     * Returns IDs of all vehicles in the simulation
-     * 
-     * @return List of vehicle IDs
-     * @throws Exception if retrieval fails
+     *
+     * @return IDs of all Vehicle in the simulation
+     * @throws Exception
      */
     public List<String> getIds() throws Exception {
+
         List<String> IDList = Vehicle.getIDList();
         return IDList;
     }
 
-    /**
-     * Updates the local vehicle states from the simulation
-     * 
-     * @throws Exception if update fails
-     */
     public void updateFromSimulation() throws Exception {
-        List<String> liveIds = Vehicle.getIDList();
 
-        vehiclesList.keySet().retainAll(liveIds);
+        List<String> aliveIds = Vehicle.getIDList();
 
-        for (String id : liveIds) {
+        vehiclesList.keySet().retainAll(aliveIds);
+
+        for (String id : aliveIds) {
             double speed = Vehicle.getSpeed(id);
             TraCIPosition pos = Vehicle.getPosition(id, false);
             double angle = Vehicle.getAngle(id);
 
-            VehicleModel v = vehiclesList.getOrDefault(id, new VehicleModel(id));
+            VehicleModel v = vehiclesList.get(id);
+            if (v == null) {
+                v = new VehicleModel(id);
+                vehiclesList.put(id, v);
+            }
 
             v.setSpeed(speed);
             v.setPosition(pos.getX(), pos.getY());
             v.setAngle(angle);
-
-            vehiclesList.put(id, v);
         }
+
     }
+
 }

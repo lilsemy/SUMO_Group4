@@ -101,4 +101,23 @@ public class MapUtil {
         double sy = canvasHeight - MARGIN - y;
         return new Point2D(sx, sy);
     }
+
+    /**
+     * Converts a distance in meters (SUMO world units) to pixels (JavaFX screen units)
+     * 
+     * @param meters distance in meters
+     * @return distance in pixels
+     */
+    public static double metersToPixels(double meters) {
+        return meters * scale;
+    }
+
+    /**
+     * Gets the current scale factor (pixels per meter)
+     * 
+     * @return scale factor
+     */
+    public static double getScale() {
+        return scale;
+    }
 }

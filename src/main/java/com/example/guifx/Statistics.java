@@ -9,50 +9,54 @@ double currentTime = Simulation.getTime();
 import java.util.*;
 
 /**
-* Statistics is a model class to calculate relevant metrics over the simulation
-*/
+ * Statistics is a model class to calculate relevant metrics over the simulation
+ */
 
 public class Statistics {
 
     private final SimulationController simCon;
 
-    //Vehicle Data Structure
-    private Map<String, VehicleModel> currentVehicles = new HashMap<>();    // All vehicles in simulation
-    private Map<String, Double> departureTimes = new HashMap<>();           // Departure times of vehicles
-    private Map<String, Integer> vehicleCountsPerEdge = new HashMap<>();    // Vehicles per Edge (density)
+    // Vehicle Data Structure
+    private Map<String, VehicleModel> currentVehicles = new HashMap<>(); // All vehicles in simulation
+    private Map<String, Double> departureTimes = new HashMap<>(); // Departure times of vehicles
+    private Map<String, Integer> vehicleCountsPerEdge = new HashMap<>(); // Vehicles per Edge (density)
 
     // Traffic Light Data Structure
     private Map<String, Integer> currentTrafficLightStates = new HashMap<>(); // Count of Traffic lights per phase
-    
+
     public Statistics(SimulationController simCon) {
         this.simCon = simCon;
     }
 
     /**
-    * Refresh vehicles list at a point in time of simulation
-    */
+     * Refresh vehicles list at a point in time of simulation
+     */
     public void updateVehicles(double currentTime) {
-    Map<String, VehicleModel> latest =
-            simCon.getVehicleController().getVehiclesMap();
+        Map<String, VehicleModel> latest = simCon.getVehicleController().getVehiclesMap();
 
-    currentVehicles = new HashMap<>(latest);
+        currentVehicles = new HashMap<>(latest);
 
-    for (String id : currentVehicles.keySet()) {
-      departureTimes.putIfAbsent(id, currentTime);
+        for (String id : currentVehicles.keySet()) {
+            departureTimes.putIfAbsent(id, currentTime);
+        }
     }
-  }
 
     /**
      * Calculates global average speed of all vehicles.
      */
     public double getAverageSpeed() {
-        if (currentVehicles.isEmpty()) return 0;
+        if (currentVehicles.isEmpty())
+            return 0;
 
         double sum = 0;
         for (VehicleModel v : currentVehicles.values()) {
             sum += v.getSpeed();
         }
         return sum / currentVehicles.size();
+    }
+
+    public int getCurrentVehiclesSize() {
+        return currentVehicles.size();
     }
 
     /**
@@ -94,45 +98,48 @@ public class Statistics {
     }
 
     /**
-    * Fetches the current state of all traffic lights from the simulation and counts how many are currently red, yellow, or green
-    */
+     * Fetches the current state of all traffic lights from the simulation and
+     * counts how many are currently red, yellow, or green
+     */
     public void updateTrafficLights() {
-    Map<String, TrafficLightModel> currentTrafficLights;
+        Map<String, TrafficLightModel> currentTrafficLights;
 
-    currentTrafficLights = simCon.getTlController().getTlList();
+        currentTrafficLights = simCon.getTlController().getTlList();
 
-    Map<String, Integer> counts = new HashMap<>();
-    counts.put("R", 0);
-    counts.put("Y", 0);
-    counts.put("G", 0);
+        Map<String, Integer> counts = new HashMap<>();
+        counts.put("R", 0);
+        counts.put("Y", 0);
+        counts.put("G", 0);
 
-    for (TrafficLightModel tl : currentTrafficLights.values()) {
-        String state = tl.getRedYellowGreenState().toUpperCase();
+        for (TrafficLightModel tl : currentTrafficLights.values()) {
+            String state = tl.getRedYellowGreenState().toUpperCase();
 
-        if (state.contains("R")) counts.put("R", counts.get("R") + 1);
-        if (state.contains("Y")) counts.put("Y", counts.get("Y") + 1);
-        if (state.contains("G")) counts.put("G", counts.get("G") + 1);
+            if (state.contains("R"))
+                counts.put("R", counts.get("R") + 1);
+            if (state.contains("Y"))
+                counts.put("Y", counts.get("Y") + 1);
+            if (state.contains("G"))
+                counts.put("G", counts.get("G") + 1);
         }
 
-    this.currentTrafficLightStates = counts;
+        this.currentTrafficLightStates = counts;
     }
-
 
     /**
      * Testing purposes -> Prints all statistics data.
      */
     public void printAllStatistics(double currentTime) {
-    
-    updateVehicles(currentTime);
-    updateVehicleDensity();
-    updateTrafficLights();    
-        
-    System.out.println("=== Simulation Statistics ===");
-    System.out.println("Total vehicles: " + currentVehicles.size());
-    System.out.println("Average speed: " + getAverageSpeed() + " m/s");
-    System.out.println("Vehicle density per edge: " + vehicleCountsPerEdge);
-    System.out.println("Travel times (for vehicles that have left the simulation): " + calculateTravelTimes(currentTime));
-    System.out.println("Traffic lights count per color: " + currentTrafficLightStates);
+
+        updateVehicles(currentTime);
+        updateVehicleDensity();
+        updateTrafficLights();
+
+        System.out.println("=== Simulation Statistics ===");
+        System.out.println("Total vehicles: " + currentVehicles.size());
+        System.out.println("Average speed: " + getAverageSpeed() + " m/s");
+        System.out.println("Vehicle density per edge: " + vehicleCountsPerEdge);
+        System.out.println(
+                "Travel times (for vehicles that have left the simulation): " + calculateTravelTimes(currentTime));
+        System.out.println("Traffic lights count per color: " + currentTrafficLightStates);
     }
 }
-

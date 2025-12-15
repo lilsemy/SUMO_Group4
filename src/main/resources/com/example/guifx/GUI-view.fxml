@@ -1,102 +1,143 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
-<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
-<?import javafx.scene.text.Font?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="660.0" prefWidth="1085.0" stylesheets="@simulation-style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.guifx.GUI">
-   <children>
-      <!-- Simulation Controls Section -->
-      <Label layoutX="82.0" layoutY="14.0" styleClass="label-title" text="Simulation Controls:" AnchorPane.leftAnchor="82.0" AnchorPane.topAnchor="14.0" />
-      
-      <!-- Control Buttons -->
-      <Button alignment="CENTER" layoutX="82.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandSpawnVehicle" prefHeight="59.0" prefWidth="137.0" text="Insert Car" textAlignment="CENTER" AnchorPane.leftAnchor="82.0" AnchorPane.topAnchor="51.0">
-         <graphic>
-            <ImageView fitHeight="33.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@proxy-image.png" />
-               </image>
-            </ImageView>
-         </graphic>
-      </Button>
-      
-      <Button layoutX="240.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandGetVehicleSpeed" prefHeight="59.0" prefWidth="137.0" text="Get Speed" AnchorPane.leftAnchor="240.0" AnchorPane.topAnchor="51.0">
-         <graphic>
-            <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@Speed.png" />
-               </image>
-            </ImageView>
-         </graphic>
-      </Button>
-      
-      <Button layoutX="398.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandChangePhase" prefHeight="59.0" prefWidth="137.0" text="ChangePhase" AnchorPane.leftAnchor="398.0" AnchorPane.topAnchor="51.0">
-         <graphic>
-            <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@trafficlight.png" />
-               </image>
-            </ImageView>
-         </graphic>
-      </Button>
-      
-      <!-- Live Simulation Section -->
-      <Label layoutX="82.0" layoutY="127.0" styleClass="label-section" text="Live Simulation:" AnchorPane.leftAnchor="82.0" AnchorPane.topAnchor="127.0" />
-      
-      <!-- Map Container with Layers -->
-      <StackPane fx:id="mapContainer" layoutX="67.0" layoutY="193.0" prefHeight="443.0" prefWidth="671.0" AnchorPane.bottomAnchor="39.0" AnchorPane.leftAnchor="52.0" AnchorPane.rightAnchor="362.0" AnchorPane.topAnchor="178.0">
-         <children>
-            <Canvas fx:id="backgroundCanvas" height="456.0" width="669.0" />
-            <Pane fx:id="laneLayer" prefHeight="456.0" prefWidth="669.0" />
-            <Pane fx:id="trafficLightLayer" prefHeight="456.0" prefWidth="669.0" />
-            <Pane fx:id="carLayer" prefHeight="456.0" prefWidth="669.0" />
+<BorderPane fx:id="rootPane"
+            xmlns="http://javafx.com/javafx/21" 
+            xmlns:fx="http://javafx.com/fxml/1" 
+            fx:controller="com.example.guifx.GUI"
+            styleClass="root-pane"
+            stylesheets="@simulation-style.css"
+            prefWidth="1200" prefHeight="700">
+    
+    <!-- TOP: Toolbar -->
+    <top>
+        <HBox styleClass="toolbar" spacing="12" alignment="CENTER_LEFT">
+            <padding><Insets top="10" right="20" bottom="10" left="20"/></padding>
+            
+            <Label text="SUMO Traffic Simulation" styleClass="app-title"/>
+            
+            <Separator orientation="VERTICAL"/>
+            
+            <Button onAction="#commandSpawnVehicle" styleClass="toolbar-btn" text="Insert Vehicle">
+                <graphic>
+                    <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
+                        <image><Image url="@proxy-image.png"/></image>
+                    </ImageView>
+                </graphic>
+            </Button>
+            
+            <Button onAction="#commandGetVehicleSpeed" styleClass="toolbar-btn" text="Get Speed">
+                <graphic>
+                    <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
+                        <image><Image url="@Speed.png"/></image>
+                    </ImageView>
+                </graphic>
+            </Button>
+            
+            <Button onAction="#commandChangePhase" styleClass="toolbar-btn" text="Change Phase">
+                <graphic>
+                    <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
+                        <image><Image url="@trafficlight.png"/></image>
+                    </ImageView>
+                </graphic>
+            </Button>
 
-         </children>
-      </StackPane>
-      
-      <!-- Statistics Section -->
-      <Label layoutX="816.0" layoutY="142.0" styleClass="label-section" text="Statistics:" AnchorPane.rightAnchor="188.0" AnchorPane.topAnchor="142.0">
-         <font>
-            <Font size="24.0" />
-         </font></Label>
-      <Label id="avgSpeedLabel" fx:id="avgSpeedLabel" layoutX="793.0" layoutY="193.0" prefHeight="28.0" prefWidth="222.0" text="Avg Speed: 0 m/s" AnchorPane.rightAnchor="70.0" AnchorPane.topAnchor="193.0" />
-      <Label id="vehicleCountLabel" fx:id="vehicleCountLabel" layoutX="778.0" layoutY="198.0" text="Vehicles: 0" AnchorPane.rightAnchor="222.0" AnchorPane.topAnchor="180.0" />
-      <LineChart fx:id="speedChart" layoutX="736.0" layoutY="215.0" prefHeight="245.0" prefWidth="375.0" AnchorPane.rightAnchor="-11.0" AnchorPane.topAnchor="215.0">
-         <xAxis>
-            <NumberAxis label="Time (s)" side="BOTTOM" />
-         </xAxis>
-         <yAxis>
-            <NumberAxis label="Speed (m/s)" side="LEFT" />
-         </yAxis>
-      </LineChart>
-      <Label fx:id="statusLabel" layoutX="773.0" layoutY="492.0" prefHeight="28.0" prefWidth="261.0" text="Status:" AnchorPane.rightAnchor="85.0" AnchorPane.topAnchor="600.0" />
-      <Button layoutX="569.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandStressTest" prefHeight="59.0" prefWidth="137.0" text="Stress Test">
-         <graphic>
-            <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@alarm.png" />
-               </image>
-            </ImageView>
-         </graphic>
-      </Button>
+            <Button fx:id="alarmButton" onAction="#commandTurnOnAlarms" styleClass="toolbar-btn" text="Start Stress Test">
+                <graphic>
+                    <ImageView fx:id="alarmIcon" fitHeight="18" fitWidth="18" preserveRatio="true">
+                        <image><Image url="@alarm.png"/></image>
+                    </ImageView>
+                </graphic>
+            </Button>
 
-   </children>
-   <styleClass>
-      <String fx:value="anchor-pane" />
-      <String fx:value="axis-label" />
-      <String fx:value="statistics-section" />
-      <String fx:value="axis" />
-      <String fx:value="anchor-pane" />
-      <String fx:value="center-align" />
-      <String fx:value="simulation-section" />
-   </styleClass>
-</AnchorPane>
+            <TextField fx:id="alarmVehicleCountField" promptText="number of vehicles" prefWidth="60" maxWidth="80"/>
+
+            <Pane HBox.hgrow="ALWAYS"/>
+            
+            <Label fx:id="zoomLabel" text="Zoom: 100%" styleClass="zoom-label"/>
+        </HBox>
+    </top>
+    
+    <!-- CENTER: Main Map View -->
+    <center>
+        <StackPane fx:id="mapContainer" styleClass="map-container">
+            <Canvas fx:id="backgroundCanvas"/>
+            <Pane fx:id="laneLayer"/>
+            <Pane fx:id="trafficLightLayer"/>
+            <Pane fx:id="carLayer"/>
+        </StackPane>
+    </center>
+    
+    <!-- RIGHT: Info Panel -->
+    <right>
+        <VBox styleClass="info-panel" prefWidth="300" minWidth="280">
+            <padding><Insets top="16" right="16" bottom="16" left="16"/></padding>
+            
+            <!-- Hover Info -->
+            <Label text="HOVER INFO" styleClass="panel-title"/>
+            <Separator styleClass="panel-separator"/>
+            <VBox fx:id="hoverInfoBox" styleClass="info-box" minHeight="70">
+                <Label fx:id="hoverInfoLabel" text="Hover over vehicle or traffic light" styleClass="info-placeholder" wrapText="true"/>
+            </VBox>
+            
+            <!-- Simulation Stats -->
+            <Label text="SIMULATION" styleClass="panel-title">
+                <VBox.margin><Insets top="16"/></VBox.margin>
+            </Label>
+            <Separator styleClass="panel-separator"/>
+            <VBox styleClass="info-box" spacing="8">
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Vehicles:" styleClass="info-label" minWidth="80"/>
+                    <Label fx:id="vehicleCountLabel" text="0" styleClass="info-value"/>
+                </HBox>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Avg Speed:" styleClass="info-label" minWidth="80"/>
+                    <Label fx:id="avgSpeedLabel" text="0.0 m/s" styleClass="info-value"/>
+                </HBox>
+                <HBox spacing="10" alignment="CENTER_LEFT">
+                    <Label text="Sim Time:" styleClass="info-label" minWidth="80"/>
+                    <Label fx:id="simTimeLabel" text="0.0s" styleClass="info-value"/>
+                </HBox>
+            </VBox>
+            
+            <!-- Speed Chart -->
+            <Label text="SPEED CHART" styleClass="panel-title">
+                <VBox.margin><Insets top="16"/></VBox.margin>
+            </Label>
+            <Separator styleClass="panel-separator"/>
+            <LineChart fx:id="speedChart" styleClass="speed-chart" 
+                       prefHeight="180" createSymbols="false" animated="false" legendVisible="false"
+                       VBox.vgrow="ALWAYS">
+                <xAxis><NumberAxis label="Time (s)" side="BOTTOM"/></xAxis>
+                <yAxis><NumberAxis label="m/s" side="LEFT"/></yAxis>
+            </LineChart>
+            
+            <Pane VBox.vgrow="ALWAYS"/>
+        </VBox>
+    </right>
+    
+    <!-- BOTTOM: Status Bar -->
+    <bottom>
+        <HBox styleClass="status-bar" alignment="CENTER_LEFT">
+            <padding><Insets top="5" right="20" bottom="5" left="20"/></padding>
+            <Label fx:id="statusLabel" text="Ready" styleClass="status-text"/>
+            <Pane HBox.hgrow="ALWAYS"/>
+            <Label text="Scroll to zoom • Drag to pan" styleClass="status-hint"/>
+        </HBox>
+    </bottom>
+</BorderPane>

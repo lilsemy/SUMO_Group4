@@ -1,30 +1,36 @@
 <routes>
 
-    <vType id="car" vClass="passenger" length="5" accel="3.5" decel="2.2" sigma="1.0" maxSpeed="10" color="red"/>
-    <vType id="bus" vClass="bus" length="12" accel="2.0" decel="2.0" sigma="0.8" maxSpeed="8" color="blue"/>
-    <vType id="truck" vClass="truck" length="8" accel="2.5" decel="2.0" sigma="0.9" maxSpeed="9" color="green"/>
-
+    <vType id="carblack" vClass="passenger" length="5" minGap="3" accel="3.5" decel="2.2" sigma="1.0" maxSpeed="10" color="black"/>
+    <vType id="carblue" vClass="passenger" length="5" minGap="3" accel="3.5" decel="2.2" sigma="1.0" maxSpeed="10" color="blue"/>
+    <vType id="carred" vClass="passenger" length="5" minGap="3" accel="3.5" decel="2.2" sigma="1.0" maxSpeed="10" color="red"/>
+    <vType id="supercargrey" vClass="passenger" length="4" minGap="3" accel="9" decel="5.0" sigma="0.7" maxSpeed="30" color="grey"/>
+    <vType id="supercarwhite" vClass="passenger" length="4" minGap="3" accel="9" decel="5.0" sigma="0.7" maxSpeed="30" color="white"/>
+    <vType id="truckwhite" vClass="truck" length="8" minGap="3" accel="2.5" decel="2.0" sigma="0.9" maxSpeed="9" color="white"/>
+    <vType id="truckyellow" vClass="truck" length="8" minGap="3" accel="2.5" decel="2.0" sigma="0.9" maxSpeed="9" color="yellow"/>
+    <vType id="bus" vClass="bus" length="12" minGap="3" accel="2.0" decel="2.0" sigma="0.8" maxSpeed="8" color="blue"/>
+    <vType id="truck" vClass="truck" length="8" minGap="3" accel="2.5" decel="2.0" sigma="0.9" maxSpeed="9" color="green"/>
+    
     <!--  Routes  -->
     <route id="r1" edges="e1 e22 e23 e24 e25 e26 e27 4804788#2 e28 e29 -e14 -e15 -e16 -e17 -e18 -e19 -e20 -e21"/> <!-- Edge "4804788#2" is between e27 and e28... (Forgot to change) -->
     <route id="r2" edges="-e51 -e50 -e49 -e48 -e46 -4804880#0 e16 e15 e14 e13 e12 e11 e10 e9 e8 e7 e6 e5 e4 e3 e2"/> <!-- Edge "-4804880#0" and "4804880#0" are at the intersection of e16,e17 and e46 (also saw it to late D:) -->
     <route id="r3" edges="-e32 -e33 -e34 -e35 e17 4804880#0 e46 e47 -e47 -e46 -4804880#0 e16 e15 e14 e13 e12 e11 e10 e9 e8 e7 e6 e5 e4 e3 e22 e23 e24 e25 e30 e31"/>
 
-    <vehicle id="car_0" type="car" route="r1" depart="0" color="1,0,0"/>
+    <vehicle id="car_0" type="carblack" route="r1" depart="0" color="1,0,0"/>
     <vehicle id="bus_0" type="bus" route="r1" depart="1" color="0,0,1"/>
-    <vehicle id="car_1" type="car" route="r1" depart="2" color="1,0,0"/>
+    <vehicle id="car_1" type="carblack" route="r1" depart="2" color="1,0,0"/>
     <vehicle id="truck_0" type="truck" route="r1" depart="3" color="0,1,0"/>
-    <vehicle id="car_2" type="car" route="r1" depart="4" color="1,0,0"/>
+    <vehicle id="car_2" type="carblack" route="r1" depart="4" color="1,0,0"/>
     <!--  Route 2: n3 -> n1  -->
     <vehicle id="truck_1" type="truck" route="r2" depart="4" color="0,1,0"/>
-    <vehicle id="car_3" type="car" route="r2" depart="4" color="1,0,0"/>
+    <vehicle id="car_3" type="carblack" route="r2" depart="4" color="1,0,0"/>
     <vehicle id="bus_1" type="bus" route="r2" depart="5" color="0,0,1"/>
-    <vehicle id="car_4" type="car" route="r2" depart="7" color="1,0,0"/>
+    <vehicle id="car_4" type="carblack" route="r2" depart="7" color="1,0,0"/>
     <vehicle id="truck_2" type="truck" route="r2" depart="9" color="0,1,0"/>
     <!--  More traffic  -->
-    <vehicle id="car_5" type="car" route="r1" depart="9" color="1,0,0"/>
+    <vehicle id="car_5" type="carblack" route="r1" depart="9" color="1,0,0"/>
     <vehicle id="bus_2" type="bus" route="r2" depart="11" color="0,0,1"/>
     <vehicle id="truck_3" type="truck" route="r1" depart="11" color="0,1,0"/>
-    <vehicle id="car_6" type="car" route="r2" depart="13" color="1,0,0"/>
+    <vehicle id="car_6" type="carblack" route="r2" depart="13" color="1,0,0"/>
 
     <!-- More traffic - 30 vehicle with random routes -->
     <vehicle id="0" depart="14.00">
