@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Group;
@@ -47,8 +48,9 @@ public class GUI {
     private Label vehicleCountLabel;
     @FXML
     private LineChart<Number, Number> speedChart;
-    @FXML
-    private Label statusLabel;
+
+    @FXML private TextArea consoleArea;
+
 
     private XYChart.Series<Number, Number> speedSeries;
 
@@ -72,6 +74,9 @@ public class GUI {
 
     private double contentWidth, contentHeight;
 
+    public void log(String message) {
+        consoleArea.appendText(message + "\n");
+    }
     /**
      * Sets the SimulationController in order to insert Cars and change the view of
      * the Sumo-GUI
@@ -83,6 +88,7 @@ public class GUI {
         this.statistics = new Statistics(simController);
         initVisuals();
     }
+
 
     /**
      * Initializes the visual layers and starts the animation loop
@@ -288,7 +294,8 @@ public class GUI {
             try {
                 double speed = simController.getVehicleController().getVehicleSpeed(lastId);
                 java.text.DecimalFormat dv = new java.text.DecimalFormat("#.##");
-                statusLabel.setText("Speed of last vehicle " + lastId + ": " + dv.format(speed));
+
+                log("Speed of last vehicle " + lastId + ": " + dv.format(speed));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
@@ -314,7 +321,7 @@ public class GUI {
      */
     public void commandStressTest(ActionEvent e){
         System.out.println("Starting Stress Test");
-        statusLabel.setText("Starting Stress Test");
+        log("Starting Stress Test");
         simController.startStressTest(50);
     }
 }
