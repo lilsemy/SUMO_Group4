@@ -127,6 +127,7 @@ public class GUI {
         } catch (Exception e) {
             e.printStackTrace();
             System.err.println("Failed to initialize visuals" + e.getMessage());
+            log("Failed to initialize visuals" + e.getMessage());
         }
     }
 
@@ -279,6 +280,7 @@ public class GUI {
     @FXML
     public void commandSpawnVehicle(ActionEvent e) {
         System.out.println("Spawning new vehicle!");
+        log("Spawning new vehicle!");
         simController.spawnVehicle();
     }
 
@@ -294,13 +296,14 @@ public class GUI {
             try {
                 double speed = simController.getVehicleController().getVehicleSpeed(lastId);
                 java.text.DecimalFormat dv = new java.text.DecimalFormat("#.##");
-
+                System.out.println("Speed of last vehicle " + lastId + ": " + dv.format(speed));
                 log("Speed of last vehicle " + lastId + ": " + dv.format(speed));
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         } else {
             System.out.println("No vehicles in simulation!");
+            log("No vehicles in simulation!");
         }
     }
 
@@ -311,6 +314,7 @@ public class GUI {
      */
     public void commandChangePhase(ActionEvent e) {
         System.out.println("Changing TrafficLight Phase!");
+        log("Changing TrafficLight Phase!");
         simController.changePhase();
     }
 
