@@ -7,13 +7,21 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.TextArea;
+
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Group;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.control.Label;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.input.KeyEvent;
+import javafx.geometry.Point2D;
+import org.eclipse.sumo.libtraci.Vehicle;
+
+
 
 /**
  * GUI is the class that controls the JavaFX GUI
@@ -50,7 +58,7 @@ public class GUI {
     private LineChart<Number, Number> speedChart;
 
     @FXML private TextArea consoleArea;
-
+    @FXML private ChoiceBox<String> vehicleSelector;
 
     private XYChart.Series<Number, Number> speedSeries;
 
@@ -64,19 +72,24 @@ public class GUI {
 
     private Group zoomGroup = new Group();
     private Scale scaleTransform = new Scale(1, 1, 0, 0);
+    private Rotate rotateTransform = new Rotate(0, 0,0);// Added rotation transform
+    private boolean isFollowing = false;// Added tracking state
+    private  String folowedVehicleId = null;// Added tracked vehicle ID
 
     private double scale = 1.0;
     private final double MIN_SCALE = 0.5;
-    private final double MAX_SCALE = 3.0;
+    private final double MAX_SCALE = 20.0;
 
     private double dragStartX, dragStartY;
     private double startTranslateX, startTranslateY;
 
     private double contentWidth, contentHeight;
 
+    // gui console
     public void log(String message) {
         consoleArea.appendText(message + "\n");
     }
+
     /**
      * Sets the SimulationController in order to insert Cars and change the view of
      * the Sumo-GUI
@@ -112,8 +125,11 @@ public class GUI {
             mapContainer.getChildren().clear();
             zoomGroup.getChildren().addAll(backgroundCanvas, laneLayer, trafficLightLayer, carLayer);
 
-            zoomGroup.getTransforms().add(scaleTransform);
+            //zoomGroup.getTransforms().add(scaleTransform);
+            zoomGroup.getTransforms().addAll(scaleTransform, rotateTransform);
             mapContainer.getChildren().add(zoomGroup);
+            mapContainer.setAlignment(javafx.geometry.Pos.TOP_LEFT); // Ensure Top-Left alignment to prevent centering
+            //                                                                     // jumps
 
             Rectangle clip = new Rectangle();
             clip.widthProperty().bind(mapContainer.widthProperty());
@@ -121,6 +137,22 @@ public class GUI {
             mapContainer.setClip(clip);
 
             setupZoomAndDrag();
+
+            //TODO vehicleselctor
+            vehicleSelector.setOnShowing(event -> {
+                var vehicles = simController.getVehicleController().getVehiclesMap().keySet();
+                vehicleSelector.getItems().setAll(vehicles);
+            });
+            vehicleSelector.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
+                if(newValue != null){
+                    folowedVehicleId = newValue;
+                    isFollowing = false;
+                    //scale = 10.0;
+                    //scaleTransform.setX(0);
+                    //scaleTransform.setY(0);
+                    log("selected & Following:"+newValue);
+                }
+            });
 
             startLoop();
 
@@ -135,9 +167,66 @@ public class GUI {
      * Sets up zoom and drag handlers for the map container
      */
     private void setupZoomAndDrag() {
+        mapContainer.setFocusTraversable(true);
+        mapContainer.setOnKeyPressed(event -> {
+            boolean rotate = false;
+            double dAngle = 0;
+            switch (event.getCode()){
+                case Q:
+                    dAngle = -3;
+                    rotate = true;
+                    break;
+                case E:
+                    dAngle = 5;
+                    rotate = true;
+                    break;
+                default:
+                    break;
+            }
+                if (rotate) {
+                    if (isFollowing) {
+                        rotateTransform.setAngle(rotateTransform.getAngle() + dAngle);
+                    } else {
+                        double cx = mapContainer.getWidth() / 2;
+                        double cy = mapContainer.getHeight() / 2;
+
+                    try {
+                        Point2D localCenter = zoomGroup.parentToLocal(cx, cy);
+                        rotateTransform.setAngle(rotateTransform.getAngle() + dAngle);
+                        Point2D newParentPos = zoomGroup.localToParent(localCenter);
+                        double dx = newParentPos.getX() - cx;
+                        double dy = newParentPos.getY() - cy;
+
+                        zoomGroup.setTranslateX(zoomGroup.getTranslateX() - dx);
+                        zoomGroup.setTranslateY(zoomGroup.getTranslateY()-dy);
+                    }catch (Exception e){
+                        e.printStackTrace();
+                    }
+                }
+                }
+    });
         mapContainer.setOnScroll(this::zoomAtMouse);
 
         mapContainer.setOnMousePressed(event -> {
+            if (isFollowing){
+                isFollowing = false;//stop
+            }
+            mapContainer.requestFocus();
+
+            try{
+                Point2D localPoint = zoomGroup.parentToLocal(event.getX(), event.getY());
+                rotateTransform.setAngle(0);
+                rotateTransform.setPivotX(0);
+                rotateTransform.setPivotY(0);
+                scaleTransform.setPivotX(0);
+                scaleTransform.setPivotY(0);
+
+                double currentScale = scaleTransform.getX();
+                zoomGroup.setTranslateX(event.getX() - zoomGroup.getLayoutX() - localPoint.getX()*currentScale);
+                zoomGroup.setTranslateY(event.getY() - zoomGroup.getLayoutY() - localPoint.getY()*currentScale);
+            }catch (Exception e){
+
+            }
             dragStartX = event.getSceneX();
             dragStartY = event.getSceneY();
             startTranslateX = zoomGroup.getTranslateX();
@@ -175,10 +264,35 @@ public class GUI {
         if (newScale == scale)
             return;
 
+        if (isFollowing) {
+            scale = newScale;
+            scaleTransform.setX(scale);
+            scaleTransform.setY(scale);
+            return;
+        }
         double mouseX = event.getX();
         double mouseY = event.getY();
 
-        double contentX = (mouseX - zoomGroup.getTranslateX()) / scale;
+        try {
+            Point2D localPoint = zoomGroup.parentToLocal(mouseX, mouseY);
+            rotateTransform.setAngle(0);
+            rotateTransform.setPivotX(0);
+            rotateTransform.setPivotY(0);
+            scaleTransform.setPivotX(0);
+            scaleTransform.setPivotY(0);
+            scale = newScale;
+            scaleTransform.setX(scale);
+            scaleTransform.setY(scale);
+            zoomGroup.setTranslateX(mouseX - zoomGroup.getLayoutX() - localPoint.getX() * scale);
+            zoomGroup.setTranslateY(mouseY - zoomGroup.getLayoutY() - localPoint.getY() * scale);
+        }catch (Exception e){
+            scale=newScale;
+            scaleTransform.setX(scale);
+            scaleTransform.setY(scale);
+        }
+
+
+        /*double contentX = (mouseX - zoomGroup.getTranslateX()) / scale;
         double contentY = (mouseY - zoomGroup.getTranslateY()) / scale;
 
         double oldScale = scale;
@@ -189,7 +303,7 @@ public class GUI {
         double newTranslateX = mouseX - contentX * scale;
         double newTranslateY = mouseY - contentY * scale;
         zoomGroup.setTranslateX(newTranslateX);
-        zoomGroup.setTranslateY(newTranslateY);
+        zoomGroup.setTranslateY(newTranslateY);*/
 
         clampTranslation();
     }
@@ -198,7 +312,7 @@ public class GUI {
      * Clamps translation to prevent gaps when panning
      */
     private void clampTranslation() {
-        double containerWidth = mapContainer.getWidth();
+       /* double containerWidth = mapContainer.getWidth();
         double containerHeight = mapContainer.getHeight();
 
         double scaledWidth = contentWidth * scale;
@@ -227,7 +341,7 @@ public class GUI {
         }
 
         zoomGroup.setTranslateX(tx);
-        zoomGroup.setTranslateY(ty);
+        zoomGroup.setTranslateY(ty);*/
     }
 
     /**
@@ -248,7 +362,44 @@ public class GUI {
                         if (trafficLightLayerInstance != null) {
                             trafficLightLayerInstance.updateTrafficLightStates();
                         }
+
+                        //
+                        if (isFollowing && folowedVehicleId != null) {
+                            try {
+                                if (simController.getVehicleController().getVehicle(folowedVehicleId) == null) {
+
+                                } else {
+                                    var sumoPos = Vehicle.getPosition(folowedVehicleId, false);
+                                    double angle = Vehicle.getAngle(folowedVehicleId);
+                                    Point2D worldPos = new Point2D(sumoPos.getX(), sumoPos.getY());
+                                    Point2D targetLocalPos = MapUtil.worldToScreen(worldPos);
+                                    double targetAngleVal = angle;
+                                    double smoothFactor = 0.1;
+                                    double currentAngle = rotateTransform.getAngle();
+                                    double nextAngle = currentAngle + (-targetAngleVal - currentAngle) * smoothFactor;
+                                    rotateTransform.setAngle(nextAngle);
+                                    rotateTransform.setPivotX(targetLocalPos.getX());
+                                    rotateTransform.setPivotY(targetLocalPos.getY());
+                                    scaleTransform.setPivotX(targetLocalPos.getX());
+                                    scaleTransform.setPivotY(targetLocalPos.getY());
+                                    double containerW = mapContainer.getWidth();
+                                    double containerH = mapContainer.getHeight();
+
+                                    double targetTx = (containerW / 2.0) - targetLocalPos.getX();
+                                    double targetTy = (containerH / 2.0) - targetLocalPos.getY();
+
+                                    double currrentTx = zoomGroup.getTranslateX();
+                                    double currrentTy = zoomGroup.getTranslateY();
+                                    zoomGroup.setTranslateX(currrentTx + (targetTx - currrentTx) * smoothFactor);
+                                    zoomGroup.setTranslateY(currrentTy + (targetTy - currrentTy) * smoothFactor);
+                                }
+                            } catch (Exception e) {
+
+                            }
+                        }
                     }
+
+                    //
 
                     if (statistics != null) {
                         double time = org.eclipse.sumo.libtraci.Simulation.getTime();
@@ -281,9 +432,45 @@ public class GUI {
     public void commandSpawnVehicle(ActionEvent e) {
         System.out.println("Spawning new vehicle!");
         log("Spawning new vehicle!");
-        simController.spawnVehicle();
+        String id = simController.spawnVehicle();
+        if(id != null) {
+            System.out.println("Spawned:"+id);
+            log("Spawned:"+id);
+        }
     }
 
+    @FXML public void commandFolowVehicle(ActionEvent e) {
+        String selectedId = null;
+        String targetId = null;
+        String lastId = null;
+        lastId = simController.getVehicleController().getLastVehicleId();
+        selectedId = vehicleSelector.getValue();
+
+        if(selectedId != null) {
+        targetId = selectedId;
+        }else if ( lastId != null){
+            targetId = lastId;
+        }
+        else{
+            targetId = lastId;
+        }
+        if(targetId != null) {
+            System.out.println("no vehicle selected!");
+            log("no vehicle  selected!");
+        }
+
+
+
+        folowedVehicleId = targetId;
+        isFollowing = true;
+
+        scale = 10.0;
+        scaleTransform.setX(scale);
+        scaleTransform.setY(scale);
+
+        System.out.println("Folowing:"+ lastId);
+        log("Folowing:"+ lastId);
+    }
     /**
      * Gets the speed of the last vehicle
      * 
