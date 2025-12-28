@@ -55,6 +55,16 @@ public class Statistics {
         return sum / currentVehicles.size();
     }
 
+    public double getAverageSpeed(Collection<VehicleModel> filteredVehicles) {
+        if (filteredVehicles.isEmpty()) return 0;
+
+        double sum = 0;
+        for (VehicleModel v : filteredVehicles) {
+            sum += v.getSpeed();
+        }
+        return sum / filteredVehicles.size();
+    }
+
     /**
      * Calculates how many vehicles there are per edge
      */
@@ -129,7 +139,7 @@ public class Statistics {
         
     System.out.println("=== Simulation Statistics ===");
     System.out.println("Total vehicles: " + currentVehicles.size());
-    System.out.println("Average speed: " + getAverageSpeed() + " m/s");
+    //System.out.println("Average speed: " + getAverageSpeed() + " m/s");
     System.out.println("Vehicle density per edge: " + vehicleCountsPerEdge);
     System.out.println("Travel times (for vehicles that have left the simulation): " + calculateTravelTimes(currentTime));
     System.out.println("Traffic lights count per color: " + currentTrafficLightStates);

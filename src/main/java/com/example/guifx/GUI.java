@@ -17,10 +17,11 @@ import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.scene.control.Label;
 import javafx.scene.control.ChoiceBox;
-import javafx.scene.input.KeyEvent;
 import javafx.geometry.Point2D;
 import org.eclipse.sumo.libtraci.Vehicle;
 
+import java.util.Collection;
+import java.util.Collections;
 
 
 /**
@@ -74,7 +75,7 @@ public class GUI {
     private Scale scaleTransform = new Scale(1, 1, 0, 0);
     private Rotate rotateTransform = new Rotate(0, 0,0);// Added rotation transform
     private boolean isFollowing = false;// Added tracking state
-    private  String folowedVehicleId = null;// Added tracked vehicle ID
+    private String followedVehicleId = null;// Added tracked vehicle ID
 
     private double scale = 1.0;
     private final double MIN_SCALE = 0.5;
@@ -84,6 +85,12 @@ public class GUI {
     private double startTranslateX, startTranslateY;
 
     private double contentWidth, contentHeight;
+
+    //FILTERING vehicleFilter = The possible filters the user can choose from the choice box
+    @FXML private ChoiceBox<TypeFilter> vehicleFilter;
+    //currentFilter = The applied filter that changes the GUI (For now only the statistics side)
+    private TypeFilter currentFilter = TypeFilter.NONE;
+
 
     // gui console
     public void log(String message) {
@@ -145,12 +152,33 @@ public class GUI {
             });
             vehicleSelector.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
                 if(newValue != null){
-                    folowedVehicleId = newValue;
+                    followedVehicleId = newValue;
                     isFollowing = false;
                     //scale = 10.0;
                     //scaleTransform.setX(0);
                     //scaleTransform.setY(0);
                     log("selected & Following:"+newValue);
+                }
+            });
+
+            //TODO FILTERING for every aspect of the gui (currently only applies to the statistics side)
+            //setting up the 4 choices in the choice box
+            vehicleFilter.getItems().addAll(
+                    TypeFilter.NONE,
+                    TypeFilter.CAR,
+                    TypeFilter.TRUCK,
+                    TypeFilter.BUS
+            );
+            //initially the applied filter is set to NONE
+            vehicleFilter.setValue(TypeFilter.NONE);
+
+            //updating the applied filter after user input
+            vehicleFilter
+                    .getSelectionModel()
+                    .selectedItemProperty()
+                    .addListener((observableValue, oldValue, newValue) -> {
+                if(newValue != null){
+                    currentFilter = newValue;
                 }
             });
 
@@ -364,13 +392,13 @@ public class GUI {
                         }
 
                         //
-                        if (isFollowing && folowedVehicleId != null) {
+                        if (isFollowing && followedVehicleId != null) {
                             try {
-                                if (simController.getVehicleController().getVehicle(folowedVehicleId) == null) {
+                                if (simController.getVehicleController().getVehicle(followedVehicleId) == null) {
 
                                 } else {
-                                    var sumoPos = Vehicle.getPosition(folowedVehicleId, false);
-                                    double angle = Vehicle.getAngle(folowedVehicleId);
+                                    var sumoPos = Vehicle.getPosition(followedVehicleId, false);
+                                    double angle = Vehicle.getAngle(followedVehicleId);
                                     Point2D worldPos = new Point2D(sumoPos.getX(), sumoPos.getY());
                                     Point2D targetLocalPos = MapUtil.worldToScreen(worldPos);
                                     double targetAngleVal = angle;
@@ -403,10 +431,17 @@ public class GUI {
 
                     if (statistics != null) {
                         double time = org.eclipse.sumo.libtraci.Simulation.getTime();
-                        statistics.updateVehicles(time);
+                        /*statistics.updateVehicles(time);
 
                         double avgSpeed = statistics.getAverageSpeed();
-                        int count = simController.getVehicleController().getVehiclesMap().size();
+                        int count = simController.getVehicleController().getVehiclesMap().size();*/
+                        Collection<VehicleModel> filteredVehiclesList =
+                                simController
+                                        .getVehicleController()
+                                                .getVehiclesByType(currentFilter);
+                        double avgSpeed = statistics.getAverageSpeed(filteredVehiclesList);
+                        int count = filteredVehiclesList.size();
+
                         java.text.DecimalFormat df = new java.text.DecimalFormat("#.##");
 
                         avgSpeedLabel.setText("Avg Speed: " + df.format(avgSpeed) + "ms");
@@ -439,7 +474,7 @@ public class GUI {
         }
     }
 
-    @FXML public void commandFolowVehicle(ActionEvent e) {
+    @FXML public void commandFollowVehicle(ActionEvent e) {
         String selectedId = null;
         String targetId = null;
         String lastId = null;
@@ -461,15 +496,15 @@ public class GUI {
 
 
 
-        folowedVehicleId = targetId;
+        followedVehicleId = targetId;
         isFollowing = true;
 
         scale = 10.0;
         scaleTransform.setX(scale);
         scaleTransform.setY(scale);
 
-        System.out.println("Folowing:"+ lastId);
-        log("Folowing:"+ lastId);
+        System.out.println("Following:"+ lastId);
+        log("Following:"+ lastId);
     }
     /**
      * Gets the speed of the last vehicle

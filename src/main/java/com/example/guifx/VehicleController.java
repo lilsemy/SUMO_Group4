@@ -159,4 +159,19 @@ public class VehicleController {
             vehiclesList.put(id, v);
         }
     }
+
+    //filtering
+    public Collection<VehicleModel> getVehiclesByType(TypeFilter filter) {
+        Collection<VehicleModel> all = vehiclesList.values();
+
+        if (filter == TypeFilter.NONE) {
+            return all;
+        }
+
+        String selectedType = filter.getTypeId();
+
+        return all.stream()
+                .filter(v -> selectedType.equals(v.getTypeId()))
+                .toList();
+    }
 }
