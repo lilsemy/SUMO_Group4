@@ -7,7 +7,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.TextArea;
-
+import javafx.scene.control.TextField;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Group;
@@ -22,6 +22,7 @@ import org.eclipse.sumo.libtraci.Vehicle;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Map;
 
 
 /**
@@ -60,6 +61,7 @@ public class GUI {
 
     @FXML private TextArea consoleArea;
     @FXML private ChoiceBox<String> vehicleSelector;
+    @FXML private TextField GetDuration;
 
     private XYChart.Series<Number, Number> speedSeries;
 
@@ -506,6 +508,7 @@ public class GUI {
         System.out.println("Following:"+ lastId);
         log("Following:"+ lastId);
     }
+
     /**
      * Gets the speed of the last vehicle
      * 
@@ -531,13 +534,21 @@ public class GUI {
 
     /**
      * Changes the traffic light phase
-     * 
+     *
      * @param e ActionEvent from button click
      */
     public void commandChangePhase(ActionEvent e) {
-        System.out.println("Changing TrafficLight Phase!");
-        log("Changing TrafficLight Phase!");
-        simController.changePhase();
+        if (!GetDuration.getText().isEmpty()) {
+            double newDur = Double.parseDouble(GetDuration.getText());
+            simController.changePhase(newDur);
+            System.out.println("Changing TrafficLight Phase with Phase Duration of: " + newDur + " seconds!");
+            log("Changing TrafficLight Phase with Phase Duration of: " + newDur + " seconds!");
+        }
+        else{
+            System.out.println("Error! Please enter a valid number for the Phase duration!");
+            log("Error! Please enter a valid number for the Phase duration!");
+        }
+
     }
 
     /**
@@ -549,5 +560,17 @@ public class GUI {
         System.out.println("Starting Stress Test");
         log("Starting Stress Test");
         simController.startStressTest(50);
+    }
+
+    public void commandPrintCongestion(ActionEvent e){
+        System.out.println("Test");
+        statistics.printCongestionHotspots();
+        Map<Byte, Double> congestions = statistics.detectCongestionHotspots();
+        if (!congestions.isEmpty()) {
+            log("Congestion detected:");
+            for (Map.Entry<Byte, Double> entry : congestions.entrySet()) {
+                log("Lane " + entry.getKey() + " → avg speed: " + String.format("%.2f", entry.getValue()) + " m/s");
+            }
+        }
     }
 }

@@ -197,8 +197,8 @@ public class SimulationController {
     }
 
 
-    public void changePhase(){
-        tlController.changePhase();
+    public void changePhase(double duration){
+        tlController.changePhase(duration);
     }
 
     public VehicleController getVehicleController(){

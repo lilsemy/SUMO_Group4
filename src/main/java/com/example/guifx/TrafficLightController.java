@@ -51,16 +51,36 @@ public class TrafficLightController {
     /**
      * Changes the phase of all traffic lights (green ↔ red)
      */
-    public void changePhase() {
+    public void changePhase(double duration) {
         for (String id : tlIds) {
             TrafficLightModel tl1 = tlList.get(id);
-            int currentPhase = tl1.getPhase();
+            int currentPhase = TrafficLight.getPhase(tl1.getId());
             if (currentPhase == 0) { // Phase 0 = green
                 tl1.setPhase(2); // Phase 2 = red
                 TrafficLight.setPhase(tl1.getId(), 2);
+                tl1.setDuration(duration);
+
+                //To change the real duration time, we have to change the Tllogic of the simulation, because there is no direct access to Phase durations
+                var tllogic = TrafficLight.getAllProgramLogics(tl1.getId()).get(0); //.get(0) fetches the default Settings for the TrafficLights. .get(1) would fetch e.g. the Rush_Hour settings.
+                tllogic.getPhases().get(2).setDuration(duration);
+                TrafficLight.setProgramLogic(tl1.getId(), tllogic); //Pushing the new Simulation logic to Sumo.
+
+                System.out.println("Current Phase of TL: " + tl1.getId() + "is: " + TrafficLight.getPhase(tl1.getId()));
+                System.out.println("Current Phase Duration of TL: " + tl1.getId() + "is: " + TrafficLight.getPhaseDuration(tl1.getId()));
+
             } else if (currentPhase == 2) {
                 tl1.setPhase(0);
                 TrafficLight.setPhase(tl1.getId(), 0);
+                tl1.setDuration(duration);
+
+                //To change the real duration time, we have to change the Tllogic of the simulation, because there is no direct access to Phase durations
+                var tllogic = TrafficLight.getAllProgramLogics(tl1.getId()).get(0); //.get(0) fetches the default Settings for the TrafficLights. .get(1) would fetch e.g. the Rush_Hour settings.
+                tllogic.getPhases().get(0).setDuration(duration);
+                TrafficLight.setProgramLogic(tl1.getId(), tllogic); //Pushing the new Simulation logic to Sumo.
+
+                System.out.println("Current Phase of TL: " + tl1.getId() + "is: " + TrafficLight.getPhase(tl1.getId()));
+                System.out.println("Current Phase Duration of TL: " + tl1.getId() + "is: " + TrafficLight.getPhaseDuration(tl1.getId()));
+
             }
         }
     }

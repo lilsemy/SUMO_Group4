@@ -2156,34 +2156,34 @@
     </edge>
 
     <tlLogic id="tl1" type="static" programID="0" offset="0">
-        <phase duration="800000" state="GG"/>
+        <phase duration="30" state="GG"/>
         <phase duration="3"  state="yy"/>
-        <phase duration="800000"  state="rr"/>
+        <phase duration="30"  state="rr"/>
     </tlLogic>
     <tlLogic id="tl2" type="static" programID="0" offset="0">
-        <phase duration="800000" state="GG"/>
+        <phase duration="30" state="GG"/>
         <phase duration="3"  state="yy"/>
-        <phase duration="800000"  state="rr"/>
+        <phase duration="30"  state="rr"/>
     </tlLogic>
     <tlLogic id="tl3" type="static" programID="0" offset="0">
-        <phase duration="800000" state="GG"/>
+        <phase duration="30" state="GG"/>
         <phase duration="3"  state="yy"/>
-        <phase duration="800000"  state="rr"/>
+        <phase duration="30"  state="rr"/>
     </tlLogic>
     <tlLogic id="tl4" type="static" programID="0" offset="0">
-        <phase duration="800000" state="GG"/>
+        <phase duration="30" state="GG"/>
         <phase duration="3"  state="yy"/>
-        <phase duration="800000"  state="rr"/>
+        <phase duration="30"  state="rr"/>
     </tlLogic>
     <tlLogic id="tl5" type="static" programID="0" offset="0">
-        <phase duration="800000" state="GG"/>
+        <phase duration="30" state="GG"/>
         <phase duration="3"  state="yy"/>
-        <phase duration="800000"  state="rr"/>
+        <phase duration="30"  state="rr"/>
     </tlLogic>
     <tlLogic id="tl6" type="static" programID="0" offset="0">
-        <phase duration="800000" state="GG"/>
+        <phase duration="30" state="GG"/>
         <phase duration="3"  state="yy"/>
-        <phase duration="800000"  state="rr"/>
+        <phase duration="30"  state="rr"/>
     </tlLogic>
 
     <junction id="10001222292" type="dead_end" x="630.65" y="360.86" incLanes="38546460#1_0" intLanes="" shape="631.51,361.39 629.98,360.10 629.79,360.33 631.32,361.62"/>
