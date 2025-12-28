@@ -23,6 +23,10 @@ public class Statistics {
 
     // Traffic Light Data Structure
     private Map<String, Integer> currentTrafficLightStates = new HashMap<>(); // Count of Traffic lights per phase
+
+    // Congestion detection (per lane)
+    private Map<Byte, List<Double>> speedsPerLane = new HashMap<>();
+    private Map<Byte, Double> congestedLanes = new HashMap<>();
     
     public Statistics(SimulationController simCon) {
         this.simCon = simCon;
@@ -125,6 +129,64 @@ public class Statistics {
         }
 
     this.currentTrafficLightStates = counts;
+    }
+
+    public Map<Byte, Double> detectCongestionHotspots() {
+        speedsPerLane.clear();
+        congestedLanes.clear();
+
+        // Group vehicle speeds by lane
+        for (VehicleModel v : currentVehicles.values()) {
+            byte laneId = v.getLaneId();
+            double speed = v.getSpeed();
+
+            List<Double> speeds = speedsPerLane.get(laneId);
+            if (speeds == null) {
+                speeds = new ArrayList<>();
+                speedsPerLane.put(laneId, speeds);
+            }
+            speeds.add(speed);
+        }
+
+        // Compute average speed per lane and detect congestion
+        for (Map.Entry<Byte, List<Double>> entry : speedsPerLane.entrySet()) {
+            byte laneId = entry.getKey();
+            List<Double> speeds = entry.getValue();
+
+            if (speeds == null || speeds.isEmpty()) {
+                continue;
+            }
+
+            double sum = 0.0;
+            for (int i = 0; i < speeds.size(); i++) {
+                sum += speeds.get(i);
+            }
+
+            double avgSpeed = sum / speeds.size();
+
+            if (avgSpeed < 1.0) {
+                congestedLanes.put(laneId, avgSpeed);
+            }
+        }
+
+        return congestedLanes;
+    }
+
+    /**
+     * Prints congestion hotspots to terminal
+     */
+    public void printCongestionHotspots() {
+        Map<Byte, Double> hotspots = detectCongestionHotspots();
+
+        if (!hotspots.isEmpty()) {
+            System.out.println("Congestion detected:");
+            for (Map.Entry<Byte, Double> entry : hotspots.entrySet()) {
+                System.out.println(
+                        "  Lane " + entry.getKey() +
+                                " → avg speed: " + String.format("%.2f", entry.getValue()) + " m/s"
+                );
+            }
+        }
     }
 
 
