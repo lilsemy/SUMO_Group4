@@ -93,8 +93,9 @@ public class SimulationController {
                     stepCounter % injectionStepInterval == 0) {
 
                 try {
+                    // Changed from (byte) 0 -> "0"
                     vehicleController.createAndInjectVehicle(
-                            "car", "r1", (byte) 0
+                            "car", "r1", "0"
                     );
 
                     stressVehiclesRemaining--;
@@ -155,38 +156,33 @@ public class SimulationController {
                 String route = cv.getRouteId();
                 switch(route) {
                     case "r1":
-                        VehicleModel car = vehicleController.createAndInjectVehicle("truck", "r2", (byte) 0);
+                        VehicleModel car = vehicleController.createAndInjectVehicle("truck", "r2", "0"); // was (byte) 0
                         createdVehicleId = car.getId();
-                        // Optionally track the vehicle in SUMO GUI
                         vehicleController.trackVehicle("View #0", car.getId());
                         System.out.println("Added a car(1): " + car.getId());
                         break;
                     case "r2":
-                        VehicleModel car2 = vehicleController.createAndInjectVehicle("truck", "r3", (byte) 0);
+                        VehicleModel car2 = vehicleController.createAndInjectVehicle("truck", "r3", "0"); // was (byte) 0
                         createdVehicleId = car2.getId();
-                        // Optionally track the vehicle in SUMO GUI
                         vehicleController.trackVehicle("View #0", car2.getId());
                         System.out.println("Added a car(2): " + car2.getId());
                         break;
                     case "r3":
-                        VehicleModel car3 = vehicleController.createAndInjectVehicle("truck", "r1", (byte) 0);
+                        VehicleModel car3 = vehicleController.createAndInjectVehicle("truck", "r1", "0"); // was (byte) 0
                         createdVehicleId = car3.getId();
-                        // Optionally track the vehicle in SUMO GUI
                         vehicleController.trackVehicle("View #0", car3.getId());
                         System.out.println("Added a car(3): " + car3.getId());
                         break;
                     default:
-                        VehicleModel car4 = vehicleController.createAndInjectVehicle("bus", "r1", (byte) 0);
+                        VehicleModel car4 = vehicleController.createAndInjectVehicle("bus", "r1", "0"); // was (byte) 0
                         createdVehicleId = car4.getId();
-                        // Optionally track the vehicle in SUMO GUI
                         vehicleController.trackVehicle("View #0", car4.getId());
                         System.out.println("Added a car(4): " + car4.getId());
                 }
             }
             else {
-                VehicleModel car = vehicleController.createAndInjectVehicle("car", "r1", (byte) 0);
+                VehicleModel car = vehicleController.createAndInjectVehicle("car", "r1", "0"); // was (byte) 0
                 createdVehicleId = car.getId();
-                // Optionally track the vehicle in SUMO GUI
                 vehicleController.trackVehicle("View #0", car.getId());
                 System.out.println("Added a car: " + car.getId());
             }

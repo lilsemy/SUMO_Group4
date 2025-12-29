@@ -30,7 +30,7 @@ public class VehicleController {
      * @return VehicleModel created
      * @throws Exception if injection fails
      */
-    public VehicleModel createAndInjectVehicle(String typeId, String routeId, byte laneId) throws Exception {
+    public VehicleModel createAndInjectVehicle(String typeId, String routeId, String laneId) throws Exception {
         vehicleCounter++;
         String id = "id" + vehicleCounter;
 
@@ -52,10 +52,10 @@ public class VehicleController {
         try {
             Vehicle.add(vehicle.getId(), vehicle.getRouteId(), vehicle.getTypeId(),
                     String.valueOf(vehicle.getDepart()),
-                    String.valueOf(vehicle.getLaneId()),
+                    vehicle.getLaneId(),
                     String.valueOf(vehicle.getPos()),
                     String.valueOf(vehicle.getSpeed()),
-                    String.valueOf(vehicle.getLaneId()));
+                    vehicle.getLaneId());
 
             vehiclesList.put(vehicle.getId(), vehicle);
             System.out.println("Injected vehicle: " + vehicle.getId());
@@ -149,12 +149,14 @@ public class VehicleController {
             double speed = Vehicle.getSpeed(id);
             TraCIPosition pos = Vehicle.getPosition(id, false);
             double angle = Vehicle.getAngle(id);
+            String laneId = Vehicle.getLaneID(id);
 
             VehicleModel v = vehiclesList.getOrDefault(id, new VehicleModel(id));
 
             v.setSpeed(speed);
             v.setPosition(pos.getX(), pos.getY());
             v.setAngle(angle);
+            v.setLaneId(laneId);
 
             vehiclesList.put(id, v);
         }

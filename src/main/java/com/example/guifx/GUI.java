@@ -59,9 +59,12 @@ public class GUI {
     @FXML
     private LineChart<Number, Number> speedChart;
 
-    @FXML private TextArea consoleArea;
-    @FXML private ChoiceBox<String> vehicleSelector;
-    @FXML private TextField GetDuration;
+    @FXML
+    private TextArea consoleArea;
+    @FXML
+    private ChoiceBox<String> vehicleSelector;
+    @FXML
+    private TextField GetDuration;
 
     private XYChart.Series<Number, Number> speedSeries;
 
@@ -75,7 +78,7 @@ public class GUI {
 
     private Group zoomGroup = new Group();
     private Scale scaleTransform = new Scale(1, 1, 0, 0);
-    private Rotate rotateTransform = new Rotate(0, 0,0);// Added rotation transform
+    private Rotate rotateTransform = new Rotate(0, 0, 0);// Added rotation transform
     private boolean isFollowing = false;// Added tracking state
     private String followedVehicleId = null;// Added tracked vehicle ID
 
@@ -89,7 +92,8 @@ public class GUI {
     private double contentWidth, contentHeight;
 
     //FILTERING vehicleFilter = The possible filters the user can choose from the choice box
-    @FXML private ChoiceBox<TypeFilter> vehicleFilter;
+    @FXML
+    private ChoiceBox<TypeFilter> vehicleFilter;
     //currentFilter = The applied filter that changes the GUI (For now only the statistics side)
     private TypeFilter currentFilter = TypeFilter.NONE;
 
@@ -102,7 +106,7 @@ public class GUI {
     /**
      * Sets the SimulationController in order to insert Cars and change the view of
      * the Sumo-GUI
-     * 
+     *
      * @param simulationController Simulation controller instance
      */
     public void setSimulationController(SimulationController simulationController) {
@@ -153,13 +157,13 @@ public class GUI {
                 vehicleSelector.getItems().setAll(vehicles);
             });
             vehicleSelector.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-                if(newValue != null){
+                if (newValue != null) {
                     followedVehicleId = newValue;
                     isFollowing = false;
                     //scale = 10.0;
                     //scaleTransform.setX(0);
                     //scaleTransform.setY(0);
-                    log("selected & Following:"+newValue);
+                    log("selected & Following:" + newValue);
                 }
             });
 
@@ -179,10 +183,10 @@ public class GUI {
                     .getSelectionModel()
                     .selectedItemProperty()
                     .addListener((observableValue, oldValue, newValue) -> {
-                if(newValue != null){
-                    currentFilter = newValue;
-                }
-            });
+                        if (newValue != null) {
+                            currentFilter = newValue;
+                        }
+                    });
 
             startLoop();
 
@@ -201,7 +205,7 @@ public class GUI {
         mapContainer.setOnKeyPressed(event -> {
             boolean rotate = false;
             double dAngle = 0;
-            switch (event.getCode()){
+            switch (event.getCode()) {
                 case Q:
                     dAngle = -3;
                     rotate = true;
@@ -213,12 +217,12 @@ public class GUI {
                 default:
                     break;
             }
-                if (rotate) {
-                    if (isFollowing) {
-                        rotateTransform.setAngle(rotateTransform.getAngle() + dAngle);
-                    } else {
-                        double cx = mapContainer.getWidth() / 2;
-                        double cy = mapContainer.getHeight() / 2;
+            if (rotate) {
+                if (isFollowing) {
+                    rotateTransform.setAngle(rotateTransform.getAngle() + dAngle);
+                } else {
+                    double cx = mapContainer.getWidth() / 2;
+                    double cy = mapContainer.getHeight() / 2;
 
                     try {
                         Point2D localCenter = zoomGroup.parentToLocal(cx, cy);
@@ -228,22 +232,22 @@ public class GUI {
                         double dy = newParentPos.getY() - cy;
 
                         zoomGroup.setTranslateX(zoomGroup.getTranslateX() - dx);
-                        zoomGroup.setTranslateY(zoomGroup.getTranslateY()-dy);
-                    }catch (Exception e){
+                        zoomGroup.setTranslateY(zoomGroup.getTranslateY() - dy);
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                 }
-                }
-    });
+            }
+        });
         mapContainer.setOnScroll(this::zoomAtMouse);
 
         mapContainer.setOnMousePressed(event -> {
-            if (isFollowing){
+            if (isFollowing) {
                 isFollowing = false;//stop
             }
             mapContainer.requestFocus();
 
-            try{
+            try {
                 Point2D localPoint = zoomGroup.parentToLocal(event.getX(), event.getY());
                 rotateTransform.setAngle(0);
                 rotateTransform.setPivotX(0);
@@ -252,9 +256,9 @@ public class GUI {
                 scaleTransform.setPivotY(0);
 
                 double currentScale = scaleTransform.getX();
-                zoomGroup.setTranslateX(event.getX() - zoomGroup.getLayoutX() - localPoint.getX()*currentScale);
-                zoomGroup.setTranslateY(event.getY() - zoomGroup.getLayoutY() - localPoint.getY()*currentScale);
-            }catch (Exception e){
+                zoomGroup.setTranslateX(event.getX() - zoomGroup.getLayoutX() - localPoint.getX() * currentScale);
+                zoomGroup.setTranslateY(event.getY() - zoomGroup.getLayoutY() - localPoint.getY() * currentScale);
+            } catch (Exception e) {
 
             }
             dragStartX = event.getSceneX();
@@ -274,7 +278,7 @@ public class GUI {
 
     /**
      * Zooms the map at the mouse pointer
-     * 
+     *
      * @param event Scroll event
      */
     private void zoomAtMouse(ScrollEvent event) {
@@ -315,8 +319,8 @@ public class GUI {
             scaleTransform.setY(scale);
             zoomGroup.setTranslateX(mouseX - zoomGroup.getLayoutX() - localPoint.getX() * scale);
             zoomGroup.setTranslateY(mouseY - zoomGroup.getLayoutY() - localPoint.getY() * scale);
-        }catch (Exception e){
-            scale=newScale;
+        } catch (Exception e) {
+            scale = newScale;
             scaleTransform.setX(scale);
             scaleTransform.setY(scale);
         }
@@ -433,14 +437,14 @@ public class GUI {
 
                     if (statistics != null) {
                         double time = org.eclipse.sumo.libtraci.Simulation.getTime();
-                        /*statistics.updateVehicles(time);
-
+                        statistics.updateVehicles(time);
+                      /*
                         double avgSpeed = statistics.getAverageSpeed();
                         int count = simController.getVehicleController().getVehiclesMap().size();*/
                         Collection<VehicleModel> filteredVehiclesList =
                                 simController
                                         .getVehicleController()
-                                                .getVehiclesByType(currentFilter);
+                                        .getVehiclesByType(currentFilter);
                         double avgSpeed = statistics.getAverageSpeed(filteredVehiclesList);
                         int count = filteredVehiclesList.size();
 
@@ -462,7 +466,7 @@ public class GUI {
 
     /**
      * Inserts a car and sets the view on it
-     * 
+     *
      * @param e ActionEvent from button click
      */
     @FXML
@@ -470,32 +474,31 @@ public class GUI {
         System.out.println("Spawning new vehicle!");
         log("Spawning new vehicle!");
         String id = simController.spawnVehicle();
-        if(id != null) {
-            System.out.println("Spawned:"+id);
-            log("Spawned:"+id);
+        if (id != null) {
+            System.out.println("Spawned:" + id);
+            log("Spawned:" + id);
         }
     }
 
-    @FXML public void commandFollowVehicle(ActionEvent e) {
+    @FXML
+    public void commandFollowVehicle(ActionEvent e) {
         String selectedId = null;
         String targetId = null;
         String lastId = null;
         lastId = simController.getVehicleController().getLastVehicleId();
         selectedId = vehicleSelector.getValue();
 
-        if(selectedId != null) {
-        targetId = selectedId;
-        }else if ( lastId != null){
+        if (selectedId != null) {
+            targetId = selectedId;
+        } else if (lastId != null) {
+            targetId = lastId;
+        } else {
             targetId = lastId;
         }
-        else{
-            targetId = lastId;
-        }
-        if(targetId != null) {
+        if (targetId != null) {
             System.out.println("no vehicle selected!");
             log("no vehicle  selected!");
         }
-
 
 
         followedVehicleId = targetId;
@@ -505,13 +508,13 @@ public class GUI {
         scaleTransform.setX(scale);
         scaleTransform.setY(scale);
 
-        System.out.println("Following:"+ lastId);
-        log("Following:"+ lastId);
+        System.out.println("Following:" + lastId);
+        log("Following:" + lastId);
     }
 
     /**
      * Gets the speed of the last vehicle
-     * 
+     *
      * @param e ActionEvent from button click
      */
     @FXML
@@ -543,8 +546,7 @@ public class GUI {
             simController.changePhase(newDur);
             System.out.println("Changing TrafficLight Phase with Phase Duration of: " + newDur + " seconds!");
             log("Changing TrafficLight Phase with Phase Duration of: " + newDur + " seconds!");
-        }
-        else{
+        } else {
             System.out.println("Error! Please enter a valid number for the Phase duration!");
             log("Error! Please enter a valid number for the Phase duration!");
         }
@@ -553,24 +555,43 @@ public class GUI {
 
     /**
      * Starts a stress test with 50 vehicles
-     * 
+     *
      * @param e ActionEvent from button click
      */
-    public void commandStressTest(ActionEvent e){
+    public void commandStressTest(ActionEvent e) {
         System.out.println("Starting Stress Test");
         log("Starting Stress Test");
         simController.startStressTest(50);
     }
 
-    public void commandPrintCongestion(ActionEvent e){
-        System.out.println("Test");
-        statistics.printCongestionHotspots();
-        Map<Byte, Double> congestions = statistics.detectCongestionHotspots();
-        if (!congestions.isEmpty()) {
-            log("Congestion detected:");
-            for (Map.Entry<Byte, Double> entry : congestions.entrySet()) {
-                log("Lane " + entry.getKey() + " → avg speed: " + String.format("%.2f", entry.getValue()) + " m/s");
-            }
+    @FXML
+    public void commandPrintCongestion(ActionEvent e) {
+
+        double time = org.eclipse.sumo.libtraci.Simulation.getTime();
+
+        Map<String, Double> congestions =
+                statistics.detectCongestionHotspots(time);
+
+        if (congestions.isEmpty()) {
+            log("No congestion found");
+            System.out.println("No congestion found");
+            return;
+        }
+
+        log("Congestion detected:");
+        System.out.println("Congestion detected:");
+
+        for (Map.Entry<String, Double> entry : congestions.entrySet()) {
+
+            String message =
+                    "Lane " + entry.getKey() +
+                            " → avg speed: " +
+                            String.format("%.2f", entry.getValue()) +
+                            " m/s";
+
+            log(message);
+            System.out.println(message);
         }
     }
+
 }

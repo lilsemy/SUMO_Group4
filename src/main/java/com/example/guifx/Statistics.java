@@ -25,9 +25,9 @@ public class Statistics {
     private Map<String, Integer> currentTrafficLightStates = new HashMap<>(); // Count of Traffic lights per phase
 
     // Congestion detection (per lane)
-    private Map<Byte, List<Double>> speedsPerLane = new HashMap<>();
-    private Map<Byte, Double> congestedLanes = new HashMap<>();
-    
+    private Map<String, List<Double>> speedsPerLane = new HashMap<>();
+    private Map<String, Double> congestedLanes = new HashMap<>();
+
     public Statistics(SimulationController simCon) {
         this.simCon = simCon;
     }
@@ -74,12 +74,15 @@ public class Statistics {
      */
     public void updateVehicleDensity() {
         vehicleCountsPerEdge.clear();
+
         for (VehicleModel v : currentVehicles.values()) {
-            String edgeId = v.getLaneId() + "";
+            String edgeId = v.getLaneId();
+
             vehicleCountsPerEdge.putIfAbsent(edgeId, 0);
             vehicleCountsPerEdge.put(edgeId, vehicleCountsPerEdge.get(edgeId) + 1);
         }
     }
+
 
     /**
      * Calculates travel times for vehicles that have left the simulation
@@ -131,63 +134,47 @@ public class Statistics {
     this.currentTrafficLightStates = counts;
     }
 
-    public Map<Byte, Double> detectCongestionHotspots() {
-        speedsPerLane.clear();
-        congestedLanes.clear();
+    public Map<String, Double> detectCongestionHotspots(double currentTime) {
 
-        // Group vehicle speeds by lane
+        updateVehicles(currentTime);
+
+        Map<String, List<Double>> speedsPerLane = new HashMap<>();
+        Map<String, Double> congestedLanes = new HashMap<>();
+
+        // Group vehicle speeds by REAL lane ID
         for (VehicleModel v : currentVehicles.values()) {
-            byte laneId = v.getLaneId();
+
+            // IMPORTANT: this must be the SUMO lane ID (e.g. "edge_12_0")
+            String laneId = v.getLaneId();
             double speed = v.getSpeed();
 
-            List<Double> speeds = speedsPerLane.get(laneId);
-            if (speeds == null) {
-                speeds = new ArrayList<>();
-                speedsPerLane.put(laneId, speeds);
-            }
-            speeds.add(speed);
+            speedsPerLane
+                    .computeIfAbsent(laneId, k -> new ArrayList<>())
+                    .add(speed);
         }
 
-        // Compute average speed per lane and detect congestion
-        for (Map.Entry<Byte, List<Double>> entry : speedsPerLane.entrySet()) {
-            byte laneId = entry.getKey();
-            List<Double> speeds = entry.getValue();
+        // Compute average speed per lane
+        for (Map.Entry<String, List<Double>> entry : speedsPerLane.entrySet()) {
 
-            if (speeds == null || speeds.isEmpty()) {
-                continue;
-            }
+            List<Double> speeds = entry.getValue();
+            if (speeds.size() < 2) continue; // optional stability filter
 
             double sum = 0.0;
-            for (int i = 0; i < speeds.size(); i++) {
-                sum += speeds.get(i);
+            for (double s : speeds) {
+                sum += s;
             }
 
             double avgSpeed = sum / speeds.size();
 
+            // Congestion condition (adjustable)
             if (avgSpeed < 1.0) {
-                congestedLanes.put(laneId, avgSpeed);
+                congestedLanes.put(entry.getKey(), avgSpeed);
             }
         }
 
         return congestedLanes;
     }
 
-    /**
-     * Prints congestion hotspots to terminal
-     */
-    public void printCongestionHotspots() {
-        Map<Byte, Double> hotspots = detectCongestionHotspots();
-
-        if (!hotspots.isEmpty()) {
-            System.out.println("Congestion detected:");
-            for (Map.Entry<Byte, Double> entry : hotspots.entrySet()) {
-                System.out.println(
-                        "  Lane " + entry.getKey() +
-                                " → avg speed: " + String.format("%.2f", entry.getValue()) + " m/s"
-                );
-            }
-        }
-    }
 
 
     /**

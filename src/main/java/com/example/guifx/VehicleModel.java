@@ -13,7 +13,7 @@ public class VehicleModel {
     private String id;
     private String typeId;
     private String routeId;
-    private byte laneId;
+    private String laneId;
 
     private double depart;
     private double pos;
@@ -25,16 +25,15 @@ public class VehicleModel {
     /**
     *@param id, typeId, routeId, laneId, depart, pos, speed
     */
-    
-    public VehicleModel(String id, String typeId, String routeId, byte laneId, int depart, double pos, double speed){
-        this.id =  id;
+
+    public VehicleModel(String id, String typeId, String routeId, String laneId, int depart, double pos, double speed){
+        this.id = id;
         this.typeId = typeId;
         this.routeId = routeId;
         this.laneId = laneId;
         this.depart = depart;
         this.pos = pos;
         this.speed = speed;
-
         this.x = 0.0;
         this.y = 0.0;
         this.angle = 0.0;
@@ -45,15 +44,14 @@ public class VehicleModel {
     /**
     *@param id, typeId, routeId, laneId
     */
-    public VehicleModel(String id, String typeId, String routeId, byte laneId, double depart ){
-        this.id =  id;
+    public VehicleModel(String id, String typeId, String routeId, String laneId, double depart) {
+        this.id = id;
         this.typeId = typeId;
         this.routeId = routeId;
         this.laneId = laneId;
         this.depart = depart;
         this.pos = 0.0;
         this.speed = 1.0;
-
         this.x = 0.0;
         this.y = 0.0;
         this.angle = 0.0;
@@ -63,7 +61,7 @@ public class VehicleModel {
             this.id = id;
             this.typeId = "car";
             this.routeId = "";
-            this.laneId = -1;
+            this.laneId = "";
             this.depart = 0;
             this.pos = 0.0;
             this.speed = 1.0;
@@ -100,9 +98,7 @@ public class VehicleModel {
     /**
     *@return laneId
     */
-    public byte getLaneId(){
-        return laneId;
-    }
+    public String getLaneId(){ return laneId; }
     
     /**
     *@return Time of Departure of the Vehicle
@@ -143,9 +139,7 @@ public class VehicleModel {
     /**
     *@param laneId
     */
-    public void setLaneId(byte laneId){
-        this.laneId = laneId;
-    }
+    public void setLaneId(String laneId){ this.laneId = laneId; }
     
     /**
     *@param speed
