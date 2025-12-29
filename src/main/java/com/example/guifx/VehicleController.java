@@ -150,6 +150,7 @@ public class VehicleController {
             TraCIPosition pos = Vehicle.getPosition(id, false);
             double angle = Vehicle.getAngle(id);
             String laneId = Vehicle.getLaneID(id);
+            String typeId = Vehicle.getTypeID(id);
 
             VehicleModel v = vehiclesList.getOrDefault(id, new VehicleModel(id));
 
@@ -157,6 +158,7 @@ public class VehicleController {
             v.setPosition(pos.getX(), pos.getY());
             v.setAngle(angle);
             v.setLaneId(laneId);
+            v.setTypeId(typeId);
 
             vehiclesList.put(id, v);
         }
@@ -174,6 +176,20 @@ public class VehicleController {
 
         return all.stream()
                 .filter(v -> selectedType.equals(v.getTypeId()))
+                .toList();
+    }
+
+    public Collection<String> getVehicleIdsByType(TypeFilter filter) {
+        Collection<String> all = vehiclesList.keySet();
+
+        if (filter == TypeFilter.NONE) {
+            return all;
+        }
+
+        String selectedType = filter.getTypeId();
+
+        return all.stream()
+                .filter(v -> selectedType.equals(vehiclesList.get(v).getTypeId()))
                 .toList();
     }
 }

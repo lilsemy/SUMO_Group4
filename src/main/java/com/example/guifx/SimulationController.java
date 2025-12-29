@@ -159,32 +159,32 @@ public class SimulationController {
                         VehicleModel car = vehicleController.createAndInjectVehicle("truck", "r2", "0"); // was (byte) 0
                         createdVehicleId = car.getId();
                         vehicleController.trackVehicle("View #0", car.getId());
-                        System.out.println("Added a car(1): " + car.getId());
+                        System.out.println("Added a car(1): " + car.getId() + "with type: " + car.getTypeId());
                         break;
                     case "r2":
                         VehicleModel car2 = vehicleController.createAndInjectVehicle("truck", "r3", "0"); // was (byte) 0
                         createdVehicleId = car2.getId();
                         vehicleController.trackVehicle("View #0", car2.getId());
-                        System.out.println("Added a car(2): " + car2.getId());
+                        System.out.println("Added a car(2): " + car2.getId() + "with type: " + car2.getTypeId());
                         break;
                     case "r3":
                         VehicleModel car3 = vehicleController.createAndInjectVehicle("truck", "r1", "0"); // was (byte) 0
                         createdVehicleId = car3.getId();
                         vehicleController.trackVehicle("View #0", car3.getId());
-                        System.out.println("Added a car(3): " + car3.getId());
+                        System.out.println("Added a car(3): " + car3.getId() + "with type: " + car3.getTypeId());
                         break;
                     default:
                         VehicleModel car4 = vehicleController.createAndInjectVehicle("bus", "r1", "0"); // was (byte) 0
                         createdVehicleId = car4.getId();
                         vehicleController.trackVehicle("View #0", car4.getId());
-                        System.out.println("Added a car(4): " + car4.getId());
+                        System.out.println("Added a car(4): " + car4.getId() + "with type: " + car4.getTypeId());
                 }
             }
             else {
                 VehicleModel car = vehicleController.createAndInjectVehicle("car", "r1", "0"); // was (byte) 0
                 createdVehicleId = car.getId();
                 vehicleController.trackVehicle("View #0", car.getId());
-                System.out.println("Added a car: " + car.getId());
+                System.out.println("Added a car: " + car.getId() + "with type: " + car.getTypeId());
             }
         } catch (Exception ex) {
             ex.printStackTrace();

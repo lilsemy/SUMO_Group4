@@ -155,4 +155,7 @@ public class VehicleModel {
     public void setAngle(double angle){
         this.angle = angle;
     }
+    public void setTypeId(String id){
+        this.typeId=id;
+    }
 }

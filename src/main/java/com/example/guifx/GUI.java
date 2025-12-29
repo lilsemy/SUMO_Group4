@@ -390,7 +390,7 @@ public class GUI {
                         simController.singleStep();
 
                         if (carLayerInstance != null) {
-                            carLayerInstance.updateCars();
+                            carLayerInstance.updateCars(simController.getVehicleController().getVehicleIdsByType(currentFilter));
                         }
 
                         if (trafficLightLayerInstance != null) {

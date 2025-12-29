@@ -127,9 +127,9 @@ public class CarLayer {
     /**
      * Updates all cars: adds new cars, updates positions and rotations, removes disappeared cars
      */
-    public void updateCars() {
-        List<String> ids = Vehicle.getIDList();
-        Set<String> activeCarIds = new HashSet<>(ids);
+    public void updateCars(Collection<String> list) {
+        //List<String> ids = Vehicle.getIDList();
+        Set<String> activeCarIds = new HashSet<>(list);
         Set<String> newCarIds = new HashSet<>(activeCarIds);
 
         Iterator<Map.Entry<String, ImageView>> it = carImageViews.entrySet().iterator();
