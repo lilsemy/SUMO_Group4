@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="660.0" prefWidth="1085.0" stylesheets="@simulation-style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.guifx.GUI">
+<AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="894.0" prefWidth="1428.0" stylesheets="@simulation-style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.guifx.GUI">
    <children>
       <!-- Simulation Controls Section -->
       <Label layoutX="82.0" layoutY="14.0" styleClass="label-title" text="Simulation Controls:" AnchorPane.leftAnchor="57.0" AnchorPane.topAnchor="14.0" />
@@ -48,7 +48,7 @@
          </font>
       </Button>
 
-      <Button layoutX="398.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandChangePhase" prefHeight="59.0" prefWidth="137.0" text="Change Phase" AnchorPane.leftAnchor="373.0" AnchorPane.topAnchor="51.0">
+      <Button layoutX="388.0" layoutY="67.0" mnemonicParsing="false" onAction="#commandChangePhase" prefHeight="59.0" prefWidth="111.0" text="Change Phase" AnchorPane.leftAnchor="373.0" AnchorPane.topAnchor="51.0">
          <graphic>
             <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -90,7 +90,7 @@
             <NumberAxis label="Speed (m/s)" side="LEFT" />
          </yAxis>
       </LineChart>
-      <Button layoutX="723.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandStressTest" prefHeight="59.0" prefWidth="137.0" text="Stress Test" AnchorPane.leftAnchor="689.0" AnchorPane.topAnchor="51.0">
+      <Button layoutX="773.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandStressTest" prefHeight="59.0" prefWidth="137.0" text="Stress Test" AnchorPane.leftAnchor="806.0" AnchorPane.topAnchor="51.0">
          <graphic>
             <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -103,7 +103,7 @@
          </font>
       </Button>
       <TextArea id="consoleArea" fx:id="consoleArea" layoutX="737.7142857142858" layoutY="484.0" prefHeight="181.0" prefWidth="344.0" AnchorPane.rightAnchor="3.2857142857142208" AnchorPane.topAnchor="469.0" />
-      <Button fx:id="commandFolowVehicle" layoutX="569.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandFollowVehicle" prefHeight="59.0" prefWidth="137.0" text="Follow Vehicle" AnchorPane.leftAnchor="531.0" AnchorPane.topAnchor="51.0">
+      <Button fx:id="commandFolowVehicle" layoutX="615.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandFollowVehicle" prefHeight="59.0" prefWidth="137.0" text="Follow Vehicle" AnchorPane.leftAnchor="648.0" AnchorPane.topAnchor="51.0">
          <font>
             <Font size="12.0" />
          </font>
@@ -114,11 +114,11 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <ChoiceBox id="vehicleSelector" fx:id="vehicleSelector" layoutX="569.0" layoutY="130.0" prefHeight="28.0" prefWidth="136.0" AnchorPane.leftAnchor="531.0" />
-      <TextField id="GetDuration" fx:id="GetDuration" layoutX="413.0" layoutY="130.0" prefHeight="28.0" prefWidth="136.0" promptText="Enter Duration" AnchorPane.leftAnchor="373.0" />
+      <ChoiceBox id="vehicleSelector" fx:id="vehicleSelector" layoutX="655.0" layoutY="130.0" prefHeight="30.0" prefWidth="137.0" AnchorPane.leftAnchor="648.0" />
+      <TextField id="GetDuration" fx:id="GetDuration" layoutX="388.0" layoutY="130.0" prefHeight="30.0" prefWidth="111.0" promptText="Enter Duration" />
 
-      <ChoiceBox fx:id="vehicleFilter" layoutX="723.0" layoutY="130.0" prefWidth="137.0" AnchorPane.leftAnchor="689.0" />
-      <Button layoutX="874.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandPrintCongestion" prefHeight="59.0" prefWidth="137.0" text="Congestions" AnchorPane.leftAnchor="847.0" AnchorPane.topAnchor="51.0">
+      <ChoiceBox fx:id="vehicleFilter" layoutX="773.0" layoutY="130.0" prefWidth="137.0" AnchorPane.leftAnchor="806.0" />
+      <Button layoutX="931.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandPrintCongestion" prefHeight="59.0" prefWidth="137.0" text="Congestions" AnchorPane.leftAnchor="964.0" AnchorPane.topAnchor="51.0">
          <graphic>
             <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -130,6 +130,10 @@
             <Font size="12.0" />
          </font>
       </Button>
+      <Label id="Tl1Dur" fx:id="Tl1Dur" layoutX="507.0" layoutY="85.0" prefHeight="20.0" prefWidth="140.0" text="Traffic Light 1: 0" />
+      <Label id="Tl2Dur" fx:id="Tl2Dur" layoutX="507.0" layoutY="105.0" prefHeight="20.0" prefWidth="140.0" text="Traffic Light 2: 0" />
+      <ChoiceBox id="TLSelector" fx:id="TLSelector" layoutX="505.0" layoutY="130.0" prefHeight="30.0" prefWidth="137.0" />
+      <Label layoutX="507.0" layoutY="66.0" styleClass="label-tl" text="Time to Phase Switch:" />
 
    </children>
    <styleClass>

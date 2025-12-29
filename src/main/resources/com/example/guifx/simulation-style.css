@@ -65,6 +65,11 @@
     -fx-font-style: italic;
 }
 
+.label-tl {
+    -fx-font-size: 13px;
+    -fx-font-weight: bold;
+}
+
 /* ============================================
    MAP CONTAINER
    ============================================ */

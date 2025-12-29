@@ -193,8 +193,8 @@ public class SimulationController {
     }
 
 
-    public void changePhase(double duration){
-        tlController.changePhase(duration);
+    public void changePhase(double duration, String GroupID){
+        tlController.changePhase(duration, GroupID);
     }
 
     public VehicleController getVehicleController(){

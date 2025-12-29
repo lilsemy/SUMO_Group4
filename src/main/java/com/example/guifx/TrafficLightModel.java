@@ -9,6 +9,7 @@ public class TrafficLightModel {
     private double duration;
     private int phase;
     private String RedYellowGreenState;
+    private String GroupID;
 
 
     public TrafficLightModel() {
@@ -27,6 +28,12 @@ public class TrafficLightModel {
             this.duration = 10;
         }
         this.RedYellowGreenState = RedYellowGreenState;
+        if (id.equals("tl1") || id.equals("tl2") || id.equals("tl3")) {
+            this.GroupID = "TL1";
+        }
+        else {
+            this.GroupID = "TL2";
+        }
     }
 
     public String getId() {
@@ -49,6 +56,10 @@ public class TrafficLightModel {
 
     public void setDuration(double duration){
         this.duration=duration;
+    }
+
+    public String getGroupID(){
+        return GroupID;
     }
 
 

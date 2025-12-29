@@ -57,6 +57,10 @@ public class GUI {
     @FXML
     private Label vehicleCountLabel;
     @FXML
+    private Label Tl1Dur;
+    @FXML
+    private Label Tl2Dur;
+    @FXML
     private LineChart<Number, Number> speedChart;
 
     @FXML
@@ -65,6 +69,8 @@ public class GUI {
     private ChoiceBox<String> vehicleSelector;
     @FXML
     private TextField GetDuration;
+    @FXML
+    private ChoiceBox<String> TLSelector;
 
     private XYChart.Series<Number, Number> speedSeries;
 
@@ -96,7 +102,7 @@ public class GUI {
     private ChoiceBox<TypeFilter> vehicleFilter;
     //currentFilter = The applied filter that changes the GUI (For now only the statistics side)
     private TypeFilter currentFilter = TypeFilter.NONE;
-
+    private double remainingTime;
 
     // gui console
     public void log(String message) {
@@ -165,6 +171,11 @@ public class GUI {
                     //scaleTransform.setY(0);
                     log("selected & Following:" + newValue);
                 }
+            });
+
+            //Initialize DropDown Menu for TrafficLights
+            TLSelector.setOnShowing(event -> {
+                TLSelector.getItems().setAll("TL1", "TL2");
             });
 
             //TODO FILTERING for every aspect of the gui (currently only applies to the statistics side)
@@ -434,9 +445,9 @@ public class GUI {
                     }
 
                     //
+                    double time = org.eclipse.sumo.libtraci.Simulation.getTime();
 
                     if (statistics != null) {
-                        double time = org.eclipse.sumo.libtraci.Simulation.getTime();
                         statistics.updateVehicles(time);
                       /*
                         double avgSpeed = statistics.getAverageSpeed();
@@ -454,6 +465,14 @@ public class GUI {
                         vehicleCountLabel.setText("Vehicles: " + count);
                         speedSeries.getData().add(new XYChart.Data<>(time, avgSpeed));
                     }
+
+                    //TrafficLight Durations
+                    java.text.DecimalFormat df = new java.text.DecimalFormat("#");
+                    remainingTime = simController.getTlController().remainingTime("tl1") - time;
+                    Tl1Dur.setText("Traffic Light 1: " + df.format(remainingTime) + "s");
+                    remainingTime = simController.getTlController().remainingTime("tl4") - time;
+                    Tl2Dur.setText("Traffic Light 2: " + df.format(remainingTime) + "s");
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     stop();
@@ -541,16 +560,20 @@ public class GUI {
      * @param e ActionEvent from button click
      */
     public void commandChangePhase(ActionEvent e) {
-        if (!GetDuration.getText().isEmpty()) {
-            double newDur = Double.parseDouble(GetDuration.getText());
-            simController.changePhase(newDur);
-            System.out.println("Changing TrafficLight Phase with Phase Duration of: " + newDur + " seconds!");
-            log("Changing TrafficLight Phase with Phase Duration of: " + newDur + " seconds!");
-        } else {
-            System.out.println("Error! Please enter a valid number for the Phase duration!");
-            log("Error! Please enter a valid number for the Phase duration!");
+        if (!TLSelector.getValue().isEmpty()){
+            if (!GetDuration.getText().isEmpty()) {
+                double newDur = Double.parseDouble(GetDuration.getText());
+                simController.changePhase(newDur, TLSelector.getValue());
+                System.out.println("Changing TrafficLight Phase of Traffic Light: " + TLSelector.getValue() + "with Phase Duration of: " + newDur + " seconds!");
+                log("Changing TrafficLight Phase of Traffic Light: " + TLSelector.getValue() + "with Phase Duration of: " + newDur + " seconds!");
+            } else {
+                System.out.println("Error! Please enter a valid number for the Phase duration!");
+                log("Error! Please enter a valid number for the Phase duration!");
+            }
         }
-
+        else {
+            System.out.println("Please select a Traffic Light");
+        }
     }
 
     /**
