@@ -14,7 +14,7 @@ public class VehicleModel {
     private String typeId;
     private String routeId;
     private String laneId;
-
+    private VehicleColor color;
     private double depart;
     private double pos;
     private double speed;
@@ -44,12 +44,13 @@ public class VehicleModel {
     /**
     *@param id, typeId, routeId, laneId
     */
-    public VehicleModel(String id, String typeId, String routeId, String laneId, double depart) {
+    public VehicleModel(String id, String typeId, String routeId, String laneId, double depart, VehicleColor color) {
         this.id = id;
         this.typeId = typeId;
         this.routeId = routeId;
         this.laneId = laneId;
         this.depart = depart;
+        this.color = color;
         this.pos = 0.0;
         this.speed = 1.0;
         this.x = 0.0;
@@ -57,18 +58,19 @@ public class VehicleModel {
         this.angle = 0.0;
     }
 
-        public VehicleModel(String id) {
-            this.id = id;
-            this.typeId = "car";
-            this.routeId = "";
-            this.laneId = "";
-            this.depart = 0;
-            this.pos = 0.0;
-            this.speed = 1.0;
-            this.x = 0.0;
-            this.y = 0.0;
-            this.angle = 0.0;
-        }
+    public VehicleModel(String id) {
+        this.id = id;
+        this.typeId = "car";
+        this.routeId = "";
+        this.laneId = "";
+        this.depart = 0;
+        this.color = VehicleColor.BLACK;
+        this.pos = 0.0;
+        this.speed = 1.0;
+        this.x = 0.0;
+        this.y = 0.0;
+        this.angle = 0.0;
+    }
 
 
         //Getter
@@ -133,8 +135,10 @@ public class VehicleModel {
     public double getAngle(){
         return angle;
     }
-    //Setter
-    //i am not sure if we need setters for all
+
+    public VehicleColor getColor() {
+        return color;
+    }
     
     /**
     *@param laneId
@@ -157,5 +161,11 @@ public class VehicleModel {
     }
     public void setTypeId(String id){
         this.typeId=id;
+    }
+
+
+
+    public void setColor(VehicleColor color) {
+        this.color = color;
     }
 }

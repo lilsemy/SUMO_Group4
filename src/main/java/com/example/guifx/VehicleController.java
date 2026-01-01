@@ -1,7 +1,6 @@
 package com.example.guifx;
 
 import org.eclipse.sumo.libtraci.Vehicle;
-import org.eclipse.sumo.libtraci.GUI;
 import org.eclipse.sumo.libtraci.TraCIPosition;
 import org.eclipse.sumo.libtraci.Simulation;
 
@@ -30,13 +29,13 @@ public class VehicleController {
      * @return VehicleModel created
      * @throws Exception if injection fails
      */
-    public VehicleModel createAndInjectVehicle(String typeId, String routeId, String laneId) throws Exception {
+    public VehicleModel createAndInjectVehicle(String typeId, String routeId, String laneId, VehicleColor color) throws Exception {
         vehicleCounter++;
         String id = "id" + vehicleCounter;
 
         double currentTime = Simulation.getTime();
 
-        VehicleModel vehicle = new VehicleModel(id, typeId, routeId, laneId, currentTime);
+        VehicleModel vehicle = new VehicleModel(id, typeId, routeId, laneId, currentTime, color);
 
         injectVehicle(vehicle);
         return vehicle;
@@ -140,6 +139,7 @@ public class VehicleController {
      * 
      * @throws Exception if update fails
      */
+    //TODO THIS CURRENTLY BREAKS FILTERING. IF CARS ARE QUEUED UP IT CHANGES THEIR COLOR TO DEFAULT VALUE WHICH ISN'T IDEAL
     public void updateFromSimulation() throws Exception {
         List<String> liveIds = Vehicle.getIDList();
 
@@ -165,31 +165,37 @@ public class VehicleController {
     }
 
     //filtering
-    public Collection<VehicleModel> getVehiclesByType(TypeFilter filter) {
-        Collection<VehicleModel> all = vehiclesList.values();
+    public Collection<VehicleModel> getFilteredVehicles(TypeFilter typeFilter, VehicleColor colorFilter) {
+        Collection<VehicleModel> result = new ArrayList<>();
 
-        if (filter == TypeFilter.NONE) {
-            return all;
+        for(VehicleModel v : vehiclesList.values()){
+            //does the type of v match with the given filter? TRUE, if not, FALSE
+            boolean typeMatches = typeFilter == TypeFilter.NONE ||
+                                  typeFilter.getTypeId().equals(v.getTypeId());
+            //does the color of v match with the given filter? TRUE, if not, FALSE
+            boolean colorMatches = colorFilter == VehicleColor.NONE ||
+                                   colorFilter == v.getColor();
+            //if both true, add to list
+            if(typeMatches && colorMatches) result.add(v);
         }
 
-        String selectedType = filter.getTypeId();
-
-        return all.stream()
-                .filter(v -> selectedType.equals(v.getTypeId()))
-                .toList();
+        return result;
     }
 
-    public Collection<String> getVehicleIdsByType(TypeFilter filter) {
-        Collection<String> all = vehiclesList.keySet();
+    public Collection<String> getFilteredVehicleIds(TypeFilter typeFilter, VehicleColor colorFilter) {
+        Collection<String> result = new ArrayList<>();
 
-        if (filter == TypeFilter.NONE) {
-            return all;
+        for(VehicleModel v : vehiclesList.values()){
+            boolean typeMatches = typeFilter == TypeFilter.NONE ||
+                                  typeFilter.getTypeId().equals(v.getTypeId());
+
+            boolean colorMatches = colorFilter == VehicleColor.NONE ||
+                                   colorFilter == v.getColor();
+
+            if(typeMatches && colorMatches) result.add(v.getId());
+
         }
 
-        String selectedType = filter.getTypeId();
-
-        return all.stream()
-                .filter(v -> selectedType.equals(vehiclesList.get(v).getTypeId()))
-                .toList();
+        return result;
     }
 }

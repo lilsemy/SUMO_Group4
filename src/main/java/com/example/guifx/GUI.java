@@ -21,8 +21,8 @@ import javafx.geometry.Point2D;
 import org.eclipse.sumo.libtraci.Vehicle;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -31,13 +31,7 @@ import java.util.Map;
 public class GUI {
     private SimulationController simController;
 
-    /**
-     * Constructor for GUI.
-     *
-     * @throws Exception if initialization fails
-     */
-    public GUI() throws Exception {
-    }
+
 
     @FXML
     private StackPane mapContainer;
@@ -99,10 +93,28 @@ public class GUI {
 
     //FILTERING vehicleFilter = The possible filters the user can choose from the choice box
     @FXML
-    private ChoiceBox<TypeFilter> vehicleFilter;
+    private ChoiceBox<TypeFilter> vehicleTypeFilter;
     //currentFilter = The applied filter that changes the GUI (For now only the statistics side)
-    private TypeFilter currentFilter = TypeFilter.NONE;
+    private TypeFilter currentTypeFilter = TypeFilter.NONE;
+    @FXML
+    private ChoiceBox<VehicleColor> vehicleColorFilter;
+    private VehicleColor currentColorFilter = VehicleColor.NONE;
+
+    //LOGIC FOR SPAWNING
+    private SpawnConfig spawnConfig = SpawnConfig.restrictTypes(Set.of(TypeFilter.CAR));
+    private ChoiceBox<TypeFilter> typeChoice;
+    private ChoiceBox<VehicleColor> colorChoice;
+
+
     private double remainingTime;
+
+    /**
+     * Constructor for GUI.
+     *
+     * @throws Exception if initialization fails
+     */
+    public GUI() throws Exception {
+    }
 
     // gui console
     public void log(String message) {
@@ -134,7 +146,7 @@ public class GUI {
 
             laneLayerInstance = new LaneLayer(laneLayer);
             trafficLightLayerInstance = new TrafficLightLayer(trafficLightLayer, null);
-            carLayerInstance = new CarLayer(carLayer);
+            carLayerInstance = new CarLayer(carLayer, simController);
 
             speedSeries = new XYChart.Series<>();
             speedSeries.setName("Avg Speed");
@@ -178,24 +190,44 @@ public class GUI {
                 TLSelector.getItems().setAll("TL1", "TL2");
             });
 
-            //TODO FILTERING for every aspect of the gui (currently only applies to the statistics side)
+
             //setting up the 4 choices in the choice box
-            vehicleFilter.getItems().addAll(
+            vehicleTypeFilter.getItems().addAll(
                     TypeFilter.NONE,
                     TypeFilter.CAR,
                     TypeFilter.TRUCK,
                     TypeFilter.BUS
             );
             //initially the applied filter is set to NONE
-            vehicleFilter.setValue(TypeFilter.NONE);
+            vehicleTypeFilter.setValue(TypeFilter.NONE);
 
             //updating the applied filter after user input
-            vehicleFilter
+            vehicleTypeFilter
                     .getSelectionModel()
                     .selectedItemProperty()
                     .addListener((observableValue, oldValue, newValue) -> {
                         if (newValue != null) {
-                            currentFilter = newValue;
+                            currentTypeFilter = newValue;
+                        }
+                    });
+
+            //Drop down menu for COLORS
+            vehicleColorFilter.getItems().addAll(
+                    VehicleColor.NONE,
+                    VehicleColor.RED,
+                    VehicleColor.BLACK,
+                    VehicleColor.WHITE,
+                    VehicleColor.YELLOW
+            );
+            //Color filter is initially set to NONE
+            vehicleColorFilter.setValue(VehicleColor.NONE);
+            //updating the color filter
+            vehicleColorFilter
+                    .getSelectionModel()
+                    .selectedItemProperty()
+                    .addListener((observableValue, oldValue, newValue) -> {
+                        if (newValue != null) {
+                            currentColorFilter = newValue;
                         }
                     });
 
@@ -401,7 +433,7 @@ public class GUI {
                         simController.singleStep();
 
                         if (carLayerInstance != null) {
-                            carLayerInstance.updateCars(simController.getVehicleController().getVehicleIdsByType(currentFilter));
+                            carLayerInstance.updateCars(simController.getVehicleController().getFilteredVehicleIds(currentTypeFilter, currentColorFilter));
                         }
 
                         if (trafficLightLayerInstance != null) {
@@ -455,7 +487,7 @@ public class GUI {
                         Collection<VehicleModel> filteredVehiclesList =
                                 simController
                                         .getVehicleController()
-                                        .getVehiclesByType(currentFilter);
+                                        .getFilteredVehicles(currentTypeFilter, currentColorFilter);
                         double avgSpeed = statistics.getAverageSpeed(filteredVehiclesList);
                         int count = filteredVehiclesList.size();
 
@@ -492,7 +524,7 @@ public class GUI {
     public void commandSpawnVehicle(ActionEvent e) {
         System.out.println("Spawning new vehicle!");
         log("Spawning new vehicle!");
-        String id = simController.spawnVehicle();
+        String id = simController.spawnVehicle(spawnConfig);
         if (id != null) {
             System.out.println("Spawned:" + id);
             log("Spawned:" + id);
