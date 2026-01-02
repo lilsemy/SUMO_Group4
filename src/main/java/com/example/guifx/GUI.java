@@ -65,6 +65,8 @@ public class GUI {
     private TextField GetDuration;
     @FXML
     private ChoiceBox<String> TLSelector;
+    @FXML
+    private TextField stressTestCountField;
 
     private XYChart.Series<Number, Number> speedSeries;
 
@@ -609,14 +611,29 @@ public class GUI {
     }
 
     /**
-     * Starts a stress test with 50 vehicles
+     * Starts a stress test with x amount of vehicles
      *
      * @param e ActionEvent from button click
      */
+    @FXML
     public void commandStressTest(ActionEvent e) {
-        System.out.println("Starting Stress Test");
-        log("Starting Stress Test");
-        simController.startStressTest(50);
+        try {
+            int count = Integer.parseInt(stressTestCountField.getText());
+
+            if (count <= 0) {
+                log("Please enter a positive number for stress test.");
+                return;
+            }
+
+            System.out.println("Starting Stress Test with " + count + " vehicles");
+            log("Starting Stress Test with " + count + " vehicles");
+
+            simController.startStressTest(count);
+
+        } catch (NumberFormatException ex) {
+            log("Invalid number. Please enter a valid integer.");
+            System.out.println("Invalid stress test number");
+        }
     }
 
     @FXML
