@@ -111,7 +111,7 @@
       <TextField id="GetDuration" fx:id="GetDuration" layoutX="388.0" layoutY="130.0" prefHeight="30.0" prefWidth="111.0" promptText="Enter Duration" />
 
       <ChoiceBox fx:id="vehicleTypeFilter" layoutX="1135.0" layoutY="66.0" prefWidth="137.0" />
-       <ChoiceBox fx:id="vehicleColorFilter" layoutX="1135.0" layoutY="95.0" prefWidth="137.0" />
+       <ChoiceBox fx:id="vehicleColorFilter" layoutX="1135.0" layoutY="97.0" prefWidth="137.0" />
        
       <Button layoutX="931.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandPrintCongestion" prefHeight="59.0" prefWidth="137.0" text="Congestions" AnchorPane.leftAnchor="964.0" AnchorPane.topAnchor="51.0">
          <graphic>
