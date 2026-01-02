@@ -94,6 +94,7 @@
             <Font size="12.0" />
          </font>
       </Button>
+      <TextField fx:id="stressTestCountField" layoutX="773.0" layoutY="130.0" prefWidth="137.0" prefHeight="30.0" promptText="Car amount" AnchorPane.leftAnchor="806.0" />
       <TextArea id="consoleArea" fx:id="consoleArea" layoutX="737.7142857142858" layoutY="484.0" prefHeight="181.0" prefWidth="344.0" AnchorPane.rightAnchor="3.2857142857142208" AnchorPane.topAnchor="469.0" />
       <Button fx:id="commandFolowVehicle" layoutX="615.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandFollowVehicle" prefHeight="59.0" prefWidth="137.0" text="Follow Vehicle" AnchorPane.leftAnchor="648.0" AnchorPane.topAnchor="51.0">
          <font>
@@ -109,8 +110,8 @@
       <ChoiceBox id="vehicleSelector" fx:id="vehicleSelector" layoutX="655.0" layoutY="130.0" prefHeight="30.0" prefWidth="137.0" AnchorPane.leftAnchor="648.0" />
       <TextField id="GetDuration" fx:id="GetDuration" layoutX="388.0" layoutY="130.0" prefHeight="30.0" prefWidth="111.0" promptText="Enter Duration" />
 
-      <ChoiceBox fx:id="vehicleTypeFilter" layoutX="773.0" layoutY="130.0" prefWidth="137.0" AnchorPane.leftAnchor="806.0" />
-       <ChoiceBox fx:id="vehicleColorFilter" layoutX="821.0" layoutY="161.0" prefWidth="137.0" />
+      <ChoiceBox fx:id="vehicleTypeFilter" layoutX="1135.0" layoutY="66.0" prefWidth="137.0" />
+       <ChoiceBox fx:id="vehicleColorFilter" layoutX="1135.0" layoutY="95.0" prefWidth="137.0" />
        
       <Button layoutX="931.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandPrintCongestion" prefHeight="59.0" prefWidth="137.0" text="Congestions" AnchorPane.leftAnchor="964.0" AnchorPane.topAnchor="51.0">
          <graphic>
