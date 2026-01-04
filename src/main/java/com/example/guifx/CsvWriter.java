@@ -30,7 +30,7 @@ public class CsvWriter {
     private void writeHeader() {
         if (!headerWritten) {
             writer.println(
-                    "time,vehicleCount,avgSpeed,congestionPresent,redLights,yellowLights,greenLights"
+                    "time;vehicleCount;avgSpeed;congestionPresent;redLights;yellowLights;greenLights"
             );
             headerWritten = true;
         }
@@ -49,7 +49,7 @@ public class CsvWriter {
         int g = trafficLightStates.getOrDefault("G", 0);
 
         writer.printf(
-                "%.2f,%d,%.3f,%b,%d,%d,%d%n",
+                "%.2f;%d;%.3f;%b;%d;%d;%d%n",
                 time,
                 vehicleCount,
                 avgSpeed,
