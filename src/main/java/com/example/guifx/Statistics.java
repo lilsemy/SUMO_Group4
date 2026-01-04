@@ -175,6 +175,37 @@ public class Statistics {
         return congestedLanes;
     }
 
+    // CSV stuff
+    // call respective update methods before writing -> Call updateVehicles(currentTime) once per step and remove internal calls where possible
+    /* like:
+
+        stats.updateVehicles(time);
+        stats.updateTrafficLights();
+
+        csv.writeStep(
+        time,
+        stats.getVehicleCount(),
+        stats.getAverageSpeed(),
+        stats.isCongestionPresent(time),
+        stats.getTrafficLightStates()
+        );
+
+     */
+
+    public int getVehicleCount() {
+        return currentVehicles.size();
+    }
+
+    public boolean isCongestionPresent(double currentTime) {
+        return !detectCongestionHotspots(currentTime).isEmpty();
+    }
+
+    public Map<String, Integer> getTrafficLightStates() {
+        return currentTrafficLightStates;
+    }
+
+
+
 
 
     /**
