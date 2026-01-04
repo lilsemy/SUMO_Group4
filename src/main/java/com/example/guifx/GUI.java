@@ -131,7 +131,7 @@ public class GUI {
      */
     public void setSimulationController(SimulationController simulationController) {
         this.simController = simulationController;
-        this.statistics = new Statistics(simController);
+        this.statistics = new Statistics(simController); //!!!!! Insert a getStatistics function im simulation Controller, beacuse we are creating there a statistic instance for CSV and thus we would have two instances of Statistics.
         initVisuals();
     }
 
@@ -147,7 +147,7 @@ public class GUI {
             MapUtil.setup(contentWidth, contentHeight, 15);
 
             laneLayerInstance = new LaneLayer(laneLayer);
-            trafficLightLayerInstance = new TrafficLightLayer(trafficLightLayer, null);
+            trafficLightLayerInstance = new TrafficLightLayer(trafficLightLayer, null, simController.getTlController());
             carLayerInstance = new CarLayer(carLayer, simController);
 
             speedSeries = new XYChart.Series<>();
