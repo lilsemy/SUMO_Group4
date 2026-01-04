@@ -6,9 +6,10 @@ package com.example.guifx;
 
 public class TrafficLightModel {
     private String id;
-    private int duration;
+    private double duration;
     private int phase;
     private String RedYellowGreenState;
+    private String GroupID;
 
 
     public TrafficLightModel() {
@@ -19,14 +20,20 @@ public class TrafficLightModel {
         this.id = id;
         this.phase = phase;
         if (this.phase == 0) {
-            this.duration = 8000000;
+            this.duration = 80;
         } else if (this.phase == 2) {
-            this.duration = 5000000;
+            this.duration = 80;
         }
         else {
             this.duration = 10;
         }
         this.RedYellowGreenState = RedYellowGreenState;
+        if (id.equals("tl1") || id.equals("tl2") || id.equals("tl3")) {
+            this.GroupID = "TL1";
+        }
+        else {
+            this.GroupID = "TL2";
+        }
     }
 
     public String getId() {
@@ -37,7 +44,7 @@ public class TrafficLightModel {
         return phase;
     }
 
-    public int getDuration() {
+    public double getDuration() {
         return duration;
     }
 
@@ -47,6 +54,13 @@ public class TrafficLightModel {
 
     public String getRedYellowGreenState(){return RedYellowGreenState;}
 
+    public void setDuration(double duration){
+        this.duration=duration;
+    }
+
+    public String getGroupID(){
+        return GroupID;
+    }
 
 
 }

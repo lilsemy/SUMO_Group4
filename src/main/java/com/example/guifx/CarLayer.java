@@ -17,20 +17,27 @@ public class CarLayer {
     // Pane to display all car nodes
     private final Pane carLayerPane;
     // Images for different vehicle types
-    private final Image carImage;
+    private final Image carBlackImage;
+    private final Image carRedImage;
+    private final Image carWhiteImage;
+    private final Image carYellowImage;
     private final Image busImage;
     private final Image truckImage;
+    private final SimulationController simController;
 
     /**
      * Constructs a CarLayer and loads vehicle images
      * 
      * @param carLayerPane Pane to display vehicles
      */
-    CarLayer(Pane carLayerPane) {
+    CarLayer(Pane carLayerPane, SimulationController simController) {
         carImageViews = new HashMap<>();
         this.carLayerPane = carLayerPane;
-
-        this.carImage = loadVehicleImage("/carblack.png");
+        this.simController = simController;
+        this.carBlackImage = loadVehicleImage("/carBlack.png");
+        this.carRedImage = loadVehicleImage("/carRed.png");
+        this.carWhiteImage = loadVehicleImage("/carWhite.png");
+        this.carYellowImage = loadVehicleImage("/carYellow.png");
         this.busImage = loadVehicleImage("/bus.png");
         this.truckImage = loadVehicleImage("/truck.png");
 
@@ -64,12 +71,13 @@ public class CarLayer {
      * @return Image for the vehicle
      */
     private Image getImageForVehicle(String vehicleId) {
-        String typeId = Vehicle.getTypeID(vehicleId);
+        /*String typeId = Vehicle.getTypeID(vehicleId);
         String classId = Vehicle.getVehicleClass(vehicleId);
         String type = typeId == null ? "" : typeId.toLowerCase();
         String vclass = classId == null ? "" : classId.toLowerCase();
+         */
 
-        if (vclass.contains("bus") || type.contains("bus")) {
+        /*if (vclass.contains("bus") || type.contains("bus")) {
             if (busImage != null) return busImage;
             return carImage;
         }
@@ -78,6 +86,24 @@ public class CarLayer {
             return carImage;
         }
         return carImage;
+        */
+        VehicleModel v = simController.getVehicleController().getVehicle(vehicleId);
+        String typeId = v.getTypeId();
+        VehicleColor color = v.getColor();
+        String type = typeId == null ? "" : typeId.toLowerCase();
+
+        return switch (type) {
+            case "car" -> switch (color) {
+                case VehicleColor.RED -> carRedImage;
+                case VehicleColor.WHITE -> carWhiteImage;
+                case VehicleColor.YELLOW -> carYellowImage;
+                default -> carBlackImage;
+            };
+            case "truck" -> truckImage;
+            case "bus" -> busImage;
+            default -> carBlackImage;
+        };
+
     }
 
     /**
@@ -127,9 +153,9 @@ public class CarLayer {
     /**
      * Updates all cars: adds new cars, updates positions and rotations, removes disappeared cars
      */
-    public void updateCars() {
-        List<String> ids = Vehicle.getIDList();
-        Set<String> activeCarIds = new HashSet<>(ids);
+    public void updateCars(Collection<String> list) {
+        //List<String> ids = Vehicle.getIDList();
+        Set<String> activeCarIds = new HashSet<>(list);
         Set<String> newCarIds = new HashSet<>(activeCarIds);
 
         Iterator<Map.Entry<String, ImageView>> it = carImageViews.entrySet().iterator();

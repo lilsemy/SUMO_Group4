@@ -1,7 +1,6 @@
 package com.example.guifx;
 
 import org.eclipse.sumo.libtraci.Vehicle;
-import org.eclipse.sumo.libtraci.GUI;
 import org.eclipse.sumo.libtraci.TraCIPosition;
 import org.eclipse.sumo.libtraci.Simulation;
 
@@ -30,13 +29,13 @@ public class VehicleController {
      * @return VehicleModel created
      * @throws Exception if injection fails
      */
-    public VehicleModel createAndInjectVehicle(String typeId, String routeId, byte laneId) throws Exception {
+    public VehicleModel createAndInjectVehicle(String typeId, String routeId, String laneId, VehicleColor color) throws Exception {
         vehicleCounter++;
         String id = "id" + vehicleCounter;
 
         double currentTime = Simulation.getTime();
 
-        VehicleModel vehicle = new VehicleModel(id, typeId, routeId, laneId, currentTime);
+        VehicleModel vehicle = new VehicleModel(id, typeId, routeId, laneId, currentTime, color);
 
         injectVehicle(vehicle);
         return vehicle;
@@ -52,10 +51,10 @@ public class VehicleController {
         try {
             Vehicle.add(vehicle.getId(), vehicle.getRouteId(), vehicle.getTypeId(),
                     String.valueOf(vehicle.getDepart()),
-                    String.valueOf(vehicle.getLaneId()),
+                    vehicle.getLaneId(),
                     String.valueOf(vehicle.getPos()),
                     String.valueOf(vehicle.getSpeed()),
-                    String.valueOf(vehicle.getLaneId()));
+                    vehicle.getLaneId());
 
             vehiclesList.put(vehicle.getId(), vehicle);
             System.out.println("Injected vehicle: " + vehicle.getId());
@@ -140,6 +139,7 @@ public class VehicleController {
      * 
      * @throws Exception if update fails
      */
+    //TODO THIS CURRENTLY BREAKS FILTERING. IF CARS ARE QUEUED UP IT CHANGES THEIR COLOR TO DEFAULT VALUE WHICH ISN'T IDEAL
     public void updateFromSimulation() throws Exception {
         List<String> liveIds = Vehicle.getIDList();
 
@@ -149,14 +149,53 @@ public class VehicleController {
             double speed = Vehicle.getSpeed(id);
             TraCIPosition pos = Vehicle.getPosition(id, false);
             double angle = Vehicle.getAngle(id);
+            String laneId = Vehicle.getLaneID(id);
+            String typeId = Vehicle.getTypeID(id);
 
             VehicleModel v = vehiclesList.getOrDefault(id, new VehicleModel(id));
 
             v.setSpeed(speed);
             v.setPosition(pos.getX(), pos.getY());
             v.setAngle(angle);
+            v.setLaneId(laneId);
+            v.setTypeId(typeId);
 
             vehiclesList.put(id, v);
         }
+    }
+
+    //filtering
+    public Collection<VehicleModel> getFilteredVehicles(TypeFilter typeFilter, VehicleColor colorFilter) {
+        Collection<VehicleModel> result = new ArrayList<>();
+
+        for(VehicleModel v : vehiclesList.values()){
+            //does the type of v match with the given filter? TRUE, if not, FALSE
+            boolean typeMatches = typeFilter == TypeFilter.NONE ||
+                                  typeFilter.getTypeId().equals(v.getTypeId());
+            //does the color of v match with the given filter? TRUE, if not, FALSE
+            boolean colorMatches = colorFilter == VehicleColor.NONE ||
+                                   colorFilter == v.getColor();
+            //if both true, add to list
+            if(typeMatches && colorMatches) result.add(v);
+        }
+
+        return result;
+    }
+
+    public Collection<String> getFilteredVehicleIds(TypeFilter typeFilter, VehicleColor colorFilter) {
+        Collection<String> result = new ArrayList<>();
+
+        for(VehicleModel v : vehiclesList.values()){
+            boolean typeMatches = typeFilter == TypeFilter.NONE ||
+                                  typeFilter.getTypeId().equals(v.getTypeId());
+
+            boolean colorMatches = colorFilter == VehicleColor.NONE ||
+                                   colorFilter == v.getColor();
+
+            if(typeMatches && colorMatches) result.add(v.getId());
+
+        }
+
+        return result;
     }
 }

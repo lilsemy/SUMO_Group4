@@ -23,7 +23,11 @@ public class Statistics {
 
     // Traffic Light Data Structure
     private Map<String, Integer> currentTrafficLightStates = new HashMap<>(); // Count of Traffic lights per phase
-    
+
+    // Congestion detection (per lane)
+    private Map<String, List<Double>> speedsPerLane = new HashMap<>();
+    private Map<String, Double> congestedLanes = new HashMap<>();
+
     public Statistics(SimulationController simCon) {
         this.simCon = simCon;
     }
@@ -55,17 +59,30 @@ public class Statistics {
         return sum / currentVehicles.size();
     }
 
+    public double getAverageSpeed(Collection<VehicleModel> filteredVehicles) {
+        if (filteredVehicles.isEmpty()) return 0;
+
+        double sum = 0;
+        for (VehicleModel v : filteredVehicles) {
+            sum += v.getSpeed();
+        }
+        return sum / filteredVehicles.size();
+    }
+
     /**
      * Calculates how many vehicles there are per edge
      */
     public void updateVehicleDensity() {
         vehicleCountsPerEdge.clear();
+
         for (VehicleModel v : currentVehicles.values()) {
-            String edgeId = v.getLaneId() + "";
+            String edgeId = v.getLaneId();
+
             vehicleCountsPerEdge.putIfAbsent(edgeId, 0);
             vehicleCountsPerEdge.put(edgeId, vehicleCountsPerEdge.get(edgeId) + 1);
         }
     }
+
 
     /**
      * Calculates travel times for vehicles that have left the simulation
@@ -117,6 +134,79 @@ public class Statistics {
     this.currentTrafficLightStates = counts;
     }
 
+    public Map<String, Double> detectCongestionHotspots(double currentTime) {
+
+        updateVehicles(currentTime);
+
+        Map<String, List<Double>> speedsPerLane = new HashMap<>();
+        Map<String, Double> congestedLanes = new HashMap<>();
+
+        // Group vehicle speeds by REAL lane ID
+        for (VehicleModel v : currentVehicles.values()) {
+
+            // IMPORTANT: this must be the SUMO lane ID (e.g. "edge_12_0")
+            String laneId = v.getLaneId();
+            double speed = v.getSpeed();
+
+            speedsPerLane
+                    .computeIfAbsent(laneId, k -> new ArrayList<>())
+                    .add(speed);
+        }
+
+        // Compute average speed per lane
+        for (Map.Entry<String, List<Double>> entry : speedsPerLane.entrySet()) {
+
+            List<Double> speeds = entry.getValue();
+            if (speeds.size() < 2) continue; // optional stability filter
+
+            double sum = 0.0;
+            for (double s : speeds) {
+                sum += s;
+            }
+
+            double avgSpeed = sum / speeds.size();
+
+            // Congestion condition (adjustable)
+            if (avgSpeed < 1.0) {
+                congestedLanes.put(entry.getKey(), avgSpeed);
+            }
+        }
+
+        return congestedLanes;
+    }
+
+    // CSV stuff
+    // call respective update methods before writing -> Call updateVehicles(currentTime) once per step and remove internal calls where possible
+    /* like:
+
+        stats.updateVehicles(time);
+        stats.updateTrafficLights();
+
+        csv.writeStep(
+        time,
+        stats.getVehicleCount(),
+        stats.getAverageSpeed(),
+        stats.isCongestionPresent(time),
+        stats.getTrafficLightStates()
+        );
+
+     */
+
+    public int getVehicleCount() {
+        return currentVehicles.size();
+    }
+
+    public boolean isCongestionPresent(double currentTime) {
+        return !detectCongestionHotspots(currentTime).isEmpty();
+    }
+
+    public Map<String, Integer> getTrafficLightStates() {
+        return currentTrafficLightStates;
+    }
+
+
+
+
 
     /**
      * Testing purposes -> Prints all statistics data.
@@ -129,7 +219,7 @@ public class Statistics {
         
     System.out.println("=== Simulation Statistics ===");
     System.out.println("Total vehicles: " + currentVehicles.size());
-    System.out.println("Average speed: " + getAverageSpeed() + " m/s");
+    //System.out.println("Average speed: " + getAverageSpeed() + " m/s");
     System.out.println("Vehicle density per edge: " + vehicleCountsPerEdge);
     System.out.println("Travel times (for vehicles that have left the simulation): " + calculateTravelTimes(currentTime));
     System.out.println("Traffic lights count per color: " + currentTrafficLightStates);

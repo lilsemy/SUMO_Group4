@@ -11,11 +11,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.nio.file.Path;
+import javafx.scene.text.Text;
+import javafx.scene.text.Font;
+import javafx.scene.layout.StackPane;
 
 /**
  * TrafficLightManager: static manager class for visualizing and controlling SUMO traffic lights.
  */
 public class TrafficLightLayer {
+
+    private final TrafficLightController tlC;
 
     // Pane for traffic light nodes, injected from Controller
     private Pane trafficLightLayer;
@@ -27,10 +32,11 @@ public class TrafficLightLayer {
      * Initialize traffic light layer.
      * Must be called once from Controller after FXML is loaded and MapGraphics.setup() ready
      */
-    public TrafficLightLayer(Pane trafficLightLayer, Path netFilePath) {
+    public TrafficLightLayer(Pane trafficLightLayer, Path netFilePath, TrafficLightController tlC) {
         this.trafficLightLayer = trafficLightLayer;
         trafficLightCircles.clear();
         this.trafficLightLayer.getChildren().clear();
+        this.tlC = tlC;
 
         // Build visual nodes for all traffic lights
         buildTrafficLightCircles();
@@ -47,13 +53,13 @@ public class TrafficLightLayer {
         }
 
         // Get all traffic light IDs from SUMO
-        List<String> trafficLightIds = TrafficLight.getIDList();
+        List<String> trafficLightIds = tlC.getTlIds();
         System.out.println("Found " + trafficLightIds.size() + " traffic lights.");
 
         for (String trafficLightId : trafficLightIds) {
             try {
                 // NOTE: Get position from JUNCTION, not TrafficLight since latter may not have a defined position
-                TraCIPosition sumoPosition = Junction.getPosition(trafficLightId);
+                TraCIPosition sumoPosition = tlC.getTlPosition(tlC.getTlList().get(trafficLightId));
                 Point2D worldPosition = new Point2D(sumoPosition.getX(), sumoPosition.getY());
 
                 // Convert to screen coordinates
@@ -64,6 +70,32 @@ public class TrafficLightLayer {
                 circle.setStroke(Color.BLUE);
                 circle.setStrokeWidth(1.0);
                 circle.setStrokeType(StrokeType.OUTSIDE);
+
+                // Create label text, to display the TL Grouping IDs
+                if (trafficLightId.equals("tl2")) {
+                    Text label = new Text("TL1");
+                    label.setFont(Font.font(8));
+                    label.setFill(Color.BLACK);
+                    label.setMouseTransparent(true); // wichtig!
+                    //TL Circles are now together with Text in a Pane
+                    StackPane trafficLightNode = new StackPane(circle, label);
+                    // Position it
+                    trafficLightNode.setLayoutX(screenPosition.getX());
+                    trafficLightNode.setLayoutY(screenPosition.getY());
+                    // Add to scene graph
+                    trafficLightLayer.getChildren().add(trafficLightNode);
+                }
+                else if (trafficLightId.equals("tl5")) {
+                    Text label = new Text("TL2");
+                    label.setFont(Font.font(8));
+                    label.setFill(Color.BLACK);
+                    label.setMouseTransparent(true); // wichtig!)
+                    StackPane trafficLightNode = new StackPane(circle, label);
+                    trafficLightNode.setLayoutX(screenPosition.getX());
+                    trafficLightNode.setLayoutY(screenPosition.getY());
+                    trafficLightLayer.getChildren().add(trafficLightNode);
+                }
+
 
                 // Add to scene graph and map
                 trafficLightLayer.getChildren().add(circle);
@@ -92,6 +124,7 @@ public class TrafficLightLayer {
             try {
                 // Get current state string like "GGggrrrr"
                 String state = TrafficLight.getRedYellowGreenState(trafficLightId);
+                //String state = tlC.getTlList().get(trafficLightId).getRedYellowGreenState(); --> Currently doesnt work, because states are not frequently updatet.
                 if (state == null || state.isEmpty()) {
                     circle.setFill(Color.GRAY); // Unknown state
                     continue;
