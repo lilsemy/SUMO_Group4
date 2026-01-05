@@ -100,4 +100,16 @@ public class TrafficLightController {
     public TraCIPosition getTlPosition(TrafficLightModel tl) {
         return Junction.getPosition(tl.getId());
     }
+
+    /**
+     * This function is called every simulation step, to synchronize our local TrafficLightModel instances with the TrafficLight values, e.g. current Phase, inside of SUMO
+     */
+    public void updateTLModel(){
+        for (String id : tlIds){
+            TrafficLightModel tl = tlList.get(id);
+            tl.setDuration(TrafficLight.getPhaseDuration(id));
+            tl.setPhase(TrafficLight.getPhase(id));
+            tl.setRedYellowGreenState(TrafficLight.getRedYellowGreenState(id));
+        }
+    }
 }

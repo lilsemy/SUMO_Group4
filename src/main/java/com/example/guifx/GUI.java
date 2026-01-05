@@ -528,6 +528,8 @@ public class GUI {
                     Tl1Dur.setText("Traffic Light 1: " + df.format(remainingTime) + "s");
                     remainingTime = simController.getTlController().remainingTime("tl4") - time;
                     Tl2Dur.setText("Traffic Light 2: " + df.format(remainingTime) + "s");
+                    //synchronize TrafficLightModels with TL values in Simualtion
+                    simController.getTlController().updateTLModel();
 
                 } catch (Exception e) {
                     e.printStackTrace();

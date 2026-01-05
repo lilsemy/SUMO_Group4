@@ -123,8 +123,8 @@ public class TrafficLightLayer {
 
             try {
                 // Get current state string like "GGggrrrr"
-                String state = TrafficLight.getRedYellowGreenState(trafficLightId);
-                //String state = tlC.getTlList().get(trafficLightId).getRedYellowGreenState(); --> Currently doesnt work, because states are not frequently updatet.
+                //String state = TrafficLight.getRedYellowGreenState(trafficLightId);
+                String state = tlC.getTlList().get(trafficLightId).getRedYellowGreenState(); //--> Currently doesnt work, because states are not frequently updatet.
                 if (state == null || state.isEmpty()) {
                     circle.setFill(Color.GRAY); // Unknown state
                     continue;

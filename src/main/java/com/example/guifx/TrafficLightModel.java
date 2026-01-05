@@ -62,5 +62,7 @@ public class TrafficLightModel {
         return GroupID;
     }
 
-
+    public void setRedYellowGreenState(String redYellowGreenState) {
+        RedYellowGreenState = redYellowGreenState;
+    }
 }
