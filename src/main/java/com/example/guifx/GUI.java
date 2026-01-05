@@ -169,6 +169,10 @@ public class GUI {
 
             setupZoomAndDrag();
 
+            /**
+            * Orders the vehicles in an alphabetically descending list
+            */
+            
             vehicleSelector.setOnShowing(event -> {
                 var vehicles = simController.getVehicleController().getVehiclesMap().keySet();
                 List<String> sortedVehicles = new ArrayList<>(vehicles);
