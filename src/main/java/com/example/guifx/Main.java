@@ -3,6 +3,7 @@ package com.example.guifx;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
 
@@ -22,6 +23,11 @@ public class Main extends Application {
     public void start(Stage stage) throws Exception {
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("GUI-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
+
+        stage.getIcons().add(
+                new Image(Main.class.getResourceAsStream("/com/example/guifx/AppIcon.png"))
+        );
+
         stage.setTitle("SumoController");
         stage.setMaximized(true);
         stage.setScene(scene);
