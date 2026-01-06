@@ -21,6 +21,11 @@ public class Statistics {
     private Map<String, Double> departureTimes = new HashMap<>();           // Departure times of vehicles
     private Map<String, Integer> vehicleCountsPerEdge = new HashMap<>();    // Vehicles per Edge (density)
 
+    // Travel time statistics (persistent across simulation steps)
+    private double totalTravelTime = 0.0;
+    private int finishedVehicleCount = 0;
+
+
     // Traffic Light Data Structure
     private Map<String, Integer> currentTrafficLightStates = new HashMap<>(); // Count of Traffic lights per phase
 
@@ -109,6 +114,27 @@ public class Statistics {
 
         return travelTimes;
     }
+
+    /**
+     * Updates travel time statistics and returns the global average travel time
+     * of all vehicles that have finished so far.
+     */
+    public double updateAndGetAverageTravelTime(double currentTime) {
+
+        Map<String, Double> finishedTravelTimes = calculateTravelTimes(currentTime);
+
+        for (double travelTime : finishedTravelTimes.values()) {
+            totalTravelTime += travelTime;
+            finishedVehicleCount++;
+        }
+
+        if (finishedVehicleCount == 0) {
+            return 0.0;
+        }
+
+        return totalTravelTime / finishedVehicleCount;
+    }
+
 
     /**
     * Fetches the current state of all traffic lights from the simulation and counts how many are currently red, yellow, or green
