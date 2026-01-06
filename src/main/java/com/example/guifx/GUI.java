@@ -56,6 +56,9 @@ public class GUI {
     private LineChart<Number, Number> speedChart;
 
     @FXML
+    private LineChart<Number, Number> travelTimeChart;
+
+    @FXML
     private TextArea consoleArea;
     @FXML
     private ChoiceBox<String> vehicleSelector;
@@ -67,6 +70,8 @@ public class GUI {
     private TextField stressTestCountField;
 
     private XYChart.Series<Number, Number> speedSeries;
+
+    private XYChart.Series<Number, Number> avgTravelTimeSeries;
 
     private LaneLayer laneLayerInstance;
     private CarLayer carLayerInstance;
@@ -152,6 +157,11 @@ public class GUI {
             speedSeries.setName("Avg Speed");
             speedChart.getData().add(speedSeries);
             speedChart.setCreateSymbols(false);
+
+            avgTravelTimeSeries = new XYChart.Series<>();
+            avgTravelTimeSeries.setName("Avg Travel Time (disappeared cars)");
+            travelTimeChart.getData().add(avgTravelTimeSeries);
+            travelTimeChart.setCreateSymbols(false);
 
             mapContainer.getChildren().clear();
             zoomGroup.getChildren().addAll(backgroundCanvas, laneLayer, trafficLightLayer, carLayer);
@@ -513,6 +523,7 @@ public class GUI {
                                         .getVehicleController()
                                         .getFilteredVehicles(currentTypeFilter, currentColorFilter);
                         double avgSpeed = statistics.getAverageSpeed(filteredVehiclesList);
+                        double avgTravelTime = statistics.updateAndGetAverageTravelTime(time);
                         int count = filteredVehiclesList.size();
 
                         java.text.DecimalFormat df = new java.text.DecimalFormat("#.##");
@@ -520,6 +531,7 @@ public class GUI {
                         avgSpeedLabel.setText("Avg Speed: " + df.format(avgSpeed) + "ms");
                         vehicleCountLabel.setText("Vehicles: " + count);
                         speedSeries.getData().add(new XYChart.Data<>(time, avgSpeed));
+                        avgTravelTimeSeries.getData().add(new XYChart.Data<>(time, avgTravelTime));
                     }
 
                     //TrafficLight Durations
