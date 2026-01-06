@@ -116,11 +116,13 @@ public class Statistics {
     }
 
     /**
-     * Updates travel time statistics and returns the global average travel time
-     * of all vehicles that have finished so far.
+     * Returns the real-time average travel time of all vehicles:
+     *  - finished vehicles contribute their final travel time
+     *  - active vehicles contribute time spent so far
      */
     public double updateAndGetAverageTravelTime(double currentTime) {
 
+        // Handle newly finished vehicles (same as before)
         Map<String, Double> finishedTravelTimes = calculateTravelTimes(currentTime);
 
         for (double travelTime : finishedTravelTimes.values()) {
@@ -128,11 +130,22 @@ public class Statistics {
             finishedVehicleCount++;
         }
 
-        if (finishedVehicleCount == 0) {
+        // Add time-so-far for all currently active vehicles
+        double activeTravelTimeSum = 0.0;
+
+        for (Map.Entry<String, Double> entry : departureTimes.entrySet()) {
+            double departureTime = entry.getValue();
+            activeTravelTimeSum += (currentTime - departureTime);
+        }
+
+        int activeVehicleCount = departureTimes.size();
+        int totalVehicleCount = finishedVehicleCount + activeVehicleCount;
+
+        if (totalVehicleCount == 0) {
             return 0.0;
         }
 
-        return totalTravelTime / finishedVehicleCount;
+        return (totalTravelTime + activeTravelTimeSum) / totalVehicleCount;
     }
 
 
