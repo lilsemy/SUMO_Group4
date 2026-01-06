@@ -82,6 +82,19 @@
             <NumberAxis label="Speed (m/s)" side="LEFT" />
          </yAxis>
       </LineChart>
+       <LineChart fx:id="travelTimeChart"
+                  layoutX="736.0"
+                  layoutY="470.0"
+                  prefHeight="245.0"
+                  prefWidth="375.0"
+                  AnchorPane.rightAnchor="-11.0">
+           <xAxis>
+               <NumberAxis label="Time (s)" side="BOTTOM" />
+           </xAxis>
+           <yAxis>
+               <NumberAxis label="Avg Travel Time (s)" side="LEFT" />
+           </yAxis>
+       </LineChart>
       <Button layoutX="773.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandStressTest" prefHeight="59.0" prefWidth="137.0" text="Stress Test" AnchorPane.leftAnchor="806.0" AnchorPane.topAnchor="51.0">
          <graphic>
             <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
@@ -95,7 +108,7 @@
          </font>
       </Button>
       <TextField fx:id="stressTestCountField" layoutX="773.0" layoutY="130.0" prefWidth="137.0" prefHeight="30.0" promptText="Car amount" AnchorPane.leftAnchor="806.0" />
-      <TextArea id="consoleArea" fx:id="consoleArea" layoutX="737.7142857142858" layoutY="484.0" prefHeight="181.0" prefWidth="344.0" AnchorPane.rightAnchor="3.2857142857142208" AnchorPane.topAnchor="469.0" />
+      <TextArea id="consoleArea" fx:id="consoleArea" layoutX="737.7142857142858" layoutY="730.0" prefHeight="181.0" prefWidth="344.0" AnchorPane.rightAnchor="3.2857142857142208" />
       <Button fx:id="commandFolowVehicle" layoutX="615.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandFollowVehicle" prefHeight="59.0" prefWidth="137.0" text="Follow Vehicle" AnchorPane.leftAnchor="648.0" AnchorPane.topAnchor="51.0">
          <font>
             <Font size="12.0" />
