@@ -16,18 +16,17 @@ public class SpawnConfig {
 
     //selects ALL attributes for spawning. It then returns the whole config for use. It will be used later to pick randomly from the whole set of attributes
     public static SpawnConfig random() {
-        return new SpawnConfig(EnumSet.allOf(TypeFilter.class), EnumSet.allOf(VehicleColor.class));
+        return new SpawnConfig(TypeFilter.spawnableAll(), VehicleColor.spawnableAll());
     }
 
     //restricts TYPE, but allows ALL colors. It then returns the whole config for use
     public static SpawnConfig restrictTypes(Collection<TypeFilter> types) {
-        return new SpawnConfig(types,EnumSet.allOf(VehicleColor.class)
-        );
+        return new SpawnConfig(types,VehicleColor.spawnableAll());
     }
 
     //restricts COLOR, but allows all types, it then returns the whole config for use
     public static SpawnConfig restrictColors(Collection<VehicleColor> colors) {
-        return new SpawnConfig(EnumSet.allOf(TypeFilter.class), colors);
+        return new SpawnConfig(TypeFilter.spawnableAll(), colors);
     }
 
     //restricts both type AND color, it then returns the whole config for use

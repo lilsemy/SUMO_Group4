@@ -106,7 +106,7 @@ public class GUI {
     private VehicleColor currentColorFilter = VehicleColor.NONE;
 
     //LOGIC FOR SPAWNING
-    private SpawnConfig spawnConfig = SpawnConfig.restrictTypes(Set.of(TypeFilter.CAR));
+    private SpawnConfig spawnConfig = SpawnConfig.random();
     private ChoiceBox<TypeFilter> typeChoice;
     private ChoiceBox<VehicleColor> colorChoice;
 
