@@ -664,7 +664,7 @@ public class GUI {
             System.out.println("Starting Stress Test with " + count + " vehicles");
             log("Starting Stress Test with " + count + " vehicles");
 
-            simController.startStressTest(count);
+            simController.startStressTest(count, spawnConfig);
 
         } catch (NumberFormatException ex) {
             log("Invalid number. Please enter a valid integer.");

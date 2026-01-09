@@ -167,8 +167,8 @@ public class CarLayer {
      */
     public void updateCars(Collection<String> list) {
         //List<String> ids = Vehicle.getIDList();
-        Set<String> activeCarIds = new HashSet<>(list);
-        Set<String> newCarIds = new HashSet<>(activeCarIds);
+        Set<String> knownVehicleIds = new HashSet<>(list);
+        Set<String> newVehicleIds = new HashSet<>(knownVehicleIds);
 
         Iterator<Map.Entry<String, ImageView>> it = carImageViews.entrySet().iterator();
         while (it.hasNext()) {
@@ -176,8 +176,16 @@ public class CarLayer {
             String carId = entry.getKey();
             ImageView carView = entry.getValue();
 
-            if (activeCarIds.contains(carId)) {
-                newCarIds.remove(carId);
+            if (knownVehicleIds.contains(carId)) {
+
+                //safety check. If car is queued up and not yet active, don't call traas methods
+                if(!Vehicle.getIDList().contains(carId)){
+                    continue;
+                }
+
+                newVehicleIds.remove(carId);
+
+
                 TraCIPosition sumoPos = Vehicle.getPosition(carId, false);
                 Point2D javaPos = MapUtil.worldToScreen(new Point2D(sumoPos.getX(), sumoPos.getY()));
                 double w = carView.getFitWidth();
@@ -196,7 +204,12 @@ public class CarLayer {
             }
         }
 
-        for (String carId : newCarIds) {
+        for (String carId : newVehicleIds) {
+            //Don't create image for not yet active vehicles
+            if(!Vehicle.getIDList().contains(carId)){
+                continue;
+            }
+
             createCarImageView(carId);
             ImageView carView = carImageViews.get(carId);
             if (carView != null) {

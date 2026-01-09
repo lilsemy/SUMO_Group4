@@ -15,6 +15,7 @@ public class VehicleModel {
     private String routeId;
     private String laneId;
     private VehicleColor color;
+    private VehicleState state;
     private double depart;
     private double pos;
     private double speed;
@@ -51,6 +52,7 @@ public class VehicleModel {
         this.laneId = laneId;
         this.depart = depart;
         this.color = color;
+        state = VehicleState.QUEUED;
         this.pos = 0.0;
         this.speed = 1.0;
         this.x = 0.0;
@@ -65,6 +67,7 @@ public class VehicleModel {
         this.laneId = "";
         this.depart = 0;
         this.color = VehicleColor.BLACK;
+        state = VehicleState.QUEUED;
         this.pos = 0.0;
         this.speed = 1.0;
         this.x = 0.0;
@@ -115,7 +118,6 @@ public class VehicleModel {
     public double getPos(){
         return pos;
     }
-
     
     /**
     *@return speed of car
@@ -139,8 +141,13 @@ public class VehicleModel {
     public VehicleColor getColor() {
         return color;
     }
-    
-    /**
+
+    public VehicleState getState(){
+        return state;
+    }
+
+
+        /**
     *@param laneId
     */
     public void setLaneId(String laneId){ this.laneId = laneId; }
@@ -168,4 +175,10 @@ public class VehicleModel {
     public void setColor(VehicleColor color) {
         this.color = color;
     }
+
+    public void setState(VehicleState state) {
+        this.state = state;
+    }
+
+
 }

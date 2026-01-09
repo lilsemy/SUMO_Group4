@@ -115,13 +115,13 @@ public class VehicleController {
      * @param vehId vehicle ID
      * @throws Exception if tracking fails
      */
-    public void trackVehicle(String viwId, String vehId) throws Exception {
+    /*public void trackVehicle(String viwId, String vehId) throws Exception {
         if (getIds().contains(vehId)) {
             // GUI.trackVehicle(viwId, vehId); // commented out
         } else {
             System.out.println("Warning! Car left the Map or was deleted.");
         }
-    }
+    }*/
 
     /**
      * Returns IDs of all vehicles in the simulation
@@ -140,7 +140,7 @@ public class VehicleController {
      * @throws Exception if update fails
      */
     //TODO THIS CURRENTLY BREAKS FILTERING. IF CARS ARE QUEUED UP IT CHANGES THEIR COLOR TO DEFAULT VALUE WHICH ISN'T IDEAL
-    public void updateFromSimulation() throws Exception {
+    /*public void updateFromSimulation() throws Exception {
         List<String> liveIds = Vehicle.getIDList();
 
         vehiclesList.keySet().retainAll(liveIds);
@@ -162,6 +162,31 @@ public class VehicleController {
 
             vehiclesList.put(id, v);
         }
+    }*/
+
+    public void updateFromSimulation() throws Exception {
+        Set<String> liveIds = new HashSet<>(Vehicle.getIDList());
+
+        for(VehicleModel v : vehiclesList.values()){
+
+            if(liveIds.contains(v.getId())){
+                v.setState(VehicleState.ACTIVE);
+
+                TraCIPosition pos = Vehicle.getPosition(v.getId());
+
+                v.setPosition(pos.getX(),pos.getY());
+                v.setSpeed(Vehicle.getSpeed(v.getId()));
+                v.setAngle(Vehicle.getAngle(v.getId()));
+                v.setTypeId(Vehicle.getTypeID(v.getId()));
+                v.setLaneId(Vehicle.getLaneID(v.getId()));
+            }
+
+        }
+        //if vehicle is flagged as ACTIVE and left the simulation, delete it.
+        vehiclesList.values().removeIf(vehicleModel ->
+                                        vehicleModel.getState() == VehicleState.ACTIVE &&
+                                                !(liveIds.contains(vehicleModel.getId())));
+
     }
 
     //filtering

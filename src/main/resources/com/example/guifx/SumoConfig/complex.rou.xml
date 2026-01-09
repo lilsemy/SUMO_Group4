@@ -9,22 +9,22 @@
     <route id="r2" edges="-e51 -e50 -e49 -e48 -e46 -e55 e16 e15 e14 e13 e12 e11 e10 e9 e8 e7 e6 e5 e4 e3 e2"/> <!-- Edge "-4804880#0" and "4804880#0" are at the intersection of e16,e17 and e46 (also saw it to late D:) -->
     <route id="r3" edges="-e32 -e33 -e34 -e35 e17 e55 e46 e47 -e47 -e46 -e55 e16 e15 e14 e13 e12 e11 e10 e9 e8 e7 e6 e5 e4 e3 e22 e23 e24 e25 e30 e31"/>
 
-    <vehicle id="car_0" type="car" route="r1" depart="0" color="1,0,0"/>
-    <vehicle id="bus_0" type="bus" route="r1" depart="1" color="0,0,1"/>
-    <vehicle id="car_1" type="car" route="r1" depart="2" color="1,0,0"/>
-    <vehicle id="truck_0" type="truck" route="r1" depart="3" color="0,1,0"/>
-    <vehicle id="car_2" type="car" route="r1" depart="4" color="1,0,0"/>
-    <!--  Route 2: n3 -> n1  -->
-    <vehicle id="truck_1" type="truck" route="r2" depart="4" color="0,1,0"/>
-    <vehicle id="car_3" type="car" route="r2" depart="4" color="1,0,0"/>
-    <vehicle id="bus_1" type="bus" route="r2" depart="5" color="0,0,1"/>
-    <vehicle id="car_4" type="car" route="r2" depart="7" color="1,0,0"/>
-    <vehicle id="truck_2" type="truck" route="r2" depart="9" color="0,1,0"/>
-    <!--  More traffic  -->
-    <vehicle id="car_5" type="car" route="r1" depart="9" color="1,0,0"/>
-    <vehicle id="bus_2" type="bus" route="r2" depart="11" color="0,0,1"/>
-    <vehicle id="truck_3" type="truck" route="r1" depart="11" color="0,1,0"/>
-    <vehicle id="car_6" type="car" route="r2" depart="13" color="1,0,0"/>
+<!--    <vehicle id="car_0" type="car" route="r1" depart="0" color="1,0,0"/>-->
+<!--    <vehicle id="bus_0" type="bus" route="r1" depart="1" color="0,0,1"/>-->
+<!--    <vehicle id="car_1" type="car" route="r1" depart="2" color="1,0,0"/>-->
+<!--    <vehicle id="truck_0" type="truck" route="r1" depart="3" color="0,1,0"/>-->
+<!--    <vehicle id="car_2" type="car" route="r1" depart="4" color="1,0,0"/>-->
+<!--    &lt;!&ndash;  Route 2: n3 -> n1  &ndash;&gt;-->
+<!--    <vehicle id="truck_1" type="truck" route="r2" depart="4" color="0,1,0"/>-->
+<!--    <vehicle id="car_3" type="car" route="r2" depart="4" color="1,0,0"/>-->
+<!--    <vehicle id="bus_1" type="bus" route="r2" depart="5" color="0,0,1"/>-->
+<!--    <vehicle id="car_4" type="car" route="r2" depart="7" color="1,0,0"/>-->
+<!--    <vehicle id="truck_2" type="truck" route="r2" depart="9" color="0,1,0"/>-->
+<!--    &lt;!&ndash;  More traffic  &ndash;&gt;-->
+<!--    <vehicle id="car_5" type="car" route="r1" depart="9" color="1,0,0"/>-->
+<!--    <vehicle id="bus_2" type="bus" route="r2" depart="11" color="0,0,1"/>-->
+<!--    <vehicle id="truck_3" type="truck" route="r1" depart="11" color="0,1,0"/>-->
+<!--    <vehicle id="car_6" type="car" route="r2" depart="13" color="1,0,0"/>-->
 
     <!-- More traffic - 30 vehicle with random routes -->
 <!--    <vehicle id="0" depart="14.00">-->

@@ -13,8 +13,6 @@ public class SimulationController {
     private final TrafficLightController tlController;
     private final LaneController laneCon;
 
-    //TODO
-    //private final EdgeController edgeController;
 
     private volatile boolean running = true;   // starts true (volatile booleans have multi-thread visibility)
 
@@ -95,7 +93,7 @@ public class SimulationController {
             stepCounter++;
 
             //stress testing only triggers when stressTestActive == true
-            if (stressTestActive &&
+            /*if (stressTestActive &&
                     stressVehiclesRemaining > 0 &&
                     stepCounter % injectionStepInterval == 0) {
 
@@ -119,7 +117,7 @@ public class SimulationController {
                     e.printStackTrace();
                 }
             }
-
+            */
             vehicleController.updateFromSimulation();
         }
     }
@@ -129,10 +127,22 @@ public class SimulationController {
      * @param count the amount of cars for the stress test
      */
 
-    public void startStressTest(int count) {
-        stressVehiclesRemaining = count;
+    public void startStressTest(int count, SpawnConfig config) {
+        /*stressVehiclesRemaining = count;
         stressTestActive = true;
-        stepCounter = 0;
+        stepCounter = 0;*/
+
+
+        for(int i = count; i>0; i--){
+            TypeFilter type = config.pickType();
+            VehicleColor color = config.pickColor();
+            try{
+                vehicleController.createAndInjectVehicle(type.getTypeId(), pickRoute(), "0", color);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 
     /**
@@ -152,52 +162,6 @@ public class SimulationController {
         makeConnection();    // start new thread
     }
 
-    //Originally in GUI, but created a new abstraction, since the GUI should only see the main controller
-/*    public String spawnVehicle(VehicleColor color){
-        String createdVehicleId = null;
-        try {
-            // Delegate vehicle creation and injection entirely to VehicleController
-            if (vehicleController.getVehicle(vehicleController.getLastVehicleId()) != null){
-                VehicleModel cv = vehicleController.getVehicle(vehicleController.getLastVehicleId());
-                String route = cv.getRouteId();
-                switch(route) {
-                    case "r1":
-                        VehicleModel car = vehicleController.createAndInjectVehicle("car", "r2", "0", color); // was (byte) 0
-                        createdVehicleId = car.getId();
-                        vehicleController.trackVehicle("View #0", car.getId());
-                        System.out.println("Added a car(1): " + car.getId() + "with type: " + car.getTypeId());
-                        break;
-                    case "r2":
-                        VehicleModel car2 = vehicleController.createAndInjectVehicle("car", "r3", "0", color); // was (byte) 0
-                        createdVehicleId = car2.getId();
-                        vehicleController.trackVehicle("View #0", car2.getId());
-                        System.out.println("Added a car(2): " + car2.getId() + "with type: " + car2.getTypeId());
-                        break;
-                    case "r3":
-                        VehicleModel car3 = vehicleController.createAndInjectVehicle("car", "r1", "0", color); // was (byte) 0
-                        createdVehicleId = car3.getId();
-                        vehicleController.trackVehicle("View #0", car3.getId());
-                        System.out.println("Added a car(3): " + car3.getId() + "with type: " + car3.getTypeId());
-                        break;
-                    default:
-                        VehicleModel car4 = vehicleController.createAndInjectVehicle("car", "r1", "0", color); // was (byte) 0
-                        createdVehicleId = car4.getId();
-                        vehicleController.trackVehicle("View #0", car4.getId());
-                        System.out.println("Added a car(4): " + car4.getId() + "with type: " + car4.getTypeId());
-                }
-            }
-            else {
-                VehicleModel car = vehicleController.createAndInjectVehicle("car", "r1", "0", color); // was (byte) 0
-                createdVehicleId = car.getId();
-                vehicleController.trackVehicle("View #0", car.getId());
-                System.out.println("Added a car: " + car.getId() + "with type: " + car.getTypeId());
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace();
-        }
-        return createdVehicleId;
-    }*/
-
     public String spawnVehicle(SpawnConfig config){
         try {
             TypeFilter type = config.pickType(); //currently the config is set to cars, because I only have all the images for them
@@ -210,7 +174,7 @@ public class SimulationController {
                     color
             );
 
-            vehicleController.trackVehicle("View #0", v.getId());
+            //vehicleController.trackVehicle("View #0", v.getId());
             return v.getId();
 
         } catch (Exception e) {
