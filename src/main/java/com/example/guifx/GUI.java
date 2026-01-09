@@ -149,7 +149,7 @@ public class GUI {
 
             MapUtil.setup(contentWidth, contentHeight, 15);
 
-            laneLayerInstance = new LaneLayer(laneLayer);
+            laneLayerInstance = new LaneLayer(laneLayer, simController.getLaneController());
             trafficLightLayerInstance = new TrafficLightLayer(trafficLightLayer, null, simController.getTlController());
             carLayerInstance = new CarLayer(carLayer, simController);
 

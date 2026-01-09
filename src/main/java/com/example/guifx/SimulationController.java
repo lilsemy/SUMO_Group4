@@ -11,6 +11,7 @@ public class SimulationController {
     private final SumoConnection connection;
     private final VehicleController vehicleController;
     private final TrafficLightController tlController;
+    private final LaneController laneCon;
 
     //TODO
     //private final EdgeController edgeController;
@@ -35,6 +36,7 @@ public class SimulationController {
 
         vehicleController = new VehicleController();
         tlController = new TrafficLightController();
+        laneCon = new LaneController();
         //makeConnection(); happens in main
     }
     /**
@@ -235,5 +237,6 @@ public class SimulationController {
     public SumoConnection getConnection() {
         return connection;
     }
+    public LaneController getLaneController(){return laneCon;}
 
 }
