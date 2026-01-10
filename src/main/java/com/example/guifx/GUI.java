@@ -19,6 +19,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ChoiceBox;
 import javafx.geometry.Point2D;
 import org.eclipse.sumo.libtraci.Vehicle;
+import org.eclipse.sumo.libtraci.VehicleType;
 
 import java.util.*;
 
@@ -107,8 +108,10 @@ public class GUI {
 
     //LOGIC FOR SPAWNING
     private SpawnConfig spawnConfig = SpawnConfig.random();
-    private ChoiceBox<TypeFilter> typeChoice;
-    private ChoiceBox<VehicleColor> colorChoice;
+    @FXML
+    private ChoiceBox<TypeFilter> typeSpawnChoice;
+    @FXML
+    private ChoiceBox<VehicleColor> colorSpawnChoice;
 
 
     private double remainingTime;
@@ -225,7 +228,7 @@ public class GUI {
             });
 
 
-            //setting up the 4 choices in the choice box
+            //DropDown Menu for TYPE FILTER
             vehicleTypeFilter.getItems().addAll(
                     TypeFilter.NONE,
                     TypeFilter.CAR,
@@ -245,7 +248,7 @@ public class GUI {
                         }
                     });
 
-            //Drop down menu for COLORS
+            //Drop down menu for COLOR FILTER
             vehicleColorFilter.getItems().addAll(
                     VehicleColor.NONE,
                     VehicleColor.RED,
@@ -262,6 +265,43 @@ public class GUI {
                     .addListener((observableValue, oldValue, newValue) -> {
                         if (newValue != null) {
                             currentColorFilter = newValue;
+                        }
+                    });
+
+            typeSpawnChoice.getItems().addAll(
+                    TypeFilter.NONE,
+                    TypeFilter.CAR,
+                    TypeFilter.TRUCK,
+                    TypeFilter.BUS
+            );
+
+            typeSpawnChoice.setValue(TypeFilter.NONE);
+
+            typeSpawnChoice
+                    .getSelectionModel()
+                    .selectedItemProperty()
+                    .addListener((observableValue, oldValue, newValue) -> {
+                        if(newValue != null) {
+                            updateSpawnConfig(typeSpawnChoice.getValue(), colorSpawnChoice.getValue());
+                        }
+                    });
+
+            colorSpawnChoice.getItems().addAll(
+                    VehicleColor.NONE,
+                    VehicleColor.WHITE,
+                    VehicleColor.BLACK,
+                    VehicleColor.RED,
+                    VehicleColor.YELLOW
+            );
+
+            colorSpawnChoice.setValue(VehicleColor.NONE);
+
+            colorSpawnChoice
+                    .getSelectionModel()
+                    .selectedItemProperty()
+                    .addListener((observableValue, oldValue, newValue) -> {
+                        if(newValue != null) {
+                            updateSpawnConfig(typeSpawnChoice.getValue(), colorSpawnChoice.getValue());
                         }
                     });
 
@@ -551,6 +591,27 @@ public class GUI {
         };
 
         timer.start();
+    }
+
+    public void updateSpawnConfig(TypeFilter selectedType, VehicleColor selectedColor){
+
+        if(selectedType == TypeFilter.NONE && selectedColor == VehicleColor.NONE){
+            spawnConfig = SpawnConfig.random();
+        }
+
+        if(selectedType == TypeFilter.NONE && selectedColor != VehicleColor.NONE){
+            spawnConfig = SpawnConfig.restrictColors(EnumSet.of(selectedColor));
+        }
+
+        if(selectedType != TypeFilter.NONE && selectedColor == VehicleColor.NONE){
+            spawnConfig = SpawnConfig.restrictTypes(EnumSet.of(selectedType));
+        }
+
+        if(selectedType != TypeFilter.NONE && selectedColor != VehicleColor.NONE){
+            spawnConfig = SpawnConfig.restrictAll(EnumSet.of(selectedType), EnumSet.of(selectedColor));
+        }
+
+
     }
 
     /**
