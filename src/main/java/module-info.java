@@ -13,6 +13,7 @@ module com.example.guifx {
 
     requires java.desktop;
     requires libtraci;
+    requires java.logging;
 
     opens com.example.guifx to javafx.fxml;
     exports com.example.guifx;

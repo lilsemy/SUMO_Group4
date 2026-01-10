@@ -6,8 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.Group;
@@ -15,12 +14,14 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
-import javafx.scene.control.Label;
-import javafx.scene.control.ChoiceBox;
 import javafx.geometry.Point2D;
 import org.eclipse.sumo.libtraci.Vehicle;
 
+import java.text.DecimalFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 /**
@@ -68,6 +69,8 @@ public class GUI {
     private ChoiceBox<String> TLSelector;
     @FXML
     private TextField stressTestCountField;
+    @FXML private Slider simSpeedSlider;
+
 
     private XYChart.Series<Number, Number> speedSeries;
 
@@ -111,7 +114,51 @@ public class GUI {
     private ChoiceBox<VehicleColor> colorChoice;
 
 
+
     private double remainingTime;
+
+    // thread //
+    // EXPLANATION: We replaced ScheduledExecutorService with a standard Thread.
+    // Why? The executor would "queue up" tasks if the simulation got slow,
+    // eventually
+    // causing a massive memory leak and "freeze".
+    // A simple "while(running)" loop waits passively until the previous step is
+    // done,
+    // so it naturally allows the CPU to breathe.
+    private Thread simThread;
+    // ACTION QUEUE for Thread Safety
+    // EXPLANATION: The User Interface (UI) runs on one thread, and the Simulation
+    // runs on another.
+    // If the UI tries to "Spawn Car" directly while the Simulation is reading the
+    // car list,
+    // they crash (ConcurrentModificationException).
+    // SOLUTION: The UI just puts a "Note" (Runnable) into this thread-safe Queue.
+    // The Simulation thread picks up the notes and executes them safely when it's
+    // ready.
+    private final ConcurrentLinkedQueue<Runnable> actionQueue = new ConcurrentLinkedQueue<>();
+    // 'volatile' ensures that changes to this variable are immediately visible to
+    // other threads.
+    // We use it to safely signal the background thread to stop.
+    private volatile boolean running = false;
+    private volatile long currentSimDelayMs = 50;
+    // --- Snapshot: Letzter Zustand für UI ---
+    // EXPLANATION: We cannot access SUMO or the SimulationController directly from
+    // the UI thread
+    // while the background thread is writing to it. This would cause "Race
+    // Conditions" or crashes.
+    // The "Snapshot Pattern" solves this: The background thread creates a read-only
+    // copy (Snapshot)
+    // of the current state. The UI thread reads only this snapshot.
+    private volatile SimSnapshot latest = null;
+
+    // chart throttle
+    private static final long UI_UPDATE_NANOS = 200_000_000L; // update charts only every 200ms ;
+    private long lastUiNow = 0 ;
+    private static final int MAX_CHART_POINTS = 300;// limitless charts cause memory leaks and lag
+
+    // Formatters reuse (creating new objects every frame is bad for performance)
+    private final DecimalFormat df2 = new DecimalFormat("#.##");
+    private final DecimalFormat df0 = new DecimalFormat("#");
 
     /**
      * Constructor for GUI.
@@ -151,7 +198,7 @@ public class GUI {
 
             laneLayerInstance = new LaneLayer(laneLayer, simController.getLaneController());
             trafficLightLayerInstance = new TrafficLightLayer(trafficLightLayer, null, simController.getTlController());
-            carLayerInstance = new CarLayer(carLayer, simController);
+            carLayerInstance = new CarLayer(carLayer);
 
             speedSeries = new XYChart.Series<>();
             speedSeries.setName("Avg Speed");
@@ -264,6 +311,28 @@ public class GUI {
                             currentColorFilter = newValue;
                         }
                     });
+
+            // Listen to Slider to adjust delay dynamically
+            // Left (0) = Very Slow (2000ms delay)
+            // Middle (50) = Normal (100ms delay)
+            // Right (100) = Very Fast (0ms delay)
+            simSpeedSlider.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+                double val = newValue.doubleValue();
+                if(val >= 50) {
+                    // Range 50 to 100 -> Mapping to 100ms down to 0ms
+                    // Formula: (100 - val) * 2
+                    // Ex: 50 -> 50*2 = 100ms. 100 -> 0*2 = 0ms.
+                    currentSimDelayMs = (long) ((100 - val)*2);
+
+
+                } else {
+                    // Range 0 to 50 -> Mapping to 2000ms down to 100ms
+                    // Formula: 100 + (50 - val) * 40
+                    // Ex: 50 -> 100 + 0 = 100ms. 0 -> 100 + 50*40 = 2100ms.
+                    currentSimDelayMs = (long) (100 +(50 - val)*40);
+                }
+            });
+
 
             startLoop();
 
@@ -462,37 +531,54 @@ public class GUI {
         timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                try {
-                    if (simController != null) {
-                        simController.singleStep();
-
-                        if (carLayerInstance != null) {
-                            carLayerInstance.updateCars(simController.getVehicleController().getFilteredVehicleIds(currentTypeFilter, currentColorFilter));
+                try{
+                if (!running){
+                    stop();
+                    return;
+                }
+                SimSnapshot snap = latest;
+                if ( snap == null){
+                    return;
+                }
+                // 1) Cars zeichnen: snapshot nutzen
+                if (carLayerInstance != null) {
+                            //carLayerInstance.updateCarsFromSnapshot(simController.getVehicleController().getFilteredVehicleIds(currentTypeFilter, currentColorFilter));
+                    carLayerInstance.updateCarsFromSnapshot(snap.vehicles());
                         }
+                // 2) Traffic lights: Draw traffic lights from Snapshot
+                if (trafficLightLayerInstance != null) {
+                            trafficLightLayerInstance.updateTrafficLightStatesFromSnapshot(snap.trafficLights());
+                }
 
-                        if (trafficLightLayerInstance != null) {
-                            trafficLightLayerInstance.updateTrafficLightStates();
+                // 3) Follow/Rotation:
+                if (isFollowing && followedVehicleId != null) {
+                    try {
+                        VehicleUiState targetVs = null;
+                        for(VehicleUiState vs : snap.vehicles()){
+                            if ( vs.id().equals(followedVehicleId)){
+                                targetVs = vs;
+                                break;
+                            }
+                        //if (simController.getVehicleController().getVehicle(followedVehicleId) == null) {
+
                         }
+                        if (targetVs != null){
+                                    //var sumoPos = Vehicle.getPosition(followedVehicleId, false);
+                                    //double angle = Vehicle.getAngle(followedVehicleId);
 
-                        //
-                        if (isFollowing && followedVehicleId != null) {
-                            try {
-                                if (simController.getVehicleController().getVehicle(followedVehicleId) == null) {
-
-                                } else {
-                                    var sumoPos = Vehicle.getPosition(followedVehicleId, false);
-                                    double angle = Vehicle.getAngle(followedVehicleId);
-                                    Point2D worldPos = new Point2D(sumoPos.getX(), sumoPos.getY());
+                                    Point2D worldPos = new Point2D(targetVs.x(), targetVs.y());
                                     Point2D targetLocalPos = MapUtil.worldToScreen(worldPos);
-                                    double targetAngleVal = angle;
+                                    double targetAngleVal = targetVs.angle();
                                     double smoothFactor = 0.1;
                                     double currentAngle = rotateTransform.getAngle();
                                     double nextAngle = currentAngle + (-targetAngleVal - currentAngle) * smoothFactor;
+
                                     rotateTransform.setAngle(nextAngle);
                                     rotateTransform.setPivotX(targetLocalPos.getX());
                                     rotateTransform.setPivotY(targetLocalPos.getY());
                                     scaleTransform.setPivotX(targetLocalPos.getX());
                                     scaleTransform.setPivotY(targetLocalPos.getY());
+
                                     double containerW = mapContainer.getWidth();
                                     double containerH = mapContainer.getHeight();
 
@@ -504,52 +590,79 @@ public class GUI {
                                     zoomGroup.setTranslateX(currrentTx + (targetTx - currrentTx) * smoothFactor);
                                     zoomGroup.setTranslateY(currrentTy + (targetTy - currrentTy) * smoothFactor);
                                 }
-                            } catch (Exception e) {
+                    } catch (Exception e) {
 
-                            }
-                        }
                     }
+                }
+                // 4) Labels + Chart nur alle 200ms (throttled)
+
+                    if (now - lastUiNow >= UI_UPDATE_NANOS){
+                        lastUiNow = now;
+
+
 
                     //
-                    double time = org.eclipse.sumo.libtraci.Simulation.getTime();
+                    //double time = org.eclipse.sumo.libtraci.Simulation.getTime();
 
-                    if (statistics != null) {
-                        statistics.updateVehicles(time);
-                      /*
-                        double avgSpeed = statistics.getAverageSpeed();
-                        int count = simController.getVehicleController().getVehiclesMap().size();*/
-                        Collection<VehicleModel> filteredVehiclesList =
-                                simController
-                                        .getVehicleController()
-                                        .getFilteredVehicles(currentTypeFilter, currentColorFilter);
-                        double avgSpeed = statistics.getAverageSpeed(filteredVehiclesList);
-                        double avgTravelTime = statistics.updateAndGetAverageTravelTime(time);
-                        int count = filteredVehiclesList.size();
+//                    if (statistics != null) {
+//                        statistics.updateVehicles(time);
+//                      /*
+//                        double avgSpeed = statistics.getAverageSpeed();
+//                        int count = simController.getVehicleController().getVehiclesMap().size();*/
+//                        Collection<VehicleModel> filteredVehiclesList =
+//                                simController
+//                                        .getVehicleController()
+//                                        .getFilteredVehicles(currentTypeFilter, currentColorFilter);
+//                        double avgSpeed = statistics.getAverageSpeed(filteredVehiclesList);
+//                        double avgTravelTime = statistics.updateAndGetAverageTravelTime(time);
+//                        int count = filteredVehiclesList.size();
 
-                        java.text.DecimalFormat df = new java.text.DecimalFormat("#.##");
+                        //java.text.DecimalFormat df = new java.text.DecimalFormat("#.##");
 
-                        avgSpeedLabel.setText("Avg Speed: " + df.format(avgSpeed) + "ms");
-                        vehicleCountLabel.setText("Vehicles: " + count);
-                        speedSeries.getData().add(new XYChart.Data<>(time, avgSpeed));
-                        avgTravelTimeSeries.getData().add(new XYChart.Data<>(time, avgTravelTime));
+                        avgSpeedLabel.setText("Avg Speed: " + df0.format(snap.avgSpeed()) + "ms");
+                        vehicleCountLabel.setText("Vehicles: " + snap.count());
+                        speedSeries.getData().add(new XYChart.Data<>(snap.time(), snap.avgSpeed()));
+                        avgTravelTimeSeries.getData().add(new XYChart.Data<>(snap.time(), snap.avgTravelTime()));
+
+                        //Traffic Light 1/2 Remaining time..
+                        double tl1Rem = 0, tl2Rem = 0;
+                        for ( TrafficLightUIState tl : snap.trafficLights()){
+                            if(tl.id().equals("tl1")){
+                                tl1Rem = tl.remainingTime();
+                            }
+                            if( tl.id().equals("tl2")){
+                                tl2Rem = tl.remainingTime();
+                            }
+                        }
+                        Tl1Dur.setText("Traffic Light 1: " + df0.format(tl1Rem) + "s");
+                        Tl2Dur.setText("Traffic Light 2: " + df0.format(tl2Rem) + "s");
+                        // Performance: Cap the number of points in charts to prevent lag
+                        if (speedSeries.getData().size() > MAX_CHART_POINTS) {
+                            speedSeries.getData().remove(0, speedSeries.getData().size() - MAX_CHART_POINTS);
+                        }
+                        if (avgTravelTimeSeries.getData().size() > MAX_CHART_POINTS) {
+                            avgTravelTimeSeries.getData().remove(0,
+                                    avgTravelTimeSeries.getData().size() - MAX_CHART_POINTS);
+                        }
+
                     }
 
-                    //TrafficLight Durations
-                    java.text.DecimalFormat df = new java.text.DecimalFormat("#");
-                    remainingTime = simController.getTlController().remainingTime("tl1") - time;
-                    Tl1Dur.setText("Traffic Light 1: " + df.format(remainingTime) + "s");
-                    remainingTime = simController.getTlController().remainingTime("tl4") - time;
-                    Tl2Dur.setText("Traffic Light 2: " + df.format(remainingTime) + "s");
-                    //synchronize TrafficLightModels with TL values in Simualtion
-                    simController.getTlController().updateTLModel();
+//                    //TrafficLight Durations
+//                    java.text.DecimalFormat df = new java.text.DecimalFormat("#");
+//                    remainingTime = simController.getTlController().remainingTime("tl1") - time;
+//                    Tl1Dur.setText("Traffic Light 1: " + df.format(remainingTime) + "s");
+//                    remainingTime = simController.getTlController().remainingTime("tl4") - time;
+//                    Tl2Dur.setText("Traffic Light 2: " + df.format(remainingTime) + "s");
+//                    //synchronize TrafficLightModels with TL values in Simualtion
+//                    simController.getTlController().updateTLModel();
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    stop();
+                    //stop();
                 }
             }
         };
-
+        startSimulationThread();
         timer.start();
     }
 
@@ -562,11 +675,13 @@ public class GUI {
     public void commandSpawnVehicle(ActionEvent e) {
         System.out.println("Spawning new vehicle!");
         log("Spawning new vehicle!");
+        actionQueue.add(()-> {
         String id = simController.spawnVehicle(spawnConfig);
         if (id != null) {
             System.out.println("Spawned:" + id);
-            log("Spawned:" + id);
+            javafx.application.Platform.runLater(()-> log("Spawned:" + id));
         }
+    });
     }
 
     @FXML
@@ -608,20 +723,22 @@ public class GUI {
      */
     @FXML
     public void commandGetVehicleSpeed(ActionEvent e) {
-        String lastId = simController.getVehicleController().getLastVehicleId();
-        if (lastId != null) {
-            try {
-                double speed = simController.getVehicleController().getVehicleSpeed(lastId);
-                java.text.DecimalFormat dv = new java.text.DecimalFormat("#.##");
-                System.out.println("Speed of last vehicle " + lastId + ": " + dv.format(speed));
-                log("Speed of last vehicle " + lastId + ": " + dv.format(speed));
-            } catch (Exception ex) {
-                ex.printStackTrace();
+        actionQueue.add(() -> {
+            String lastId = simController.getVehicleController().getLastVehicleId();
+            if (lastId != null) {
+                try {
+                    double speed = simController.getVehicleController().getVehicleSpeed(lastId);
+                    //java.text.DecimalFormat dv = new java.text.DecimalFormat("#.##");
+                    System.out.println("Speed of last vehicle " + lastId + ": " + df2.format(speed));
+                    javafx.application.Platform.runLater(() -> log("Speed of last vehicle " + lastId + ": " + df2.format(speed)));
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            } else {
+                System.out.println("No vehicles in simulation!");
+                javafx.application.Platform.runLater(() -> log("No vehicles in simulation!"));
             }
-        } else {
-            System.out.println("No vehicles in simulation!");
-            log("No vehicles in simulation!");
-        }
+        });
     }
 
     /**
@@ -631,12 +748,21 @@ public class GUI {
      */
     public void commandChangePhase(ActionEvent e) {
         if (!TLSelector.getValue().isEmpty()){
+
             if (!GetDuration.getText().isEmpty()) {
-                double newDur = Double.parseDouble(GetDuration.getText());
-                simController.changePhase(newDur, TLSelector.getValue());
-                System.out.println("Changing TrafficLight Phase of Traffic Light: " + TLSelector.getValue() + "with Phase Duration of: " + newDur + " seconds!");
-                log("Changing TrafficLight Phase of Traffic Light: " + TLSelector.getValue() + "with Phase Duration of: " + newDur + " seconds!");
-            } else {
+                try {
+                    double newDur = Double.parseDouble(GetDuration.getText());
+                    String tl = TLSelector.getValue();
+                    actionQueue.add(() -> {
+                        simController.changePhase(newDur, tl);
+                        System.out.println("Changing TrafficLight Phase of Traffic Light: " + tl + "with Phase Duration of: " + newDur + " seconds!");
+                        log("Changing TrafficLight Phase of Traffic Light: " + tl + "with Phase Duration of: " + newDur + " seconds!");
+                    });
+                } catch (Exception ex) {
+                    System.out.println("Error! Please enter a valid number for the Phase duration!");
+                    log("Error! Please enter a valid number for the Phase duration!");
+                }
+            }    else {
                 System.out.println("Error! Please enter a valid number for the Phase duration!");
                 log("Error! Please enter a valid number for the Phase duration!");
             }
@@ -657,7 +783,7 @@ public class GUI {
             int count = Integer.parseInt(stressTestCountField.getText());
 
             if (count <= 0) {
-                log("Please enter a positive number for stress test.");
+                javafx.application.Platform.runLater(() ->log("Please enter a positive number for stress test."));
                 return;
             }
 
@@ -674,32 +800,135 @@ public class GUI {
 
     @FXML
     public void commandPrintCongestion(ActionEvent e) {
+        actionQueue.add(() -> {
+            double time = org.eclipse.sumo.libtraci.Simulation.getTime();
 
-        double time = org.eclipse.sumo.libtraci.Simulation.getTime();
+            Map<String, Double> congestions =
+                    statistics.detectCongestionHotspots(time);
 
-        Map<String, Double> congestions =
-                statistics.detectCongestionHotspots(time);
+            if (congestions.isEmpty()) {
+                javafx.application.Platform.runLater(() -> log("No congestion found"));
+                System.out.println("No congestion found");
+                return;
+            }
 
-        if (congestions.isEmpty()) {
-            log("No congestion found");
-            System.out.println("No congestion found");
-            return;
+            javafx.application.Platform.runLater(() -> log("Congestion detected:"));
+            System.out.println("Congestion detected:");
+
+            for (Map.Entry<String, Double> entry : congestions.entrySet()) {
+
+                String message =
+                        "Lane " + entry.getKey() +
+                                " → avg speed: " +
+                                String.format("%.2f", entry.getValue()) +
+                                " m/s";
+
+                javafx.application.Platform.runLater(() -> log(message));
+                System.out.println(message);
+            }
+        });
+    }
+
+    // Neue Methode zum Starten des Sim-Threads (Self-Throttling Loop)
+    private void startSimulationThread() {
+        running = true;
+        simThread = new Thread(() -> {
+            // CsvWriter initialization here
+
+            while (running) {
+                try {
+                    long startTime = System.currentTimeMillis();
+                    Runnable task;
+                    while ((task = actionQueue.poll()) != null) {
+                        try {
+                            task.run();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+
+
+                    simController.singleStep();
+                    double time = simController.getTime();
+
+                    Collection<String> ids = simController.getVehicleController().getFilteredVehicleIds(currentTypeFilter, currentColorFilter);
+
+                    List<VehicleUiState> states = new ArrayList<>(Math.max(1, ids.size()));
+
+                    double sumSpeed = 0;
+                    int validSpeedCount = 0;
+                    for (String id : ids) {
+                        try {
+                            VehicleModel v = simController.getVehicleController().getVehicle(id);
+                            if (v != null) {
+                                states.add(new VehicleUiState(id, v.getX(), v.getY(), v.getAngle(), v.getTypeId(), v.getColor()));
+
+                                // Calculate Stats "on the fly"
+                                sumSpeed += v.getSpeed();
+                                validSpeedCount++;
+                            }
+                        } catch (Exception ex) {
+
+                        }
+                    }
+                    double avg = (validSpeedCount > 0) ?  sumSpeed / validSpeedCount :0.0;
+                    int count = states.size();
+                    double avgTrvelTime = 0;
+                    if (statistics != null) {
+                        statistics.updateVehicles(time);
+                        avgTrvelTime = statistics.updateAndGetAverageTravelTime(time);
+                    }
+                    long stepDuration = System.currentTimeMillis() - startTime;
+
+                    // If step took significantly longer than allowed (e.g. > currentDelay + 20ms
+                    // buffer)
+                    // and we are not in "Unlimited/Turbo" mode (delay != 0)
+                    if (currentSimDelayMs > 0 && stepDuration > currentSimDelayMs + 50) {
+                        System.out.println("System Overload: Step took " + stepDuration + "ms (Target: "
+                                + currentSimDelayMs + "ms)");
+                    }
+
+                    simController.getTlController().updateTLModel();
+
+                    List<TrafficLightUIState> tlStates = new ArrayList<>();
+                    for (var entry : simController.getTlController().getTlList().entrySet()) {
+                        String id = entry.getKey();
+                        String state = entry.getValue().getRedYellowGreenState();
+                        double rem = simController.getTlController().remainingTime(id) - time;
+                        tlStates.add(new TrafficLightUIState(id, state, Math.max(0, rem)));
+                    }
+                    latest = new SimSnapshot(time, states, avg, avgTrvelTime, count, tlStates);
+
+
+                    // csv
+                    long elapsedTime = System.currentTimeMillis() - startTime;
+                    long wait = currentSimDelayMs - elapsedTime;
+                    if (wait > 0) {
+                        Thread.sleep(wait);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+
+        });
+        simThread.setDaemon(true);
+        simThread.start();
+    }
+    public void stopAll(){
+        running = false;
+        if(timer != null){
+            timer.stop();
         }
+        if(simController != null){
+            simController.stopSimulation();
 
-        log("Congestion detected:");
-        System.out.println("Congestion detected:");
-
-        for (Map.Entry<String, Double> entry : congestions.entrySet()) {
-
-            String message =
-                    "Lane " + entry.getKey() +
-                            " → avg speed: " +
-                            String.format("%.2f", entry.getValue()) +
-                            " m/s";
-
-            log(message);
-            System.out.println(message);
+        }
+        if(simController != null && simController.getConnection() != null){
+            simController.getConnection().close();
         }
     }
+
+
 
 }

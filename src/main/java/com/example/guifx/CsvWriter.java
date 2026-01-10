@@ -1,4 +1,4 @@
-package com.example.guifx.stats;
+package com.example.guifx;
 
 import java.io.FileWriter;
 import java.io.IOException;

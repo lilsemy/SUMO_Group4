@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
@@ -21,6 +22,7 @@
       <!-- Simulation Controls Section -->
       <Label layoutX="82.0" layoutY="14.0" styleClass="label-title" text="Simulation Controls:" AnchorPane.leftAnchor="57.0" AnchorPane.topAnchor="14.0" />
 
+      <Slider id="simSpeedSlider" fx:id="simSpeedSlider" layoutX="337.0" layoutY="36.0" value="50.0" AnchorPane.rightAnchor="951.0" AnchorPane.topAnchor="25.0" />
       <!-- Control Buttons -->
       <Button alignment="CENTER" layoutX="82.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandSpawnVehicle" prefHeight="59.0" prefWidth="137.0" text="Insert Car" textAlignment="CENTER" AnchorPane.leftAnchor="57.0" AnchorPane.topAnchor="51.0">
          <graphic>
@@ -146,6 +148,7 @@
       <ChoiceBox id="TLSelector" fx:id="TLSelector" layoutX="505.0" layoutY="130.0" prefHeight="30.0" prefWidth="137.0" />
       <Label layoutX="507.0" layoutY="66.0" styleClass="label-tl" text="Time to Phase Switch:" />
       <ChoiceBox id="TLSelector" fx:id="TLSelector1" layoutX="71.0" layoutY="130.0" prefHeight="30.0" prefWidth="137.0" />
+
 
 
    </children>

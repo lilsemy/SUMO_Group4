@@ -202,5 +202,8 @@ public class SimulationController {
         return connection;
     }
     public LaneController getLaneController(){return laneCon;}
+    public double getTime() {
+        return org.eclipse.sumo.libtraci.Simulation.getTime();
+    }
 
 }

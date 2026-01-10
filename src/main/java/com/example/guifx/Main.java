@@ -13,6 +13,7 @@ import javafx.stage.Stage;
     */
 
 public class Main extends Application {
+    private GUI gui;
     @Override
 
     /**
@@ -34,21 +35,22 @@ public class Main extends Application {
         stage.show();
 
         GUI gui = fxmlLoader.getController();
+        this.gui = gui;
 
         SimulationController simController = new SimulationController();
         gui.setSimulationController(simController);
         simController.makeConnection();
 
     }
+        @Override
+        public void stop() throws Exception {
+        if (gui != null) {
+           // gui.stopAll();
+        }
+            super.stop();
 
-
-
-
-
-
-
-
-
-
-
+        }
 }
+
+
+

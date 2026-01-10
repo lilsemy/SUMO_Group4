@@ -2,8 +2,8 @@ package com.example.guifx;
 
 import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
-import org.eclipse.sumo.libtraci.TraCIPosition;
-import org.eclipse.sumo.libtraci.Vehicle;
+
+//import org.eclipse.sumo.libtraci.Vehicle;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.*;
@@ -32,17 +32,17 @@ public class CarLayer {
     private final Image truckWhiteImage;
     private final Image truckYellowImage;
 
-    private final SimulationController simController;
+    //private final SimulationController simController;
 
     /**
      * Constructs a CarLayer and loads vehicle images
      * 
      * @param carLayerPane Pane to display vehicles
      */
-    CarLayer(Pane carLayerPane, SimulationController simController) {
+    CarLayer(Pane carLayerPane) {
         carImageViews = new HashMap<>();
         this.carLayerPane = carLayerPane;
-        this.simController = simController;
+        //this.simController = simController;
 
         this.carBlackImage = loadVehicleImage("/carBlack.png");
         this.carRedImage = loadVehicleImage("/carRed.png");
@@ -59,7 +59,10 @@ public class CarLayer {
         this.truckWhiteImage = loadVehicleImage("/truckWhite.png");
         this.truckYellowImage = loadVehicleImage("/truckYellow.png");
 
-        if (carLayerPane == null) {
+
+        // FIX: Only clear if pane is NOT null
+        //if (carLayerPane == null) {
+        if (carLayerPane != null) {
             this.carLayerPane.getChildren().clear();
         }
     }
@@ -82,35 +85,58 @@ public class CarLayer {
         }
     }
 
+
+
+    /**
+     * Returns the width and height for a vehicle
+     * 
+     *
+     * @return array [width, height]
+     */
+    private double[] getSizeForVehicle(String typeId) {
+        //String typeId = Vehicle.getTypeID(vehicleId);
+        //String classId = Vehicle.getVehicleClass(vehicleId);
+        String type = typeId == null ? "" : typeId.toLowerCase();
+        //String vclass = classId == null ? "" : classId.toLowerCase();
+
+        if (type.contains("bus")) {
+            return new double[]{9, 20};
+        }
+        if (type.contains("truck") || type.contains("trailer") ) {
+            return new double[]{8, 17};
+        }
+        return new double[]{7, 15};
+    }
+
     /**
      * Returns the appropriate image for a vehicle
-     * 
-     * @param vehicleId vehicle ID
+     *
+     *
      * @return Image for the vehicle
      */
-    private Image getImageForVehicle(String vehicleId) {
-        VehicleModel v = simController.getVehicleController().getVehicle(vehicleId);
-        String typeId = v.getTypeId();
-        VehicleColor color = v.getColor();
+    private Image getImageForVehicleType(String typeId, VehicleColor color) {
+        //VehicleModel v = simController.getVehicleController().getVehicle(vehicleId);
+        //String typeId = v.getTypeId();
+        //VehicleColor color = v.getColor();
         String type = typeId == null ? "" : typeId.toLowerCase();
 
         return switch (type) {
             case "car" -> switch (color) {
-                case VehicleColor.RED -> carRedImage;
-                case VehicleColor.WHITE -> carWhiteImage;
-                case VehicleColor.YELLOW -> carYellowImage;
+                case RED -> carRedImage;
+                case WHITE -> carWhiteImage;
+                case YELLOW -> carYellowImage;
                 default -> carBlackImage;
             };
             case "truck" -> switch (color) {
-                case VehicleColor.RED -> truckRedImage;
-                case VehicleColor.WHITE -> truckWhiteImage;
-                case VehicleColor.YELLOW -> truckYellowImage;
+                case RED -> truckRedImage;
+                case WHITE -> truckWhiteImage;
+                case YELLOW -> truckYellowImage;
                 default -> truckBlackImage;
             };
             case "bus" -> switch (color) {
-                case VehicleColor.RED -> busRedImage;
-                case VehicleColor.WHITE -> busWhiteImage;
-                case VehicleColor.YELLOW -> busYellowImage;
+                case RED -> busRedImage;
+                case WHITE -> busWhiteImage;
+                case YELLOW -> busYellowImage;
                 default -> busBlackImage;
             };
             default -> carBlackImage;
@@ -119,56 +145,43 @@ public class CarLayer {
     }
 
     /**
-     * Returns the width and height for a vehicle
-     * 
-     * @param vehicleId vehicle ID
-     * @return array [width, height]
-     */
-    private double[] getSizeForVehicle(String vehicleId) {
-        String typeId = Vehicle.getTypeID(vehicleId);
-        String classId = Vehicle.getVehicleClass(vehicleId);
-        String type = typeId == null ? "" : typeId.toLowerCase();
-        String vclass = classId == null ? "" : classId.toLowerCase();
-
-        if (vclass.contains("bus") || type.contains("bus")) {
-            return new double[]{9, 20};
-        }
-        if (vclass.contains("truck") || vclass.contains("trailer") || type.contains("truck") || type.contains("trailer")) {
-            return new double[]{8, 17};
-        }
-        return new double[]{7, 15};
-    }
-
-    /**
      * Creates a new car ImageView and adds it to the pane
-     * 
-     * @param carID vehicle ID
+     *
+     *
      */
-    private void createCarImageView(String carID) {
-        Image vehicleImage = getImageForVehicle(carID);
+    private void createCarImageViewFromSnapshot(VehicleUiState vs) {
+        Image vehicleImage = getImageForVehicleType(vs.type(),vs.color() );
         if (vehicleImage == null) {
-            System.err.println("No image available for vehicle: " + carID);
+
+            System.err.println("No image available for vehicle: " + vs.id());
             return;
         }
 
         ImageView carView = new ImageView(vehicleImage);
-        double[] size = getSizeForVehicle(carID);
+        double[] size = getSizeForVehicle(vs.type());
         carView.setFitWidth(size[0]);
         carView.setFitHeight(size[1]);
         carView.setPreserveRatio(true);
         carView.setSmooth(true);
 
-        carImageViews.put(carID, carView);
+        carImageViews.put(vs.id(), carView);
         carLayerPane.getChildren().add(carView);
     }
 
     /**
      * Updates all cars: adds new cars, updates positions and rotations, removes disappeared cars
      */
-    public void updateCars(Collection<String> list) {
+    public void updateCarsFromSnapshot(List<VehicleUiState> vehicleStates) {
         //List<String> ids = Vehicle.getIDList();
-        Set<String> knownVehicleIds = new HashSet<>(list);
-        Set<String> newVehicleIds = new HashSet<>(knownVehicleIds);
+        Set<String> activeCarIds = new HashSet<>();
+        Map<String, VehicleUiState> stateMap = new HashMap<>();
+        for (VehicleUiState vs : vehicleStates) {
+            activeCarIds.add(vs.id());
+            stateMap.put(vs.id(),vs);
+        }
+
+        Set<String>newCarIds = new HashSet<>(activeCarIds);
+
 
         Iterator<Map.Entry<String, ImageView>> it = carImageViews.entrySet().iterator();
         while (it.hasNext()) {
@@ -176,26 +189,30 @@ public class CarLayer {
             String carId = entry.getKey();
             ImageView carView = entry.getValue();
 
-            if (knownVehicleIds.contains(carId)) {
-
+            if (activeCarIds.contains(carId)) {
+                newCarIds.remove(carId);
                 //safety check. If car is queued up and not yet active, don't call traas methods
-                if(!Vehicle.getIDList().contains(carId)){
-                    continue;
-                }
+//                if(!Vehicle.getIDList().contains(carId)){
+//                    continue;
+//                }
 
-                newVehicleIds.remove(carId);
+                //newVehicleIds.remove(carId);
 
 
-                TraCIPosition sumoPos = Vehicle.getPosition(carId, false);
-                Point2D javaPos = MapUtil.worldToScreen(new Point2D(sumoPos.getX(), sumoPos.getY()));
+                //TraCIPosition sumoPos = Vehicle.getPosition(carId, false);
+                VehicleUiState vs = stateMap.get(carId);
+                Point2D javaPos = MapUtil.worldToScreen(new Point2D(vs.x(), vs.y()));
                 double w = carView.getFitWidth();
                 double h = carView.getFitHeight();
-                double angle = Vehicle.getAngle(carId);
+                double angle = vs.angle();
+
                 carView.setRotate(angle);
 
+                //
                 double radAngle = Math.toRadians(angle);
                 double offsetX = h / 2 * Math.sin(radAngle);
                 double offsetY = -(h / 2) * Math.cos(radAngle);
+
                 carView.setLayoutX(javaPos.getX() - w / 2.0 - offsetX);
                 carView.setLayoutY(javaPos.getY() - h / 2.0 - offsetY);
             } else {
@@ -204,24 +221,33 @@ public class CarLayer {
             }
         }
 
-        for (String carId : newVehicleIds) {
+        for (String carId : newCarIds) {
             //Don't create image for not yet active vehicles
-            if(!Vehicle.getIDList().contains(carId)){
-                continue;
-            }
+            VehicleUiState vs = stateMap.get(carId);
+            createCarImageViewFromSnapshot(vs);
+           ImageView carView = carImageViews.get(carId);
 
-            createCarImageView(carId);
-            ImageView carView = carImageViews.get(carId);
+//            if(!Vehicle.getIDList().contains(carId)){
+//                continue;
+//            }
+
+//            createCarImageView(carId);
+
             if (carView != null) {
-                TraCIPosition sumoPosition = Vehicle.getPosition(carId, false);
-                Point2D javaPosition = MapUtil.worldToScreen(new Point2D(sumoPosition.getX(), sumoPosition.getY()));
+                //TraCIPosition sumoPosition = Vehicle.getPosition(carId, false);
+                Point2D javaPosition = MapUtil.worldToScreen(new Point2D(vs.x(), vs.y()));
                 double width = carView.getFitWidth();
                 double height = carView.getFitHeight();
                 carView.setLayoutX(javaPosition.getX() - width / 2.0);
                 carView.setLayoutY(javaPosition.getY() - height / 2.0);
-                double angle = Vehicle.getAngle(carId);
+                double angle = vs.angle();
                 carView.setRotate(angle);
             }
         }
     }
+
+
+
+
+
 }
