@@ -173,9 +173,38 @@ public class GUI {
 
             //TODO vehicleselctor
             vehicleSelector.setOnShowing(event -> {
-                var vehicles = simController.getVehicleController().getVehiclesMap().keySet();
-                vehicleSelector.getItems().setAll(vehicles);
-            });
+
+    Set<String> vehicles =
+            simController.getVehicleController().getVehiclesMap().keySet();
+
+    List<String> sortedVehicles = new ArrayList<>(vehicles);
+
+    Collections.sort(sortedVehicles, new Comparator<String>() {
+        @Override
+        public int compare(String a, String b) {
+
+            // remove "id" part
+            String numAString = a.substring(2);
+            String numBString = b.substring(2);
+
+            int numA = 0;
+            int numB = 0;
+
+            try {
+                numA = Integer.parseInt(numAString);
+                numB = Integer.parseInt(numBString);
+            } catch (NumberFormatException e) {
+                // if something weird happens, keep original order
+                return 0;
+            }
+
+            // descending order
+            return numB - numA;
+        }
+    });
+
+    vehicleSelector.getItems().setAll(sortedVehicles);
+});
             vehicleSelector.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
                 if (newValue != null) {
                     followedVehicleId = newValue;
