@@ -3,6 +3,7 @@ package com.example.guifx;
 import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
@@ -69,6 +70,8 @@ public class GUI {
     private ChoiceBox<String> TLSelector;
     @FXML
     private TextField stressTestCountField;
+    @FXML
+    private ChoiceBox<String> InsertionSelector;
 
     private XYChart.Series<Number, Number> speedSeries;
 
@@ -227,6 +230,11 @@ public class GUI {
                 TLSelector.getItems().setAll("TL1", "TL2");
             });
 
+            //Initialize DropDown Menu for EdgeInsertion
+            //Inserting is only available for the Lanes, that are rendered on the Map
+            InsertionSelector.setOnShowing(event -> {
+                InsertionSelector.getItems().setAll(simController.getLaneController().getPrintLanes());
+            });
 
             //DropDown Menu for TYPE FILTER
             vehicleTypeFilter.getItems().addAll(
@@ -623,10 +631,19 @@ public class GUI {
     public void commandSpawnVehicle(ActionEvent e) {
         System.out.println("Spawning new vehicle!");
         log("Spawning new vehicle!");
-        String id = simController.spawnVehicle(spawnConfig);
-        if (id != null) {
-            System.out.println("Spawned:" + id);
-            log("Spawned:" + id);
+        if (InsertionSelector.getValue() == null) {
+            String id = simController.spawnVehicle(spawnConfig, null);
+            if (id != null) {
+                System.out.println("Spawned:" + id);
+                log("Spawned:" + id + " randomly!");
+            }
+        }
+        else {
+            String id = simController.spawnVehicle(spawnConfig, InsertionSelector.getValue());
+            if (id != null) {
+                System.out.println("Spawned:" + id + " on Lane: " + InsertionSelector.getValue() + "!");
+                log("Spawned:" + id + " on Lane: " + InsertionSelector.getValue() + "!");
+            }
         }
     }
 

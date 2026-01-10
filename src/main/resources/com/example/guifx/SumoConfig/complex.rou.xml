@@ -8,6 +8,26 @@
     <route id="r1" edges="e1 e22 e23 e24 e25 e26 e27 e54 e28 e29 -e14 -e15 -e16 -e17 -e18 -e19 -e20 -e21"/> <!-- Edge "4804788#2" is between e27 and e28... (Forgot to change) -->
     <route id="r2" edges="-e51 -e50 -e49 -e48 -e46 -e55 e16 e15 e14 e13 e12 e11 e10 e9 e8 e7 e6 e5 e4 e3 e2"/> <!-- Edge "-4804880#0" and "4804880#0" are at the intersection of e16,e17 and e46 (also saw it to late D:) -->
     <route id="r3" edges="-e32 -e33 -e34 -e35 e17 e55 e46 e47 -e47 -e46 -e55 e16 e15 e14 e13 e12 e11 e10 e9 e8 e7 e6 e5 e4 e3 e22 e23 e24 e25 e30 e31"/>
+    <route id="r4" edges="-e45 -e44 -e43 e12 e11 e10 e9 e8 e7 e6 e5 e4 e3 -e3 -e4"/>
+    <route id="r6" edges="e23 e24 e25 e26 e27 e54 e28 e29 -e14 -e15 -e16 -e17 -e18 -e19 -e20 -e21 e21 e20 e19"/>
+    <route id="r7" edges="-e34 -e35 e17 e16 e15 e14 e13 e12 e11 e10 e9 e8 e7 e6 e5 e4 e3 e22 e23"/>
+    <route id="r8" edges="-e5 -e6 -e7 -e8 -e9 -e10 -e11 -e12 -e13 -e14 -e15 -e16 -e17 -e18 -e19"/>
+    <route id="r9" edges="e6 e5 e4 e3 -e3 -e4 -e5 -e6"/>
+    <route id="r10" edges="e13 e12 e11 e10 e9 e8 e7"/>
+    <route id="r11" edges="-e53 -e52 -e49 -e48 -e46 -e55 -e17 -e18 -e19 -e20 -e21 e21 e20 e19"/>
+    <route id="r12" edges="e4 e3 e22 e23 e24 e25"/>
+    <route id="r13" edges="e43 e44 e45 -e45 -e44 -e43 -e13 -e14 -e15 -e16 -e17 -e18 -e19 -e20 -e21 e21 e20"/>
+    <route id="r14" edges="e28 e29 e13 e12 e11 e10 e9 e8 -e8 -e9 -e10"/>
+    <route id="r15" edges="-e35 e17 e55 e46 e48 e49 -e49"/>
+    <route id="r16" edges="-e12 e12 e11 e10 e9 e8 e7 e6 e5 e4 e3 -e3 -e4"/>
+    <route id="r17" edges="-e13 -e14 -e15 -e16 e55 e46 e48 -e48"/>
+    <route id="r18" edges="e21 e20 e19 e18 e17 e16 e15 e14 e13 e12 e11 e10 e9 e8 -e8"/>
+    <route id="r19" edges="-e52 -e49 -e48 -e46 -e55 -e17 e35 e34 e33 e32 -e32 -e33 -e34"/>
+    <route id="r20" edges="-e44 -e43 -e13 -e14 -e15 -e16 e55 e46 e48 e49 e52"/>
+    <route id="r21" edges="e23 e24"/>
+    <route id="r22" edges="-e20 -e21 e21 e20 e19 e18 e35 e34"/>
+    <route id="r23" edges="-e19 -e20 -e21 e21 e20 e19 e18 e17 e16 e15 e14 e13 e12 e11 e10 e9 e8 e7 e6 e5 e4 e3 e22 e23 e24 e25 e26 e27 e54"/>
+
 
 <!--    <vehicle id="car_0" type="car" route="r1" depart="0" color="1,0,0"/>-->
 <!--    <vehicle id="bus_0" type="bus" route="r1" depart="1" color="0,0,1"/>-->

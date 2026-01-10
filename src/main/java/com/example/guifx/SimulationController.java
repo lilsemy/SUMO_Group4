@@ -1,5 +1,8 @@
 package com.example.guifx;
 
+import org.eclipse.sumo.libtraci.Simulation;
+import org.eclipse.sumo.libtraci.Vehicle;
+
 import java.util.List;
 import java.util.Random;
 
@@ -13,7 +16,6 @@ public class SimulationController {
     private final TrafficLightController tlController;
     private final LaneController laneCon;
 
-
     private volatile boolean running = true;   // starts true (volatile booleans have multi-thread visibility)
 
     //Stress test counters
@@ -22,7 +24,8 @@ public class SimulationController {
     private int injectionStepInterval = 10; // every 10 steps -> 10*0.05s/step = every 0.5s
     private boolean stressTestActive = false;
 
-    private static List<String> routes = List.of("r1","r2","r3");
+    private static List<String> routes = List.of("r1", "r2", "r3", "r4", "r6", "r7", "r8", "r9", "r10",
+            "r11", "r12", "r13", "r14", "r15", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23");
     private Random random = new Random();
     /**
     *
@@ -162,19 +165,31 @@ public class SimulationController {
         makeConnection();    // start new thread
     }
 
-    public String spawnVehicle(SpawnConfig config){
+    public String spawnVehicle(SpawnConfig config, String lane){
         try {
             TypeFilter type = config.pickType(); //currently the config is set to cars, because I only have all the images for them
             VehicleColor color = config.pickColor();
 
             VehicleModel v = vehicleController.createAndInjectVehicle(
                     type.getTypeId(),
-                    pickRoute(), //VERY BASIC IMPLEMENTATION, NEEDS REWORK, SEE BELOW
+                    pickRoute(),
                     "0",
                     color
             );
 
-            //vehicleController.trackVehicle("View #0", v.getId());
+            if(lane != null) {
+                //Random Edge choosen from List of all Edges, that are leaving the Map -> Endpoint of newly created Route
+                String target = laneCon.getEndLanes().get(new Random().nextInt(laneCon.getEndLanes().size()));
+
+                //Calculate a route from the User selected Edge, to the just choosen End Edge
+                var route = Simulation.findRoute(laneCon.getLaneModel(lane).getEdge(), target);
+
+                //Change Route of Vehicle to new Route
+                vehicleController.setRoute(v.getId(), route.getEdges());
+
+                //Teleport Vehicle to actual Lane, which was selected
+                vehicleController.moveToLane(v.getId(), lane);
+            }
             return v.getId();
 
         } catch (Exception e) {
@@ -182,7 +197,7 @@ public class SimulationController {
             return null;
         }
     }
-    //Since we only have r1,r2,r3 for now, it returns randomly one of them
+
     private String pickRoute(){
         return routes.get(random.nextInt(routes.size()));
     }
