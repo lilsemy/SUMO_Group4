@@ -2,157 +2,379 @@
    SUMO Traffic Simulation - Minimal Clean Style
    ============================================ */
 
+/* --- Dark theme tokens ------------------------------------------------ */
+
 /* Root container */
 .root {
-    -fx-font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    -fx-font-family: "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+
+    font-size: 14px;
     -fx-font-size: 14px;
-    -fx-background-color: #f2f2f2;
+
+    /* Dark mode background (simple neutral) */
+    background-color: #121212;
+    -fx-background-color: #121212;
+}
+
+/* ============================================
+   TYPOGRAPHY
+   ============================================ */
+
+.label {
+    -fx-text-fill: #e6e6e6;
+
+    font-size: 13px;
+    -fx-font-size: 13px;
+}
+
+.label-title {
+    font-size: 20px;
+    -fx-font-size: 20px;
+
+    font-weight: 800;
+    -fx-font-weight: 800;
+}
+
+.label-section {
+    font-size: 17px;
+    -fx-font-size: 17px;
+
+    font-weight: 800;
+    -fx-font-weight: 800;
+}
+
+.label-note {
+    font-size: 11px;
+    -fx-font-size: 11px;
+
+    -fx-text-fill: #a0a0a0;
+
+    font-style: italic;
+    -fx-font-style: italic;
+}
+
+.label-tl {
+    font-size: 13px;
+    -fx-font-size: 13px;
+
+    font-weight: 700;
+    -fx-font-weight: 700;
+}
+
+.label-filter {
+    font-size: 12px;
+    -fx-font-size: 12px;
+
+    font-weight: 700;
+    -fx-font-weight: 700;
+
+    -fx-text-fill: #d6d6d6;
+}
+
+/* ============================================
+   LAYOUT: SIDEBAR / MAP / BOTTOM BAR
+   ============================================ */
+
+.sidebar-scroll,
+.map-scroll {
+    background: transparent;
+    background-color: transparent;
+    -fx-background: transparent;
+    -fx-background-color: transparent;
+}
+
+.sidebar-scroll > .viewport,
+.map-scroll > .viewport {
+    background-color: transparent;
+    -fx-background-color: transparent;
+}
+
+/* Dark scrollbars (simple) */
+.scroll-pane .scroll-bar:vertical,
+.scroll-pane .scroll-bar:horizontal {
+    background-color: transparent;
+    -fx-background-color: transparent;
+}
+.scroll-pane .scroll-bar .track {
+    background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-color: rgba(255, 255, 255, 0.08);
+    -fx-background-insets: 0;
+}
+.scroll-pane .scroll-bar .thumb {
+    background-color: rgba(255, 255, 255, 0.18);
+    -fx-background-color: rgba(255, 255, 255, 0.18);
+    -fx-background-radius: 8px;
+}
+.scroll-pane .scroll-bar .thumb:hover {
+    background-color: rgba(255, 255, 255, 0.24);
+    -fx-background-color: rgba(255, 255, 255, 0.24);
+}
+
+.sidebar {
+    background-color: #1b1b1b;
+    -fx-background-color: #1b1b1b;
+
+    border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+
+    border-width: 1px;
+    -fx-border-width: 1px;
+
+    border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+
+    padding: 10px;
+    -fx-padding: 10px;
+}
+
+.sidebar-group {
+    padding: 6px 0 6px 0;
+    -fx-padding: 6px 0 6px 0;
+}
+
+.map-card {
+    /* Keep outer card dark, map container itself stays light */
+    background-color: #1b1b1b;
+    -fx-background-color: #1b1b1b;
+
+    border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+
+    border-width: 1px;
+    -fx-border-width: 1px;
+
+    border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+}
+
+.bottom-bar {
+    background-color: #1b1b1b;
+    -fx-background-color: #1b1b1b;
+
+    border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+
+    border-width: 1px;
+    -fx-border-width: 1px;
+
+    border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+
+    padding: 12px;
+    -fx-padding: 12px;
+
+    /* Prevent child nodes with square backgrounds from showing through rounded corners */
+    -fx-background-insets: 0;
+    -fx-border-insets: 0;
 }
 
 /* ============================================
    BUTTONS
    ============================================ */
 
-/*
 .button {
-    -fx-background-color: #4a6fa5;   */
-/* xanh trung tính, không gradient *//*
+    font-weight: 700;
+    -fx-font-weight: 700;
+
+    border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
+
+    padding: 8px 12px;
+    -fx-padding: 8px 12px;
+
+    cursor: hand;
+    -fx-cursor: hand;
+
+    border-width: 1px;
+    -fx-border-width: 1px;
+}
+
+.primary-button {
+    background-color: #2563eb;
+    -fx-background-color: #2563eb;
 
     -fx-text-fill: white;
-    -fx-font-weight: 600;
-    -fx-font-size: 13px;
-    -fx-background-radius: 6px;
-    -fx-padding: 10px 18px;
-    -fx-cursor: hand;
-    -fx-border-color: transparent;
-    -fx-effect: none;    */
-/* bỏ shadow cho sạch *//*
 
+    border-color: #1d4ed8;
+    -fx-border-color: #1d4ed8;
+}
+.primary-button:hover {
+    background-color: #1d4ed8;
+    -fx-background-color: #1d4ed8;
+}
+.primary-button:pressed {
+    background-color: #1e40af;
+    -fx-background-color: #1e40af;
 }
 
-.button:hover {
-    -fx-background-color: #3f5f8f;
+.secondary-button {
+    background-color: #2a2a2a;
+    -fx-background-color: #2a2a2a;
+
+    -fx-text-fill: #e6e6e6;
+
+    border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+}
+.secondary-button:hover {
+    background-color: #313131;
+    -fx-background-color: #313131;
+}
+.secondary-button:pressed {
+    background-color: #262626;
+    -fx-background-color: #262626;
 }
 
-.button:pressed {
-    -fx-background-color: #36547f;
-    -fx-translate-y: 1px;
+.danger-button {
+    background-color: #ef4444;
+    -fx-background-color: #ef4444;
+
+    -fx-text-fill: white;
+
+    border-color: #dc2626;
+    -fx-border-color: #dc2626;
 }
-*/
+.danger-button:hover {
+    background-color: #dc2626;
+    -fx-background-color: #dc2626;
+}
+.danger-button:pressed {
+    background-color: #b91c1c;
+    -fx-background-color: #b91c1c;
+}
+
+/* Make button graphic + text feel balanced */
+.button .label {
+    -fx-text-fill: inherit;
+}
 
 /* ============================================
-   LABELS
+   INPUTS (TextField / ChoiceBox)
    ============================================ */
 
-.label {
-    -fx-text-fill: #2f2f2f;
-    -fx-font-size: 14px;
-}
+.control-field,
+.text-field,
+.choice-box,
+.text-area {
+    background-color: #1f1f1f;
+    -fx-background-color: #1f1f1f;
 
-.label-title {
-    -fx-font-size: 22px;
-    -fx-font-weight: bold;
-}
+    border-radius: 10px;
+    -fx-background-radius: 10px;
+    -fx-border-radius: 10px;
 
-.label-section {
-    -fx-font-size: 18px;
-    -fx-font-weight: bold;
-}
+    border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-color: rgba(255, 255, 255, 0.12);
 
-.label-note {
-    -fx-font-size: 11px;
-    -fx-text-fill: #7a7a7a;
-    -fx-font-style: italic;
-}
-
-.label-tl {
-    -fx-font-size: 13px;
-    -fx-font-weight: bold;
-}
-
-/* ============================================
-   MAP CONTAINER
-   ============================================ */
-
-#mapContainer {
-    -fx-background-color: #ffffff;
-    -fx-border-color: #d0d0d0;
+    border-width: 1px;
     -fx-border-width: 1px;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
+
+    padding: 5px 10px;
+    -fx-padding: 5px 10px;
+
+    -fx-text-fill: #e6e6e6;
+}
+
+.control-field:focused,
+.text-field:focused,
+.choice-box:focused,
+.text-area:focused {
+    border-color: rgba(255, 255, 255, 0.22);
+    -fx-border-color: rgba(255, 255, 255, 0.22);
+
+    -fx-effect: null;
+}
+
+/* ChoiceBox popup colors */
+.choice-box .context-menu {
+    background-color: #1f1f1f;
+    -fx-background-color: #1f1f1f;
+
+    border-color: rgba(255, 255, 255, 0.12);
+    -fx-border-color: rgba(255, 255, 255, 0.12);
+}
+.choice-box .menu-item > .label {
+    -fx-text-fill: #e5e7eb;
+}
+.choice-box .menu-item:focused {
+    background-color: #2a2a2a;
+    -fx-background-color: #2a2a2a;
+}
+
+/* TextArea: make its inner background dark too */
+.text-area .content {
+    background-color: #1f1f1f;
+    -fx-background-color: #1f1f1f;
+}
+
+/* Charts (dark, simple) */
+.chart {
+    background-color: transparent;
+    -fx-background-color: transparent;
+}
+.chart-plot-background {
+    background-color: rgba(255, 255, 255, 0.06);
+    -fx-background-color: rgba(255, 255, 255, 0.06);
+}
+.chart-vertical-grid-lines,
+.chart-horizontal-grid-lines {
+    stroke: rgba(255, 255, 255, 0.10);
+    -fx-stroke: rgba(255, 255, 255, 0.10);
+}
+.axis {
+    -fx-tick-label-fill: #cfcfcf;
+}
+.axis-label {
+    -fx-text-fill: #cfcfcf;
+}
+
+/* MAP CONTAINER (keep light) */
+#mapContainer {
+    background-color: #ffffff;
+    -fx-background-color: #ffffff;
+
+    border-color: #e5e7eb;
+    -fx-border-color: #e5e7eb;
+
+    border-width: 1px;
+    -fx-border-width: 1px;
+
+    border-radius: 10px;
+    -fx-border-radius: 10px;
+    -fx-background-radius: 10px;
 }
 
 #backgroundCanvas {
+    background-color: #f7f7f7;
     -fx-background-color: #f7f7f7;
 }
 
 #carLayer,
 #trafficLightLayer,
 #laneLayer {
+    background-color: transparent;
     -fx-background-color: transparent;
 }
 
-/* ============================================
-   CHARTS
-   ============================================ */
-/*
-.chart {
-    -fx-background-color: white;
-    -fx-border-color: #dcdcdc;
-    -fx-border-width: 1px;
-    -fx-border-radius: 6px;
-    -fx-background-radius: 6px;
-    -fx-padding: 8px;
-}
-
-.chart-title {
-    -fx-font-size: 14px;
-    -fx-font-weight: bold;
-    -fx-text-fill: #333;
-}
-
-.axis {
-    -fx-tick-label-fill: #555;
-    -fx-font-size: 11px;
-}
-
-.axis-label {
-    -fx-text-fill: #666;
-}*/
-
-/* ============================================
-   LAYOUT SECTIONS
-   ============================================ */
-
-.control-section,
-.simulation-section,
-.statistics-section {
-    -fx-background-color: white;
-    -fx-padding: 15px;
-    -fx-spacing: 10px;
-    -fx-border-color: #e4e4e4;
-    -fx-border-width: 0 0 1px 0;
-}
-
-/* ============================================
-   ANCHOR PANE
-   ============================================ */
-
+/* Anchor pane */
 .anchor-pane {
-    -fx-background-color: #f2f2f2;
+    background-color: #121212;
+    -fx-background-color: #121212;
 }
 
-/* ============================================
-   ALIGNMENT + SPACING
-   ============================================ */
-
+/* Alignment helpers */
 .center-align { -fx-alignment: center; }
 .top-align { -fx-alignment: top-center; }
 
-.spacing-small { -fx-spacing: 5px; }
+.spacing-small { -fx-spacing: 6px; }
 .spacing-medium { -fx-spacing: 10px; }
-.spacing-large { -fx-spacing: 20px; }
+.spacing-large { -fx-spacing: 18px; }
 
-.padding-small { -fx-padding: 5px; }
-.padding-medium { -fx-padding: 10px; }
-.padding-large { -fx-padding: 20px; }
+.padding-small { padding: 6px; -fx-padding: 6px; }
+.padding-medium { padding: 10px; -fx-padding: 10px; }
+.padding-large { padding: 18px; -fx-padding: 18px; }

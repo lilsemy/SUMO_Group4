@@ -175,8 +175,7 @@ public class GUI {
             //zoomGroup.getTransforms().add(scaleTransform);
             zoomGroup.getTransforms().addAll(scaleTransform, rotateTransform);
             mapContainer.getChildren().add(zoomGroup);
-            mapContainer.setAlignment(javafx.geometry.Pos.TOP_LEFT); // Ensure Top-Left alignment to prevent centering
-            //                                                                     // jumps
+            mapContainer.setAlignment(javafx.geometry.Pos.CENTER_RIGHT); // Ensure Center-Right alignment
 
             Rectangle clip = new Rectangle();
             clip.widthProperty().bind(mapContainer.widthProperty());
