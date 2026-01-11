@@ -10,10 +10,7 @@ import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
@@ -213,7 +210,7 @@ public class GUI {
 
             laneLayerInstance = new LaneLayer(laneLayer, simController.getLaneController());
             trafficLightLayerInstance = new TrafficLightLayer(trafficLightLayer, null, simController.getTlController());
-            carLayerInstance = new CarLayer(carLayer, simController);
+            carLayerInstance = new CarLayer(carLayer);
 
             speedSeries = new XYChart.Series<>();
             speedSeries.setName("Avg Speed");
