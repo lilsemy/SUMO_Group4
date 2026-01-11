@@ -1090,6 +1090,15 @@ public class GUI {
         simThread = new Thread(() -> {
             // CsvWriter initialization here
 
+            CsvWriter csv = null;
+            try {
+               csv =  new CsvWriter("simulation.csv");
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+            double lastCsvWriteTime = 0.0;
+
+
             while (running) {
                 try {
                     long startTime = System.currentTimeMillis();
@@ -1100,11 +1109,13 @@ public class GUI {
                         } catch (Exception ex) {
                             ex.printStackTrace();
                         }
+
                     }
 
 
                     simController.singleStep();
                     double time = simController.getTime();
+
 
                     Collection<String> ids = simController.getVehicleController().getFilteredVehicleIds(currentTypeFilter, currentColorFilter);
 
@@ -1156,6 +1167,18 @@ public class GUI {
 
 
                     // csv
+                    if( csv != null && time - lastCsvWriteTime >= 1.0) {
+                        csv.writeStep(
+                                time,
+                                statistics.getVehicleCount(),
+                                statistics.getAverageSpeed(),
+                                statistics.isCongestionPresent(time),
+                                statistics.getTrafficLightStates()
+                        );
+                        lastCsvWriteTime = time;
+
+                    }
+
                     long elapsedTime = System.currentTimeMillis() - startTime;
                     long wait = currentSimDelayMs - elapsedTime;
                     if (wait > 0) {
