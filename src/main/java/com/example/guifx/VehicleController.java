@@ -1,5 +1,6 @@
 package com.example.guifx;
 
+import org.eclipse.sumo.libtraci.StringVector;
 import org.eclipse.sumo.libtraci.Vehicle;
 import org.eclipse.sumo.libtraci.TraCIPosition;
 import org.eclipse.sumo.libtraci.Simulation;
@@ -66,6 +67,7 @@ public class VehicleController {
         }
     }
 
+
     /**
      * Returns the speed of a vehicle
      * 
@@ -90,6 +92,26 @@ public class VehicleController {
     public String getLastVehicleId() {
         if (vehiclesList.isEmpty()) return null;
         return "id" + vehicleCounter;
+    }
+
+    /**
+     * Teleports Vehicle to given Lane.
+     * @param vehID
+     * @param lane
+     */
+    public void moveToLane(String vehID, String lane){
+        Vehicle.moveTo(vehID, lane, 0);
+    }
+
+    /**
+     * Sets Vehicles Route to newly given Route.
+     * @param vehId
+     * @param route
+     */
+    public void setRoute(String vehId, StringVector route){
+        VehicleModel v = getVehicle(vehId);
+        v.setRouteId("c"); //"c" stands for custom RouteID, since we calculate a random one, which is not saved in rou.xml -> has no ID
+        Vehicle.setRoute(vehId, route);
     }
 
     /**

@@ -3,6 +3,7 @@ package com.example.guifx;
 import javafx.animation.AnimationTimer;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
@@ -14,8 +15,11 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
+import javafx.scene.control.Label;
+import javafx.scene.control.ChoiceBox;
 import javafx.geometry.Point2D;
 import org.eclipse.sumo.libtraci.Vehicle;
+import org.eclipse.sumo.libtraci.VehicleType;
 
 import java.text.DecimalFormat;
 import java.util.*;
@@ -71,6 +75,8 @@ public class GUI {
     private TextField stressTestCountField;
     @FXML private Slider simSpeedSlider;
 
+    @FXML
+    private ChoiceBox<String> InsertionSelector;
 
     private XYChart.Series<Number, Number> speedSeries;
 
@@ -110,8 +116,10 @@ public class GUI {
 
     //LOGIC FOR SPAWNING
     private SpawnConfig spawnConfig = SpawnConfig.random();
-    private ChoiceBox<TypeFilter> typeChoice;
-    private ChoiceBox<VehicleColor> colorChoice;
+    @FXML
+    private ChoiceBox<TypeFilter> typeSpawnChoice;
+    @FXML
+    private ChoiceBox<VehicleColor> colorSpawnChoice;
 
 
 
@@ -216,8 +224,7 @@ public class GUI {
             //zoomGroup.getTransforms().add(scaleTransform);
             zoomGroup.getTransforms().addAll(scaleTransform, rotateTransform);
             mapContainer.getChildren().add(zoomGroup);
-            mapContainer.setAlignment(javafx.geometry.Pos.TOP_LEFT); // Ensure Top-Left alignment to prevent centering
-            //                                                                     // jumps
+            mapContainer.setAlignment(javafx.geometry.Pos.CENTER_RIGHT); // Ensure Center-Right alignment
 
             Rectangle clip = new Rectangle();
             clip.widthProperty().bind(mapContainer.widthProperty());
@@ -269,8 +276,13 @@ public class GUI {
             //Initialize DropDown Menu for TrafficLights
             TLSelector.setOnShowing(event -> TLSelector.getItems().setAll("TL1", "TL2"));
 
+            //Initialize DropDown Menu for EdgeInsertion
+            //Inserting is only available for the Lanes, that are rendered on the Map
+            InsertionSelector.setOnShowing(event -> {
+                InsertionSelector.getItems().setAll(simController.getLaneController().getPrintLanes());
+            });
 
-            //setting up the 4 choices in the choice box
+            //DropDown Menu for TYPE FILTER
             vehicleTypeFilter.getItems().addAll(
                     TypeFilter.NONE,
                     TypeFilter.CAR,
@@ -290,7 +302,7 @@ public class GUI {
                         }
                     });
 
-            //Drop down menu for COLORS
+            //Drop down menu for COLOR FILTER
             vehicleColorFilter.getItems().addAll(
                     VehicleColor.NONE,
                     VehicleColor.RED,
@@ -331,6 +343,43 @@ public class GUI {
                 }
             });
 
+
+            typeSpawnChoice.getItems().addAll(
+                    TypeFilter.NONE,
+                    TypeFilter.CAR,
+                    TypeFilter.TRUCK,
+                    TypeFilter.BUS
+            );
+
+            typeSpawnChoice.setValue(TypeFilter.NONE);
+
+            typeSpawnChoice
+                    .getSelectionModel()
+                    .selectedItemProperty()
+                    .addListener((observableValue, oldValue, newValue) -> {
+                        if(newValue != null) {
+                            updateSpawnConfig(typeSpawnChoice.getValue(), colorSpawnChoice.getValue());
+                        }
+                    });
+
+            colorSpawnChoice.getItems().addAll(
+                    VehicleColor.NONE,
+                    VehicleColor.WHITE,
+                    VehicleColor.BLACK,
+                    VehicleColor.RED,
+                    VehicleColor.YELLOW
+            );
+
+            colorSpawnChoice.setValue(VehicleColor.NONE);
+
+            colorSpawnChoice
+                    .getSelectionModel()
+                    .selectedItemProperty()
+                    .addListener((observableValue, oldValue, newValue) -> {
+                        if(newValue != null) {
+                            updateSpawnConfig(typeSpawnChoice.getValue(), colorSpawnChoice.getValue());
+                        }
+                    });
 
             startLoop();
 
@@ -664,25 +713,59 @@ public class GUI {
         timer.start();
     }
 
+    public void updateSpawnConfig(TypeFilter selectedType, VehicleColor selectedColor){
+
+        if(selectedType == TypeFilter.NONE && selectedColor == VehicleColor.NONE){
+            spawnConfig = SpawnConfig.random();
+        }
+
+        if(selectedType == TypeFilter.NONE && selectedColor != VehicleColor.NONE){
+            spawnConfig = SpawnConfig.restrictColors(EnumSet.of(selectedColor));
+        }
+
+        if(selectedType != TypeFilter.NONE && selectedColor == VehicleColor.NONE){
+            spawnConfig = SpawnConfig.restrictTypes(EnumSet.of(selectedType));
+        }
+
+        if(selectedType != TypeFilter.NONE && selectedColor != VehicleColor.NONE){
+            spawnConfig = SpawnConfig.restrictAll(EnumSet.of(selectedType), EnumSet.of(selectedColor));
+        }
+
+
+    }
+
     /**
      * Inserts a car and sets the view on it
      *
      * @param e ActionEvent from button click
      */
-    @FXML
+
     public void commandSpawnVehicle(ActionEvent e) {
         System.out.println("Spawning new vehicle!");
         log("Spawning new vehicle!");
         actionQueue.add(()-> {
-        String id = simController.spawnVehicle(spawnConfig);
-        if (id != null) {
-            System.out.println("Spawned:" + id);
-            javafx.application.Platform.runLater(()-> log("Spawned:" + id));
+        //String id = simController.spawnVehicle(spawnConfig);
+        //if (id != null) {
+         //   System.out.println("Spawned:" + id);
+         //   javafx.application.Platform.runLater(()-> log("Spawned:" + id));
+        if (InsertionSelector.getValue() == null) {
+            String id = simController.spawnVehicle(spawnConfig, null);
+            if (id != null) {
+                System.out.println("Spawned:" + id);
+                javafx.application.Platform.runLater(()->log("Spawned:" + id + " randomly!"));
+            }
+        }
+        else {
+            String id = simController.spawnVehicle(spawnConfig, InsertionSelector.getValue());
+            if (id != null) {
+                System.out.println("Spawned:" + id + " on Lane: " + InsertionSelector.getValue() + "!");
+                javafx.application.Platform.runLater(()->log("Spawned:" + id + " on Lane: " + InsertionSelector.getValue() + "!"));
+            }
         }
     });
     }
 
-    @FXML
+
     public void commandFollowVehicle(ActionEvent e) {
         String selectedId = null;
         String targetId = null;
@@ -719,7 +802,7 @@ public class GUI {
      *
      * @param e ActionEvent from button click
      */
-    @FXML
+
     public void commandGetVehicleSpeed(ActionEvent e) {
         actionQueue.add(() -> {
             String lastId = simController.getVehicleController().getLastVehicleId();
@@ -775,7 +858,7 @@ public class GUI {
      *
      * @param e ActionEvent from button click
      */
-    @FXML
+
     public void commandStressTest(ActionEvent e) {
         try {
             int count = Integer.parseInt(stressTestCountField.getText());
@@ -796,7 +879,7 @@ public class GUI {
         }
     }
 
-    @FXML
+
     public void commandPrintCongestion(ActionEvent e) {
         actionQueue.add(() -> {
             double time = org.eclipse.sumo.libtraci.Simulation.getTime();
@@ -930,3 +1013,4 @@ public class GUI {
 
 
 }
+

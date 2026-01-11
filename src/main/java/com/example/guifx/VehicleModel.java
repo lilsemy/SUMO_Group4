@@ -170,7 +170,9 @@ public class VehicleModel {
         this.typeId=id;
     }
 
-
+    public void setRouteId(String routeId){
+        this.routeId = routeId;
+    }
 
     public void setColor(VehicleColor color) {
         this.color = color;

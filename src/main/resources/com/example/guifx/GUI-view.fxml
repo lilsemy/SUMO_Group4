@@ -16,11 +16,22 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
+<?import java.lang.*?>
+<?import javafx.scene.canvas.*?>
+<?import javafx.scene.chart.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="894.0" prefWidth="1428.0" stylesheets="@simulation-style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.guifx.GUI">
+<AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="914.0" prefWidth="1582.0" stylesheets="@simulation-style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.guifx.GUI">
    <children>
-      <!-- Simulation Controls Section -->
-      <Label layoutX="82.0" layoutY="14.0" styleClass="label-title" text="Simulation Controls:" AnchorPane.leftAnchor="57.0" AnchorPane.topAnchor="14.0" />
+      <!-- Left sidebar controls (scrollable, narrower, height limited above bottom bar) -->
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="sidebar-scroll" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0" AnchorPane.bottomAnchor="200.0" prefViewportWidth="220.0">
+         <content>
+            <VBox fx:id="leftControls" spacing="10.0" styleClass="sidebar" prefWidth="220.0">
+               <children>
+                  <Label styleClass="label-title" text="Simulation Controls" />
 
       <Slider id="simSpeedSlider" fx:id="simSpeedSlider" layoutX="337.0" layoutY="36.0" value="50.0" AnchorPane.rightAnchor="951.0" AnchorPane.topAnchor="25.0" />
       <!-- Control Buttons -->
@@ -36,129 +47,183 @@
             <Font size="12.0" />
          </font>
       </Button>
+                  <VBox spacing="8.0" styleClass="sidebar-group">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#commandSpawnVehicle" prefHeight="42.0" prefWidth="220.0" text="Insert Car" styleClass="primary-button">
+                           <graphic>
+                              <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@proxy-image.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <ChoiceBox id="InsertionSelector" fx:id="InsertionSelector" prefHeight="28.0" prefWidth="220.0" styleClass="control-field" />
+                     </children>
+                  </VBox>
 
-      <Button layoutX="240.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandGetVehicleSpeed" prefHeight="59.0" prefWidth="137.0" text="Get Speed" AnchorPane.leftAnchor="215.0" AnchorPane.topAnchor="51.0">
-         <graphic>
-            <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@Speed.png" />
-               </image>
-            </ImageView>
-         </graphic>
-         <font>
-            <Font size="12.0" />
-         </font>
-      </Button>
+                  <VBox spacing="8.0" styleClass="sidebar-group">
+                     <children>
+                        <Button fx:id="commandFolowVehicle" mnemonicParsing="false" onAction="#commandFollowVehicle" prefHeight="42.0" prefWidth="220.0" text="Follow Vehicle" styleClass="secondary-button">
+                           <graphic>
+                              <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@Search.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <ChoiceBox id="vehicleSelector" fx:id="vehicleSelector" prefHeight="28.0" prefWidth="220.0" styleClass="control-field" />
+                     </children>
+                  </VBox>
 
-      <Button layoutX="388.0" layoutY="67.0" mnemonicParsing="false" onAction="#commandChangePhase" prefHeight="59.0" prefWidth="111.0" text="Change Phase" AnchorPane.leftAnchor="373.0" AnchorPane.topAnchor="51.0">
-         <graphic>
-            <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@trafficlight.png" />
-               </image>
-            </ImageView>
-         </graphic>
-         <font>
-            <Font size="12.0" />
-         </font>
-      </Button>
+                  <VBox spacing="8.0" styleClass="sidebar-group">
+                     <children>
+                        <Button mnemonicParsing="false" onAction="#commandGetVehicleSpeed" prefHeight="42.0" prefWidth="220.0" text="Get Speed" styleClass="secondary-button">
+                           <graphic>
+                              <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@Speed.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <TextField id="GetDuration" fx:id="GetDuration" prefHeight="28.0" prefWidth="220.0" promptText="Duration (s)" styleClass="control-field" />
+                     </children>
+                  </VBox>
 
-      <!-- Live Simulation Section -->
-      <Label layoutX="67.0" layoutY="157.0" styleClass="label-section" text="Live Simulation:" AnchorPane.leftAnchor="52.0" AnchorPane.topAnchor="155.0" />
+                  <Separator />
 
-      <!-- Map Container with Layers -->
-      <StackPane fx:id="mapContainer" layoutX="67.0" layoutY="193.0" prefHeight="443.0" prefWidth="671.0" AnchorPane.bottomAnchor="39.0" AnchorPane.leftAnchor="52.0" AnchorPane.rightAnchor="362.0" AnchorPane.topAnchor="178.0">
+                  <VBox spacing="8.0" styleClass="sidebar-group">
+                     <children>
+                        <Label styleClass="label-filter" text="Spawning filters:" />
+                        <HBox spacing="6.0">
+                           <children>
+                              <ChoiceBox id="SpawnConfigType" fx:id="typeSpawnChoice" prefHeight="28.0" prefWidth="220.0" styleClass="control-field" />
+                              <ChoiceBox id="SpawnConfigColor" fx:id="colorSpawnChoice" prefHeight="28.0" prefWidth="220.0" styleClass="control-field" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+
+                  <VBox spacing="8.0" styleClass="sidebar-group">
+                     <children>
+                        <Label styleClass="label-filter" text="View filters:" />
+                        <HBox spacing="6.0">
+                           <children>
+                              <ChoiceBox fx:id="vehicleTypeFilter" prefHeight="28.0" prefWidth="220.0" styleClass="control-field" />
+                              <ChoiceBox fx:id="vehicleColorFilter" prefHeight="28.0" prefWidth="220.0" styleClass="control-field" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+
+                  <Separator />
+
+                  <VBox spacing="8.0" styleClass="sidebar-group">
+                     <children>
+                        <Label styleClass="label-tl" text="Traffic lights:" />
+                        <Button mnemonicParsing="false" onAction="#commandChangePhase" prefHeight="42.0" prefWidth="220.0" text="Change Phase" styleClass="secondary-button">
+                           <graphic>
+                              <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@trafficlight.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <ChoiceBox id="TLSelector" fx:id="TLSelector" prefHeight="28.0" prefWidth="220.0" styleClass="control-field" />
+                     </children>
+                  </VBox>
+
+                  <Separator />
+
+                  <VBox spacing="8.0" styleClass="sidebar-group">
+                     <children>
+                        <Label styleClass="label-filter" text="Load test:" />
+                        <Button mnemonicParsing="false" onAction="#commandStressTest" prefHeight="42.0" prefWidth="220.0" text="Stress Test" styleClass="danger-button">
+                           <graphic>
+                              <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@alarm.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                        <TextField fx:id="stressTestCountField" prefHeight="28.0" prefWidth="220.0" promptText="Car amount" styleClass="control-field" />
+
+                        <Button mnemonicParsing="false" onAction="#commandPrintCongestion" prefHeight="42.0" prefWidth="220.0" text="Congestions" styleClass="secondary-button">
+                           <graphic>
+                              <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                                 <image>
+                                    <Image url="@Congestion.png" />
+                                 </image>
+                              </ImageView>
+                           </graphic>
+                        </Button>
+                     </children>
+                  </VBox>
+               </children>
+            </VBox>
+         </content>
+      </ScrollPane>
+
+      <!-- Center map area (scrollable, height limited above bottom bar) -->
+      <VBox spacing="10.0" AnchorPane.leftAnchor="300.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" AnchorPane.bottomAnchor="200.0">
          <children>
-            <Canvas fx:id="backgroundCanvas" height="456.0" width="669.0" />
-            <Pane fx:id="laneLayer" prefHeight="456.0" prefWidth="669.0" />
-            <Pane fx:id="trafficLightLayer" prefHeight="456.0" prefWidth="669.0" />
-            <Pane fx:id="carLayer" prefHeight="456.0" prefWidth="669.0" />
-
+            <Label styleClass="label-section" text="Live Simulation:" />
+            <ScrollPane fitToWidth="true" fitToHeight="true" pannable="true" hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED" styleClass="map-scroll" VBox.vgrow="ALWAYS">
+               <content>
+                  <StackPane fx:id="mapContainer" prefHeight="600.0" prefWidth="1100.0" styleClass="map-card">
+                     <children>
+                        <Canvas fx:id="backgroundCanvas" width="1100.0" height="600.0" />
+                        <Pane fx:id="laneLayer" prefHeight="600.0" prefWidth="1100.0" />
+                        <Pane fx:id="trafficLightLayer" prefHeight="600.0" prefWidth="1100.0" />
+                        <Pane fx:id="carLayer" prefHeight="600.0" prefWidth="1100.0" />
+                     </children>
+                  </StackPane>
+               </content>
+            </ScrollPane>
          </children>
-      </StackPane>
+      </VBox>
 
-      <!-- Statistics Section -->
-      <Label layoutX="816.0" layoutY="142.0" styleClass="label-section" text="Statistics:" AnchorPane.rightAnchor="260.0" AnchorPane.topAnchor="145.0">
-         <font>
-            <Font size="24.0" />
-         </font></Label>
-      <Label id="avgSpeedLabel" fx:id="avgSpeedLabel" layoutX="793.0" layoutY="223.0" prefHeight="28.0" prefWidth="130.0" text="Avg Speed: 0 m/s" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="195.0" />
-      <Label id="vehicleCountLabel" fx:id="vehicleCountLabel" layoutX="792.0" layoutY="210.0" prefHeight="20.0" prefWidth="130.0" text="Vehicles: 0" AnchorPane.rightAnchor="200.0" AnchorPane.topAnchor="180.0" />
-      <LineChart fx:id="speedChart" layoutX="736.0" layoutY="215.0" prefHeight="245.0" prefWidth="375.0" AnchorPane.rightAnchor="-11.0" AnchorPane.topAnchor="215.0">
-         <xAxis>
-            <NumberAxis label="Time (s)" side="BOTTOM" />
-         </xAxis>
-         <yAxis>
-            <NumberAxis label="Speed (m/s)" side="LEFT" />
-         </yAxis>
-      </LineChart>
-       <LineChart fx:id="travelTimeChart" layoutX="736.0" layoutY="470.0" prefHeight="245.0" prefWidth="375.0" AnchorPane.rightAnchor="-11.0">
-           <xAxis>
-               <NumberAxis label="Time (s)" side="BOTTOM" />
-           </xAxis>
-           <yAxis>
-               <NumberAxis label="Avg Travel Time (s)" side="LEFT" />
-           </yAxis>
-       </LineChart>
-      <Button layoutX="773.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandStressTest" prefHeight="59.0" prefWidth="137.0" text="Stress Test" AnchorPane.leftAnchor="806.0" AnchorPane.topAnchor="51.0">
-         <graphic>
-            <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@alarm.png" />
-               </image>
-            </ImageView>
-         </graphic>
-         <font>
-            <Font size="12.0" />
-         </font>
-      </Button>
-      <TextField fx:id="stressTestCountField" layoutX="773.0" layoutY="130.0" prefHeight="30.0" prefWidth="137.0" promptText="Car amount" AnchorPane.leftAnchor="806.0" />
-      <TextArea id="consoleArea" fx:id="consoleArea" layoutX="737.7142857142858" layoutY="730.0" prefHeight="181.0" prefWidth="344.0" AnchorPane.rightAnchor="3.2857142857142208" />
-      <Button fx:id="commandFolowVehicle" layoutX="615.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandFollowVehicle" prefHeight="59.0" prefWidth="137.0" text="Follow Vehicle" AnchorPane.leftAnchor="648.0" AnchorPane.topAnchor="51.0">
-         <font>
-            <Font size="12.0" />
-         </font>
-         <graphic>
-            <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@Search.png" />
-               </image>
-            </ImageView>
-         </graphic></Button>
-      <ChoiceBox id="vehicleSelector" fx:id="vehicleSelector" layoutX="655.0" layoutY="130.0" prefHeight="30.0" prefWidth="137.0" AnchorPane.leftAnchor="648.0" />
-      <TextField id="GetDuration" fx:id="GetDuration" layoutX="388.0" layoutY="130.0" prefHeight="30.0" prefWidth="111.0" promptText="Enter Duration" />
+      <!-- Bottom statistics bar (horizontal) -->
+      <HBox fx:id="bottomStats" spacing="12.0" styleClass="bottom-bar" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="20.0" prefHeight="120.0">
+         <children>
+            <VBox spacing="6.0" prefWidth="260.0">
+               <children>
+                  <Label styleClass="label-section" text="Statistics:" />
+                  <Label id="vehicleCountLabel" fx:id="vehicleCountLabel" text="Vehicles: 0" />
+                  <Label id="avgSpeedLabel" fx:id="avgSpeedLabel" text="Avg Speed: 0 m/s" />
+                  <Label id="Tl1Dur" fx:id="Tl1Dur" text="TL1: 0" />
+                  <Label id="Tl2Dur" fx:id="Tl2Dur" text="TL2: 0" />
+               </children>
+            </VBox>
 
-      <ChoiceBox fx:id="vehicleTypeFilter" layoutX="1135.0" layoutY="66.0" prefWidth="137.0" />
-       <ChoiceBox fx:id="vehicleColorFilter" layoutX="1135.0" layoutY="97.0" prefWidth="137.0" />
-       
-      <Button layoutX="931.0" layoutY="66.0" mnemonicParsing="false" onAction="#commandPrintCongestion" prefHeight="59.0" prefWidth="137.0" text="Congestions" AnchorPane.leftAnchor="964.0" AnchorPane.topAnchor="51.0">
-         <graphic>
-            <ImageView fitHeight="31.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@Congestion.png" />
-               </image>
-            </ImageView>
-         </graphic>
-         <font>
-            <Font size="12.0" />
-         </font>
-      </Button>
-      <Label id="Tl1Dur" fx:id="Tl1Dur" layoutX="507.0" layoutY="85.0" prefHeight="20.0" prefWidth="140.0" text="Traffic Light 1: 0" />
-      <Label id="Tl2Dur" fx:id="Tl2Dur" layoutX="507.0" layoutY="105.0" prefHeight="20.0" prefWidth="140.0" text="Traffic Light 2: 0" />
-      <ChoiceBox id="TLSelector" fx:id="TLSelector" layoutX="505.0" layoutY="130.0" prefHeight="30.0" prefWidth="137.0" />
-      <Label layoutX="507.0" layoutY="66.0" styleClass="label-tl" text="Time to Phase Switch:" />
-      <ChoiceBox id="TLSelector" fx:id="TLSelector1" layoutX="71.0" layoutY="130.0" prefHeight="30.0" prefWidth="137.0" />
+            <LineChart fx:id="speedChart" prefHeight="110.0" prefWidth="420.0" animated="false" legendVisible="true">
+               <xAxis>
+                  <NumberAxis label="Time (s)" side="BOTTOM" />
+               </xAxis>
+               <yAxis>
+                  <NumberAxis label="Speed (m/s)" side="LEFT" />
+               </yAxis>
+            </LineChart>
 
+            <LineChart fx:id="travelTimeChart" prefHeight="110.0" prefWidth="420.0" animated="false" legendVisible="true">
+               <xAxis>
+                  <NumberAxis label="Time (s)" side="BOTTOM" />
+               </xAxis>
+               <yAxis>
+                  <NumberAxis label="Avg Travel Time (s)" side="LEFT" />
+               </yAxis>
+            </LineChart>
 
+            <TextArea id="consoleArea" fx:id="consoleArea" prefHeight="110.0" prefWidth="350.0" />
+         </children>
+      </HBox>
 
    </children>
    <styleClass>
       <String fx:value="anchor-pane" />
-      <String fx:value="axis-label" />
-      <String fx:value="statistics-section" />
-      <String fx:value="axis" />
-      <String fx:value="anchor-pane" />
-      <String fx:value="center-align" />
-      <String fx:value="simulation-section" />
    </styleClass>
 </AnchorPane>
