@@ -269,10 +269,10 @@ public class GUI {
             vehicleSelector.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
                 if (newValue != null) {
                     followedVehicleId = newValue;
-                    isFollowing = false;
-                    //scale = 10.0;
-                    //scaleTransform.setX(0);
-                    //scaleTransform.setY(0);
+                    isFollowing = true;
+                    scale = 10.0;
+                    scaleTransform.setX(0);
+                    scaleTransform.setY(0);
                     log("selected & Following:" + newValue);
                 }
             });
@@ -784,7 +784,7 @@ public class GUI {
         } else {
             targetId = lastId;
         }
-        if (targetId != null) {
+        if (targetId == null) {
             System.out.println("no vehicle selected!");
             log("no vehicle  selected!");
         }
@@ -797,8 +797,8 @@ public class GUI {
         scaleTransform.setX(scale);
         scaleTransform.setY(scale);
 
-        System.out.println("Following:" + lastId);
-        log("Following:" + lastId);
+        System.out.println("Following:" + targetId);
+        log("Following:" + targetId);
     }
 
     /**
