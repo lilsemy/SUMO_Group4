@@ -99,7 +99,6 @@ public class GUI {
     private Rotate rotateTransform = new Rotate(0, 0, 0);// Added rotation transform
     private boolean isFollowing = false;// Added tracking state
     private String followedVehicleId = null;// Added tracked vehicle ID
-
     private double scale = 1.0;
     private final double MIN_SCALE = 0.5;
     private final double MAX_SCALE = 20.0;

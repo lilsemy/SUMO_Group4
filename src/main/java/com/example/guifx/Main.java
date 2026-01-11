@@ -45,7 +45,7 @@ public class Main extends Application {
         @Override
         public void stop() throws Exception {
         if (gui != null) {
-           // gui.stopAll();
+           gui.stopAll();
         }
             super.stop();
 
