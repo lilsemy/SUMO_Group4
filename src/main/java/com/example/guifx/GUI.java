@@ -210,6 +210,30 @@ public class GUI {
             laneLayerInstance = new LaneLayer(laneLayer, simController.getLaneController());
             trafficLightLayerInstance = new TrafficLightLayer(trafficLightLayer, null, simController.getTlController());
             carLayerInstance = new CarLayer(carLayer);
+            carLayerInstance.setVehicleClickListener((vehicleId, isPinned) -> {
+                if (isPinned) {
+                    pinnedVehicleInfoId = vehicleId;
+                    updateVehicleInfoSidebar(vehicleId);
+                } else {
+                    // hover only updates when nothing is pinned
+                    if (pinnedVehicleInfoId == null) {
+                        updateVehicleInfoSidebar(vehicleId);
+                    }
+                }
+            });
+
+            // clicking empty map area should clear selection ("No vehicle selected")
+            // Use event filter so we don't override zoom/drag handlers.
+            mapContainer.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, evt -> {
+                if (evt.getTarget() == mapContainer || evt.getTarget() == backgroundCanvas) {
+                    pinnedVehicleInfoId = null;
+                    if (carLayerInstance != null) carLayerInstance.clearSelection();
+                    updateVehicleInfoSidebar(null);
+                }
+            });
+
+            // initial state
+            updateVehicleInfoSidebar(null);
 
             speedSeries = new XYChart.Series<>();
             speedSeries.setName("Avg Speed");
@@ -996,6 +1020,69 @@ public class GUI {
             }
         });
     }
+
+    // Right sidebar vehicle info
+    @FXML private javafx.scene.control.Label vehicleInfoHeader;
+    @FXML private javafx.scene.control.Label vehicleInfoId;
+    @FXML private javafx.scene.control.Label vehicleInfoType;
+    @FXML private javafx.scene.control.Label vehicleInfoColor;
+    @FXML private javafx.scene.control.Label vehicleInfoSpeed;
+    @FXML private javafx.scene.control.Label vehicleInfoLane;
+    @FXML private javafx.scene.control.Label vehicleInfoRoute;
+    @FXML private javafx.scene.control.Label vehicleInfoPos;
+    @FXML private javafx.scene.control.Label vehicleInfoAngle;
+
+    private String pinnedVehicleInfoId;
+    private String hoveredVehicleInfoId;
+
+    private void updateVehicleInfoSidebar(String vehicleId) {
+        // sidebar might not exist in some older FXMLs
+        if (vehicleInfoHeader == null) return;
+
+        // keep track of hover vs pinned to allow real-time refresh
+        if (Objects.equals(vehicleId, pinnedVehicleInfoId)) {
+            // pinned is tracked separately
+        } else {
+            hoveredVehicleInfoId = vehicleId;
+        }
+
+        if (vehicleId == null || simController == null) {
+            vehicleInfoHeader.setText("No vehicle selected");
+            if (vehicleInfoId != null) vehicleInfoId.setText("ID: -");
+            if (vehicleInfoType != null) vehicleInfoType.setText("Type: -");
+            if (vehicleInfoColor != null) vehicleInfoColor.setText("Color: -");
+            if (vehicleInfoSpeed != null) vehicleInfoSpeed.setText("Speed: -");
+            if (vehicleInfoLane != null) vehicleInfoLane.setText("Lane: -");
+            if (vehicleInfoRoute != null) vehicleInfoRoute.setText("Route: -");
+            if (vehicleInfoPos != null) vehicleInfoPos.setText("Pos: -");
+            if (vehicleInfoAngle != null) vehicleInfoAngle.setText("Angle: -");
+            return;
+        }
+
+        VehicleModel v = simController.getVehicleController().getVehicle(vehicleId);
+        if (v == null) {
+            updateVehicleInfoSidebar(null);
+            return;
+        }
+
+        java.text.DecimalFormat df2 = new java.text.DecimalFormat("#.##");
+        java.text.DecimalFormat df0 = new java.text.DecimalFormat("#");
+
+        vehicleInfoHeader.setText("Selected: " + vehicleId);
+        if (vehicleInfoId != null) vehicleInfoId.setText("ID: " + v.getId());
+        if (vehicleInfoType != null) vehicleInfoType.setText("Type: " + safe(v.getTypeId()));
+        if (vehicleInfoColor != null) vehicleInfoColor.setText("Color: " + String.valueOf(v.getColor()));
+        if (vehicleInfoSpeed != null) vehicleInfoSpeed.setText("Speed: " + df2.format(v.getSpeed()) + " m/s");
+        if (vehicleInfoLane != null) vehicleInfoLane.setText("Lane: " + safe(v.getLaneId()));
+        if (vehicleInfoRoute != null) vehicleInfoRoute.setText("Route: " + safe(v.getRouteId()));
+        if (vehicleInfoPos != null) vehicleInfoPos.setText("Pos: " + df2.format(v.getX()) + ", " + df2.format(v.getY()));
+        if (vehicleInfoAngle != null) vehicleInfoAngle.setText("Angle: " + df0.format(v.getAngle()));
+    }
+
+    private static String safe(String s) {
+        return s == null ? "-" : s;
+    }
+
 
     // Neue Methode zum Starten des Sim-Threads (Self-Throttling Loop)
     private void startSimulationThread() {

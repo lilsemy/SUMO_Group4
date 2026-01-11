@@ -27,26 +27,26 @@
 <AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="914.0" prefWidth="1582.0" stylesheets="@simulation-style.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.guifx.GUI">
    <children>
       <!-- Left sidebar controls (scrollable, narrower, height limited above bottom bar) -->
-      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="sidebar-scroll" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0" AnchorPane.bottomAnchor="200.0" prefViewportWidth="220.0">
+      <ScrollPane fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" styleClass="sidebar-scroll" AnchorPane.leftAnchor="20.0" AnchorPane.topAnchor="20.0" AnchorPane.bottomAnchor="20.0" prefViewportWidth="220.0">
          <content>
             <VBox fx:id="leftControls" spacing="10.0" styleClass="sidebar" prefWidth="220.0">
                <children>
                   <Label styleClass="label-title" text="Simulation Controls" />
 
-      <Slider id="simSpeedSlider" fx:id="simSpeedSlider" layoutX="337.0" layoutY="36.0" value="50.0" AnchorPane.rightAnchor="951.0" AnchorPane.topAnchor="25.0" />
-      <!-- Control Buttons -->
-      <Button alignment="CENTER" layoutX="82.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandSpawnVehicle" prefHeight="59.0" prefWidth="137.0" text="Insert Car" textAlignment="CENTER" AnchorPane.leftAnchor="57.0" AnchorPane.topAnchor="51.0">
-         <graphic>
-            <ImageView fitHeight="33.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@proxy-image.png" />
-               </image>
-            </ImageView>
-         </graphic>
-         <font>
-            <Font size="12.0" />
-         </font>
-      </Button>
+                  <Slider id="simSpeedSlider" fx:id="simSpeedSlider" layoutX="337.0" layoutY="36.0" value="50.0" AnchorPane.rightAnchor="951.0" AnchorPane.topAnchor="25.0" />
+                  <!-- Control Buttons -->
+                  <Button alignment="CENTER" layoutX="82.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandSpawnVehicle" prefHeight="59.0" prefWidth="137.0" text="Insert Car" textAlignment="CENTER" AnchorPane.leftAnchor="57.0" AnchorPane.topAnchor="51.0">
+                     <graphic>
+                        <ImageView fitHeight="33.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@proxy-image.png" />
+                           </image>
+                        </ImageView>
+                     </graphic>
+                     <font>
+                        <Font size="12.0" />
+                     </font>
+                  </Button>
                   <VBox spacing="8.0" styleClass="sidebar-group">
                      <children>
                         <Button mnemonicParsing="false" onAction="#commandSpawnVehicle" prefHeight="42.0" prefWidth="220.0" text="Insert Car" styleClass="primary-button">
@@ -88,7 +88,6 @@
                               </ImageView>
                            </graphic>
                         </Button>
-                        <TextField id="GetDuration" fx:id="GetDuration" prefHeight="28.0" prefWidth="220.0" promptText="Duration (s)" styleClass="control-field" />
                      </children>
                   </VBox>
 
@@ -133,6 +132,7 @@
                            </graphic>
                         </Button>
                         <ChoiceBox id="TLSelector" fx:id="TLSelector" prefHeight="28.0" prefWidth="220.0" styleClass="control-field" />
+                        <TextField id="GetDuration" fx:id="GetDuration" prefHeight="28.0" prefWidth="220.0" promptText="Duration (s)" styleClass="control-field" />
                      </children>
                   </VBox>
 
@@ -169,7 +169,7 @@
       </ScrollPane>
 
       <!-- Center map area (scrollable, height limited above bottom bar) -->
-      <VBox spacing="10.0" AnchorPane.leftAnchor="300.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" AnchorPane.bottomAnchor="200.0">
+      <VBox spacing="10.0" AnchorPane.leftAnchor="270.0" AnchorPane.rightAnchor="440.0" AnchorPane.topAnchor="20.0" AnchorPane.bottomAnchor="200.0">
          <children>
             <Label styleClass="label-section" text="Live Simulation:" />
             <ScrollPane fitToWidth="true" fitToHeight="true" pannable="true" hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED" styleClass="map-scroll" VBox.vgrow="ALWAYS">
@@ -187,10 +187,10 @@
          </children>
       </VBox>
 
-      <!-- Bottom statistics bar (horizontal) -->
-      <HBox fx:id="bottomStats" spacing="12.0" styleClass="bottom-bar" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="20.0" prefHeight="120.0">
+      <!-- Right side bar (was bottom statistics bar) -->
+      <VBox fx:id="bottomStats" spacing="12.0" styleClass="bottom-bar" AnchorPane.topAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.bottomAnchor="20.0" prefWidth="400.0">
          <children>
-            <VBox spacing="6.0" prefWidth="260.0">
+            <VBox spacing="6.0">
                <children>
                   <Label styleClass="label-section" text="Statistics:" />
                   <Label id="vehicleCountLabel" fx:id="vehicleCountLabel" text="Vehicles: 0" />
@@ -200,7 +200,7 @@
                </children>
             </VBox>
 
-            <LineChart fx:id="speedChart" prefHeight="110.0" prefWidth="420.0" animated="false" legendVisible="true">
+            <LineChart fx:id="speedChart" prefHeight="300.0" prefWidth="500.0" animated="false" legendVisible="true">
                <xAxis>
                   <NumberAxis label="Time (s)" side="BOTTOM" />
                </xAxis>
@@ -209,7 +209,7 @@
                </yAxis>
             </LineChart>
 
-            <LineChart fx:id="travelTimeChart" prefHeight="110.0" prefWidth="420.0" animated="false" legendVisible="true">
+            <LineChart fx:id="travelTimeChart" prefHeight="300.0" prefWidth="500.0" animated="false" legendVisible="true">
                <xAxis>
                   <NumberAxis label="Time (s)" side="BOTTOM" />
                </xAxis>
@@ -218,7 +218,37 @@
                </yAxis>
             </LineChart>
 
-            <TextArea id="consoleArea" fx:id="consoleArea" prefHeight="110.0" prefWidth="350.0" />
+            <TextArea id="consoleArea" fx:id="consoleArea" prefHeight="160.0" prefWidth="500.0" />
+         </children>
+      </VBox>
+
+      <!-- Bottom bar (was right vehicle info sidebar) -->
+      <HBox fx:id="rightVehicleInfo" spacing="12.0" styleClass="sidebar" AnchorPane.leftAnchor="270.0" AnchorPane.rightAnchor="440.0" AnchorPane.bottomAnchor="20.0" prefHeight="160.0">
+         <children>
+            <VBox spacing="6.0" prefWidth="260.0">
+               <children>
+                  <Label styleClass="label-title" text="Vehicle Info" />
+                  <Label fx:id="vehicleInfoHeader" styleClass="label-note" text="No vehicle selected" />
+               </children>
+            </VBox>
+
+            <VBox spacing="6.0" styleClass="sidebar-group" prefWidth="260.0">
+               <children>
+                  <Label fx:id="vehicleInfoId" text="ID: -" />
+                  <Label fx:id="vehicleInfoType" text="Type: -" />
+                  <Label fx:id="vehicleInfoColor" text="Color: -" />
+                  <Label fx:id="vehicleInfoSpeed" text="Speed: -" />
+               </children>
+            </VBox>
+
+            <VBox spacing="6.0" styleClass="sidebar-group" prefWidth="260.0">
+               <children>
+                  <Label fx:id="vehicleInfoLane" text="Lane: -" />
+                  <Label fx:id="vehicleInfoRoute" text="Route: -" />
+                  <Label fx:id="vehicleInfoPos" text="Pos: -" />
+                  <Label fx:id="vehicleInfoAngle" text="Angle: -" />
+               </children>
+            </VBox>
          </children>
       </HBox>
 

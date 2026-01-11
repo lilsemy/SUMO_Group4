@@ -172,6 +172,18 @@
     -fx-border-insets: 0;
 }
 
+/* Right statistics panel (reusing bottom-bar style) */
+#bottomStats {
+    -fx-padding: 12px;
+    padding: 12px;
+}
+
+/* Vehicle info bottom bar */
+#rightVehicleInfo {
+    -fx-padding: 12px;
+    padding: 12px;
+}
+
 /* ============================================
    BUTTONS
    ============================================ */
@@ -383,4 +395,15 @@
 .alarm-blink {
     background-color: #3a0f0f;
     -fx-background-color: #3a0f0f;
+}
+
+/* Right vehicle info sidebar */
+#rightVehicleInfo {
+    /* reuse sidebar styling, ensure consistent padding */
+    padding: 10px;
+    -fx-padding: 10px;
+}
+
+#rightVehicleInfo .label {
+    -fx-text-fill: #e6e6e6;
 }
