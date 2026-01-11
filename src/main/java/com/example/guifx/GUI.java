@@ -267,9 +267,7 @@ public class GUI {
             });
 
             //Initialize DropDown Menu for TrafficLights
-            TLSelector.setOnShowing(event -> {
-                TLSelector.getItems().setAll("TL1", "TL2");
-            });
+            TLSelector.setOnShowing(event -> TLSelector.getItems().setAll("TL1", "TL2"));
 
 
             //setting up the 4 choices in the choice box
