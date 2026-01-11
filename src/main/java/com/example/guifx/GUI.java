@@ -681,7 +681,7 @@ public class GUI {
                             if(tl.id().equals("tl1")){
                                 tl1Rem = tl.remainingTime();
                             }
-                            if( tl.id().equals("tl2")){
+                            if( tl.id().equals("tl4")){
                                 tl2Rem = tl.remainingTime();
                             }
                         }
