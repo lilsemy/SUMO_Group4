@@ -35,18 +35,6 @@
 
                   <Slider id="simSpeedSlider" fx:id="simSpeedSlider" layoutX="337.0" layoutY="36.0" value="50.0" AnchorPane.rightAnchor="951.0" AnchorPane.topAnchor="25.0" />
                   <!-- Control Buttons -->
-                  <Button alignment="CENTER" layoutX="82.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandSpawnVehicle" prefHeight="59.0" prefWidth="137.0" text="Insert Car" textAlignment="CENTER" AnchorPane.leftAnchor="57.0" AnchorPane.topAnchor="51.0">
-                     <graphic>
-                        <ImageView fitHeight="33.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
-                           <image>
-                              <Image url="@proxy-image.png" />
-                           </image>
-                        </ImageView>
-                     </graphic>
-                     <font>
-                        <Font size="12.0" />
-                     </font>
-                  </Button>
                   <VBox spacing="8.0" styleClass="sidebar-group">
                      <children>
                         <Button mnemonicParsing="false" onAction="#commandSpawnVehicle" prefHeight="42.0" prefWidth="220.0" text="Insert Car" styleClass="primary-button">

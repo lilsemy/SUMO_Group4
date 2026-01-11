@@ -176,6 +176,19 @@
 #bottomStats {
     -fx-padding: 12px;
     padding: 12px;
+
+    /* Make gaps between sections more even */
+    -fx-spacing: 16px;
+}
+
+#bottomStats .label-section {
+    padding: 0 0 6px 0;
+    -fx-padding: 0 0 6px 0;
+}
+
+#bottomStats .text-area {
+    -fx-background-insets: 0;
+    -fx-background-radius: 10px;
 }
 
 /* Vehicle info bottom bar */
@@ -339,62 +352,41 @@
     -fx-stroke: rgba(255, 255, 255, 0.10);
 }
 .axis {
+    /* Tick labels (numbers) */
     -fx-tick-label-fill: #cfcfcf;
 }
 .axis-label {
+    /* Axis title text */
     -fx-text-fill: #cfcfcf;
 }
 
-/* MAP CONTAINER (keep light) */
-#mapContainer {
-    background-color: #ffffff;
-    -fx-background-color: #ffffff;
-
-    border-color: #e5e7eb;
-    -fx-border-color: #e5e7eb;
-
-    border-width: 1px;
-    -fx-border-width: 1px;
-
-    border-radius: 10px;
-    -fx-border-radius: 10px;
-    -fx-background-radius: 10px;
+/* Force tick labels/axis labels even when skins create nested text nodes */
+.axis .text {
+    fill: #cfcfcf;
+    -fx-fill: #cfcfcf;
+}
+.axis-tick-mark {
+    stroke: rgba(255, 255, 255, 0.25);
+    -fx-stroke: rgba(255, 255, 255, 0.25);
+}
+.axis-minor-tick-mark {
+    stroke: rgba(255, 255, 255, 0.12);
+    -fx-stroke: rgba(255, 255, 255, 0.12);
 }
 
-#backgroundCanvas {
-    background-color: #f7f7f7;
-    -fx-background-color: #f7f7f7;
+/* Chart title + legend text */
+.chart-title {
+    -fx-text-fill: #e6e6e6;
 }
-
-#carLayer,
-#trafficLightLayer,
-#laneLayer {
+.chart-legend {
     background-color: transparent;
     -fx-background-color: transparent;
 }
-
-/* Anchor pane */
-.anchor-pane {
-    background-color: #121212;
-    -fx-background-color: #121212;
+.chart-legend-item {
+    -fx-text-fill: #cfcfcf;
 }
-
-/* Alignment helpers */
-.center-align { -fx-alignment: center; }
-.top-align { -fx-alignment: top-center; }
-
-.spacing-small { -fx-spacing: 6px; }
-.spacing-medium { -fx-spacing: 10px; }
-.spacing-large { -fx-spacing: 18px; }
-
-.padding-small { padding: 6px; -fx-padding: 6px; }
-.padding-medium { padding: 10px; -fx-padding: 10px; }
-.padding-large { padding: 18px; -fx-padding: 18px; }
-
-/* --- Alarm blink (stress test warning) -------------------------------- */
-.alarm-blink {
-    background-color: #3a0f0f;
-    -fx-background-color: #3a0f0f;
+.chart-legend-item-symbol {
+    -fx-background-radius: 4px;
 }
 
 /* Right vehicle info sidebar */
