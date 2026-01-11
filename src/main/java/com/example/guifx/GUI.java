@@ -1143,6 +1143,7 @@ public class GUI {
                     if (statistics != null) {
                         statistics.updateVehicles(time);
                         avgTrvelTime = statistics.updateAndGetAverageTravelTime(time);
+                        statistics.updateTrafficLights();
                     }
                     long stepDuration = System.currentTimeMillis() - startTime;
 
