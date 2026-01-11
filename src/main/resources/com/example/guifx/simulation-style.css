@@ -378,3 +378,9 @@
 .padding-small { padding: 6px; -fx-padding: 6px; }
 .padding-medium { padding: 10px; -fx-padding: 10px; }
 .padding-large { padding: 18px; -fx-padding: 18px; }
+
+/* --- Alarm blink (stress test warning) -------------------------------- */
+.alarm-blink {
+    background-color: #3a0f0f;
+    -fx-background-color: #3a0f0f;
+}

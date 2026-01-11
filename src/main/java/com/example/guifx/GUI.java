@@ -1,26 +1,28 @@
 package com.example.guifx;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
+import javafx.geometry.Point2D;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.image.Image;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.Group;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
-import javafx.scene.control.Label;
-import javafx.scene.control.ChoiceBox;
-import javafx.geometry.Point2D;
+import javafx.util.Duration;
 import org.eclipse.sumo.libtraci.Vehicle;
-import org.eclipse.sumo.libtraci.VehicleType;
 
 import java.util.*;
 
@@ -31,7 +33,11 @@ import java.util.*;
 public class GUI {
     private SimulationController simController;
 
+    @FXML
+    private javafx.scene.image.ImageView stressAlarmIcon;
 
+    private static final String ALARM_PNG = "/com/example/guifx/alarm.png";
+    private static final String ALARM_GIF = "/com/example/guifx/alarm.gif";
 
     @FXML
     private StackPane mapContainer;
@@ -735,6 +741,8 @@ public class GUI {
 
             if (count <= 0) {
                 log("Please enter a positive number for stress test.");
+                // ensure icon is reset
+                setStressAlarmIcon(false);
                 return;
             }
 
@@ -743,9 +751,90 @@ public class GUI {
 
             simController.startStressTest(count, spawnConfig);
 
+            // Trigger 10s alarm blink + gif icon
+            startStressAlarmBlink(Duration.seconds(10));
+
         } catch (NumberFormatException ex) {
             log("Invalid number. Please enter a valid integer.");
             System.out.println("Invalid stress test number");
+            setStressAlarmIcon(false);
+        }
+    }
+
+    private void setStressAlarmIcon(boolean active) {
+        if (stressAlarmIcon == null) return;
+
+        String res = active ? ALARM_GIF : ALARM_PNG;
+        try {
+            var url = getClass().getResource(res);
+            if (url != null) {
+                stressAlarmIcon.setImage(new Image(url.toExternalForm()));
+            }
+        } catch (Exception ignored) {
+        }
+    }
+
+    // Alarm (10s blink) for stress test
+    private Timeline alarmBlinkTimeline;
+    private Timeline alarmAutoStopTimeline;
+    private boolean alarmBlinkOn = false;
+
+    /**
+     * Starts a red blink alarm on the whole UI for a fixed duration.
+     * This only changes a CSS class on the root, so it won't affect the map container styling.
+     */
+    private void startStressAlarmBlink(Duration totalDuration) {
+        stopStressAlarmBlink();
+
+        javafx.scene.Parent root = (mapContainer != null && mapContainer.getScene() != null)
+                ? mapContainer.getScene().getRoot()
+                : null;
+        if (root == null) {
+            return;
+        }
+
+        setStressAlarmIcon(true);
+        alarmBlinkOn = false;
+
+        alarmBlinkTimeline = new Timeline(
+                new KeyFrame(Duration.millis(200), evt -> {
+                    if (alarmBlinkOn) {
+                        root.getStyleClass().remove("alarm-blink");
+                    } else {
+                        if (!root.getStyleClass().contains("alarm-blink")) {
+                            root.getStyleClass().add("alarm-blink");
+                        }
+                    }
+                    alarmBlinkOn = !alarmBlinkOn;
+                })
+        );
+        alarmBlinkTimeline.setCycleCount(Timeline.INDEFINITE);
+        alarmBlinkTimeline.play();
+
+        alarmAutoStopTimeline = new Timeline(new KeyFrame(totalDuration, evt -> stopStressAlarmBlink()));
+        alarmAutoStopTimeline.setCycleCount(1);
+        alarmAutoStopTimeline.play();
+    }
+
+    private void stopStressAlarmBlink() {
+        javafx.scene.Parent root = (mapContainer != null && mapContainer.getScene() != null)
+                ? mapContainer.getScene().getRoot()
+                : null;
+
+        if (alarmBlinkTimeline != null) {
+            alarmBlinkTimeline.stop();
+            alarmBlinkTimeline = null;
+        }
+        if (alarmAutoStopTimeline != null) {
+            alarmAutoStopTimeline.stop();
+            alarmAutoStopTimeline = null;
+        }
+
+        alarmBlinkOn = false;
+        setStressAlarmIcon(false);
+
+        if (root != null) {
+            root.getStyleClass().remove("alarm-blink");
         }
     }
 
