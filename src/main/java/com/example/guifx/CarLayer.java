@@ -7,6 +7,7 @@ import org.eclipse.sumo.libtraci.Vehicle;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.*;
+import javafx.scene.input.MouseEvent;
 
 /**
  * CarLayer is responsible for displaying vehicles in the simulation on a JavaFX Pane
@@ -58,6 +59,15 @@ public class CarLayer {
         this.truckRedImage = loadVehicleImage("/truckRed.png");
         this.truckWhiteImage = loadVehicleImage("/truckWhite.png");
         this.truckYellowImage = loadVehicleImage("/truckYellow.png");
+
+        // Click on empty space => clear pinned selection
+        if (this.carLayerPane != null) {
+            this.carLayerPane.addEventFilter(MouseEvent.MOUSE_PRESSED, evt -> {
+                if (evt.getTarget() == this.carLayerPane) {
+                    clearSelection();
+                }
+            });
+        }
 
         if (carLayerPane == null) {
             this.carLayerPane.getChildren().clear();
@@ -140,6 +150,34 @@ public class CarLayer {
     }
 
     /**
+     * Callback used by UI layer (GUI) to react on hover / click selection.
+     */
+    public interface VehicleClickListener {
+        /**
+         * @param vehicleId vehicle id or null when nothing is selected/hovered
+         * @param isPinned true if this is a click selection (pinned), false if it's just hover
+         */
+        void onVehicleFocusChanged(String vehicleId, boolean isPinned);
+    }
+
+    private VehicleClickListener vehicleClickListener;
+    private String pinnedVehicleId;
+    private String hoveredVehicleId;
+
+    public void setVehicleClickListener(VehicleClickListener listener) {
+        this.vehicleClickListener = listener;
+    }
+
+    /** Clear pinned selection (e.g. when clicking on empty space). */
+    public void clearSelection() {
+        pinnedVehicleId = null;
+        hoveredVehicleId = null;
+        if (vehicleClickListener != null) {
+            vehicleClickListener.onVehicleFocusChanged(null, true);
+        }
+    }
+
+    /**
      * Creates a new car ImageView and adds it to the pane
      * 
      * @param carID vehicle ID
@@ -157,6 +195,31 @@ public class CarLayer {
         carView.setFitHeight(size[1]);
         carView.setPreserveRatio(true);
         carView.setSmooth(true);
+
+        // Hover: show info while pointer is on the vehicle (unless another is pinned)
+        carView.setOnMouseEntered(evt -> {
+            hoveredVehicleId = carID;
+            if (pinnedVehicleId == null && vehicleClickListener != null) {
+                vehicleClickListener.onVehicleFocusChanged(carID, false);
+            }
+        });
+        carView.setOnMouseExited(evt -> {
+            if (Objects.equals(hoveredVehicleId, carID)) {
+                hoveredVehicleId = null;
+            }
+            if (pinnedVehicleId == null && vehicleClickListener != null) {
+                vehicleClickListener.onVehicleFocusChanged(null, false);
+            }
+        });
+
+        // Click: pin selection
+        carView.setOnMouseClicked(evt -> {
+            evt.consume();
+            pinnedVehicleId = carID;
+            if (vehicleClickListener != null) {
+                vehicleClickListener.onVehicleFocusChanged(carID, true);
+            }
+        });
 
         carImageViews.put(carID, carView);
         carLayerPane.getChildren().add(carView);
@@ -199,8 +262,23 @@ public class CarLayer {
                 carView.setLayoutX(javaPos.getX() - w / 2.0 - offsetX);
                 carView.setLayoutY(javaPos.getY() - h / 2.0 - offsetY);
             } else {
+                // if the removed car was pinned/hovered, clear and update UI
+                boolean removedPinned = Objects.equals(pinnedVehicleId, carId);
+                boolean removedHover = Objects.equals(hoveredVehicleId, carId);
+
                 carLayerPane.getChildren().remove(carView);
                 it.remove();
+
+                if (removedPinned) {
+                    pinnedVehicleId = null;
+                }
+                if (removedHover) {
+                    hoveredVehicleId = null;
+                }
+
+                if ((removedPinned || removedHover) && pinnedVehicleId == null && vehicleClickListener != null) {
+                    vehicleClickListener.onVehicleFocusChanged(null, true);
+                }
             }
         }
 

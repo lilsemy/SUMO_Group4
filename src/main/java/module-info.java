@@ -1,6 +1,6 @@
 module com.example.guifx {
-    requires javafx.controls;
-    requires javafx.fxml;
+    requires transitive javafx.controls;
+    requires transitive javafx.fxml;
     requires javafx.web;
 
     requires org.controlsfx.controls;
