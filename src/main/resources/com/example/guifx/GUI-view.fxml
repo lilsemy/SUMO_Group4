@@ -1,5 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
+<?import javafx.scene.canvas.Canvas?>
+<?import javafx.scene.chart.LineChart?>
+<?import javafx.scene.chart.NumberAxis?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
 <?import java.lang.*?>
 <?import javafx.scene.canvas.*?>
 <?import javafx.scene.chart.*?>
@@ -17,6 +33,20 @@
                <children>
                   <Label styleClass="label-title" text="Simulation Controls" />
 
+      <Slider id="simSpeedSlider" fx:id="simSpeedSlider" layoutX="337.0" layoutY="36.0" value="50.0" AnchorPane.rightAnchor="951.0" AnchorPane.topAnchor="25.0" />
+      <!-- Control Buttons -->
+      <Button alignment="CENTER" layoutX="82.0" layoutY="51.0" mnemonicParsing="false" onAction="#commandSpawnVehicle" prefHeight="59.0" prefWidth="137.0" text="Insert Car" textAlignment="CENTER" AnchorPane.leftAnchor="57.0" AnchorPane.topAnchor="51.0">
+         <graphic>
+            <ImageView fitHeight="33.0" fitWidth="29.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@proxy-image.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <font>
+            <Font size="12.0" />
+         </font>
+      </Button>
                   <VBox spacing="8.0" styleClass="sidebar-group">
                      <children>
                         <Button mnemonicParsing="false" onAction="#commandSpawnVehicle" prefHeight="42.0" prefWidth="220.0" text="Insert Car" styleClass="primary-button">
@@ -72,7 +102,7 @@
                               <ChoiceBox id="SpawnConfigColor" fx:id="colorSpawnChoice" prefHeight="28.0" prefWidth="220.0" styleClass="control-field" />
                            </children>
                         </HBox>
-                     </children> 
+                     </children>
                   </VBox>
 
                   <VBox spacing="8.0" styleClass="sidebar-group">

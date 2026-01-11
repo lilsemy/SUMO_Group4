@@ -38,6 +38,7 @@ public class TrafficLightLayer {
         this.trafficLightLayer.getChildren().clear();
         this.tlC = tlC;
 
+
         // Build visual nodes for all traffic lights
         buildTrafficLightCircles();
     }
@@ -84,8 +85,7 @@ public class TrafficLightLayer {
                     trafficLightNode.setLayoutY(screenPosition.getY());
                     // Add to scene graph
                     trafficLightLayer.getChildren().add(trafficLightNode);
-                }
-                else if (trafficLightId.equals("tl5")) {
+                } else if (trafficLightId.equals("tl5")) {
                     Text label = new Text("TL2");
                     label.setFont(Font.font(8));
                     label.setFill(Color.BLACK);
@@ -107,53 +107,72 @@ public class TrafficLightLayer {
         }
 
         // Do one initial update to set correct colors
-        updateTrafficLightStates();
+        //updateTrafficLightStatesFromSnapshot();
     }
 
     /**
      * Update the state (color) of all managed traffic light nodes.
      * Called every frame from the Controller AnimationTimer
      */
-    public void updateTrafficLightStates() {
-        if (trafficLightLayer == null) return;
+    public void updateTrafficLightStatesFromSnapshot(List<TrafficLightUIState> lights) {
+        if (trafficLightLayer == null || lights == null) return;
+        // Converting List to a temporary Map for faster ID lookup during the loop
+        Map<String, String> stateMap = new HashMap<>();
+        for (TrafficLightUIState tl : lights) {
+            stateMap.put(tl.id(), tl.state());
+        }
 
         for (Map.Entry<String, Circle> entry : trafficLightCircles.entrySet()) {
             String trafficLightId = entry.getKey();
             Circle circle = entry.getValue();
 
-            try {
-                // Get current state string like "GGggrrrr"
-                //String state = TrafficLight.getRedYellowGreenState(trafficLightId);
-                String state = tlC.getTlList().get(trafficLightId).getRedYellowGreenState(); //--> Currently doesnt work, because states are not frequently updatet.
-                if (state == null || state.isEmpty()) {
-                    circle.setFill(Color.GRAY); // Unknown state
-                    continue;
-                }
-
-                // For simplicity, base the color on *second* signal in state string
-                // Position of 2nd signal corresponds to 2nd index lane participating in the traffic light control
-                char secondSignal = Character.toLowerCase(state.charAt(1));
-
-                switch (secondSignal) {
-                    case 'g':
-                        circle.setFill(Color.GREEN);
-                        break;
-                    case 'y':
-                        circle.setFill(Color.YELLOW);
-                        break;
-                    case 'r':
-                        circle.setFill(Color.DARKRED);
-                        break;
-                    default:
-                        circle.setFill(Color.GRAY); //other
-                        break;
-                }
-
-            } catch (Exception e) {
-                System.err.println("Failed to update state for traffic light '" + trafficLightId + "': " + e.getMessage());
-                circle.setFill(Color.BLACK); //err state
+            String state = stateMap.get(trafficLightId);
+            if (state == null || state.isEmpty()) {
+                circle.setFill(Color.GRAY);
+                continue;
             }
+            setCircleColorFromState(circle, state, trafficLightId);
+
+//            try {
+//                // Get current state string like "GGggrrrr"
+//                //String state = TrafficLight.getRedYellowGreenState(trafficLightId);
+//                String state = tlC.getTlList().get(trafficLightId).getRedYellowGreenState(); //--> Currently doesnt work, because states are not frequently updatet.
+//                if (state == null || state.isEmpty()) {
+//                    circle.setFill(Color.GRAY); // Unknown state
+//                    continue;
+//                }
+
+
         }
     }
 
+    private void setCircleColorFromState(Circle circle, String state, String trafficLightId) {
+        // For simplicity, base the color on *second* signal in state string
+        // Position of 2nd signal corresponds to 2nd index lane participating in the traffic light control
+        try {
+            char secondSignal = Character.toLowerCase(state.charAt(1));
+
+
+            switch (secondSignal) {
+                case 'g':
+                    circle.setFill(Color.GREEN);
+                    break;
+                case 'y':
+                    circle.setFill(Color.YELLOW);
+                    break;
+                case 'r':
+                    circle.setFill(Color.DARKRED);
+                    break;
+                default:
+                    circle.setFill(Color.GRAY); //other
+                    break;
+            }
+
+        } catch (Exception e) {
+            System.err.println("Failed to update state for traffic light '" + trafficLightId + "': " + e.getMessage());
+            circle.setFill(Color.BLACK); //err state
+        }
+
+    }
 }
+

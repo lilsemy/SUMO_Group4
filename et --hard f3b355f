@@ -1,0 +1,73 @@
+[33mf3b355f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mTest[m[33m)[m HEAD@{0}: commit: THREAD
+[33m438984b[m HEAD@{1}: pull origin Test: Fast-forward
+[33me94d957[m HEAD@{2}: pull origin Test: Fast-forward
+[33me937e79[m HEAD@{3}: reset: moving to HEAD
+[33me937e79[m HEAD@{4}: pull origin Test: Fast-forward
+[33m0cbc347[m HEAD@{5}: reset: moving to HEAD
+[33m0cbc347[m HEAD@{6}: commit: Adding Rotation and Following Funktions
+[33m05730b9[m HEAD@{7}: commit: Console fixed
+[33m09cce2d[m HEAD@{8}: commit: Add Console in Gui
+[33m1931703[m HEAD@{9}: checkout: moving from main to Test
+[33m3691bc8[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m HEAD@{10}: pull origin main: Fast-forward
+[33m149a195[m HEAD@{11}: checkout: moving from Test to main
+[33m1931703[m HEAD@{12}: pull origin Test: Merge made by the 'ort' strategy.
+[33me3bb045[m HEAD@{13}: commit: docu
+[33m390163f[m HEAD@{14}: pull origin Test: Fast-forward
+[33m7562658[m HEAD@{15}: pull origin Test: Fast-forward
+[33m1efb642[m HEAD@{16}: pull origin Test: Fast-forward
+[33mab825b9[m HEAD@{17}: pull origin Test: Fast-forward
+[33m4f55550[m HEAD@{18}: commit: User Guide
+[33m04cc70c[m HEAD@{19}: commit: ser Guide
+[33mcf75cbd[m HEAD@{20}: commit: working on status asugabe
+[33m43f558b[m HEAD@{21}: pull origin Test: Fast-forward
+[33m0434406[m HEAD@{22}: pull origin Test: Fast-forward
+[33m27d22b5[m HEAD@{23}: pull origin Test: Merge made by the 'ort' strategy.
+[33m46c7bfc[m HEAD@{24}: commit: bug fixed get speed
+[33m12ccb2e[m HEAD@{25}: pull origin Test: Fast-forward
+[33m717b2fd[m HEAD@{26}: pull origin Test: Fast-forward
+[33m435a003[m HEAD@{27}: commit: bug fixed get speed
+[33mabe8845[m HEAD@{28}: checkout: moving from Styled to Test
+[33m2777773[m[33m ([m[1;32mStyled[m[33m)[m HEAD@{29}: checkout: moving from Test to Styled
+[33mabe8845[m HEAD@{30}: checkout: moving from Styled to Test
+[33m2777773[m[33m ([m[1;32mStyled[m[33m)[m HEAD@{31}: checkout: moving from integrate-test-styled to Styled
+[33mabe8845[m HEAD@{32}: checkout: moving from Test to integrate-test-styled
+[33mabe8845[m HEAD@{33}: pull: Merge made by the 'ort' strategy.
+[33m69a7982[m HEAD@{34}: checkout: moving from Test to Test
+[33m69a7982[m HEAD@{35}: reset: moving to HEAD
+[33m69a7982[m HEAD@{36}: checkout: moving from Styled to Test
+[33m2777773[m[33m ([m[1;32mStyled[m[33m)[m HEAD@{37}: checkout: moving from Test to Styled
+[33m69a7982[m HEAD@{38}: commit: status
+[33m68b58af[m HEAD@{39}: pull: Fast-forward
+[33me5e6c17[m HEAD@{40}: commit: implementing statistics in Gui
+[33m5abe5a9[m HEAD@{41}: pull: Fast-forward
+[33me08ca75[m HEAD@{42}: pull: Fast-forward
+[33m4430b41[m HEAD@{43}: pull: Fast-forward
+[33m5772fc5[m HEAD@{44}: pull: Fast-forward
+[33mbf00d44[m HEAD@{45}: pull: Fast-forward
+[33m8887c11[m HEAD@{46}: pull origin Test: Fast-forward
+[33m2948346[m HEAD@{47}: checkout: moving from Test to Test
+[33m2948346[m HEAD@{48}: commit: ginal merge Version 2.0
+[33md73b3a4[m HEAD@{49}: reset: moving to HEAD
+[33md73b3a4[m HEAD@{50}: pull: Fast-forward
+[33mb00a04e[m HEAD@{51}: reset: moving to HEAD
+[33mb00a04e[m HEAD@{52}: pull: Fast-forward
+[33md2ae029[m HEAD@{53}: pull: Fast-forward
+[33mbcf19a5[m HEAD@{54}: pull: Fast-forward
+[33ma5293a8[m HEAD@{55}: commit: Merging Version 1.0
+[33mb44828a[m HEAD@{56}: commit: Merging Version 1.0
+[33m149a195[m HEAD@{57}: checkout: moving from main to Test
+[33m149a195[m HEAD@{58}: pull origin main: Fast-forward
+[33m607064e[m HEAD@{59}: reset: moving to origin/main
+[33m84cab33[m HEAD@{60}: reset: moving to HEAD
+[33m84cab33[m HEAD@{61}: reset: moving to HEAD
+[33m84cab33[m HEAD@{62}: commit (merge): VOR DEM
+[33me3dea60[m HEAD@{63}: commit (merge): VOR DEM DOKU
+[33m111b19c[m HEAD@{64}: commit: VOR DEM DOKU
+[33m9916dee[m HEAD@{65}: commit (merge): oop Classes implemented code salat
+[33m54e4199[m HEAD@{66}: commit: oop Classes implemented code salat
+[33m932f867[m HEAD@{67}: commit: oop Classes not implemented
+[33mcfa2b0c[m HEAD@{68}: pull origin main: Fast-forward
+[33m2a2755f[m HEAD@{69}: commit (amend): TrasS dependency added
+[33m77be236[m HEAD@{70}: commit: TrasS dependency added
+[33m8647d41[m HEAD@{71}: commit: Add TraaS.jar
+[33m45f6489[m HEAD@{72}: clone: from https://github.com/lilsemy/SUMO_Group4.git

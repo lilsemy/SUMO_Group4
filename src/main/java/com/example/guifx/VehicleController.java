@@ -5,7 +5,10 @@ import org.eclipse.sumo.libtraci.Vehicle;
 import org.eclipse.sumo.libtraci.TraCIPosition;
 import org.eclipse.sumo.libtraci.Simulation;
 
+import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.*;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * VehicleController controls vehicles in the simulation
@@ -18,7 +21,7 @@ public class VehicleController {
      * Constructs a VehicleController
      */
     public VehicleController() {
-        this.vehiclesList = new HashMap<>();
+        this.vehiclesList = new ConcurrentHashMap<>();
     }
 
     /**
@@ -152,8 +155,8 @@ public class VehicleController {
      * @throws Exception if retrieval fails
      */
     public List<String> getIds() throws Exception {
-        List<String> IDList = Vehicle.getIDList();
-        return IDList;
+        //List<String> IDList = Vehicle.getIDList();
+        return Vehicle.getIDList();
     }
 
     /**
@@ -183,8 +186,8 @@ public class VehicleController {
             v.setTypeId(typeId);
 
             vehiclesList.put(id, v);
-        }
-    }*/
+        }*/
+
 
     public void updateFromSimulation() throws Exception {
         Set<String> liveIds = new HashSet<>(Vehicle.getIDList());
@@ -223,7 +226,9 @@ public class VehicleController {
             boolean colorMatches = colorFilter == VehicleColor.NONE ||
                                    colorFilter == v.getColor();
             //if both true, add to list
-            if(typeMatches && colorMatches) result.add(v);
+            boolean isActive = v.getState() == VehicleState.ACTIVE;
+            if (typeMatches && colorMatches && isActive){
+                result.add(v);}
         }
 
         return result;
@@ -239,7 +244,9 @@ public class VehicleController {
             boolean colorMatches = colorFilter == VehicleColor.NONE ||
                                    colorFilter == v.getColor();
 
-            if(typeMatches && colorMatches) result.add(v.getId());
+            boolean isActive = v.getState() == VehicleState.ACTIVE;
+            if (typeMatches && colorMatches && isActive){
+                result.add(v.getId());}
 
         }
 
