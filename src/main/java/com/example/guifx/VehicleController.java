@@ -204,7 +204,9 @@ public class VehicleController {
             boolean colorMatches = colorFilter == VehicleColor.NONE ||
                                    colorFilter == v.getColor();
             //if both true, add to list
-            if(typeMatches && colorMatches) result.add(v);
+            boolean isActive = v.getState() == VehicleState.ACTIVE;
+            if (typeMatches && colorMatches && isActive){
+                result.add(v);}
         }
 
         return result;
@@ -220,7 +222,9 @@ public class VehicleController {
             boolean colorMatches = colorFilter == VehicleColor.NONE ||
                                    colorFilter == v.getColor();
 
-            if(typeMatches && colorMatches) result.add(v.getId());
+            boolean isActive = v.getState() == VehicleState.ACTIVE;
+            if (typeMatches && colorMatches && isActive){
+                result.add(v.getId());}
 
         }
 
