@@ -273,7 +273,7 @@ public class GUI {
 
                 sortedVehicles.sort((v1, v2) -> {
 
-                    // Prefix = alles vor der letzten Zahl (z.B. "id", "car_", "truck")
+                    // Prefix = alles vor der letzten Zahl
                     String type1 = v1.replaceAll("\\d+$", "");
                     String type2 = v2.replaceAll("\\d+$", "");
 
