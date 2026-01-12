@@ -265,24 +265,30 @@ public class GUI {
             */
             
             vehicleSelector.setOnShowing(event -> {
-                var vehicles = simController.getVehicleController().getVehiclesMap().keySet();
+                var vehicles = simController
+                        .getVehicleController()
+                        .getFilteredVehicleIds(currentTypeFilter, currentColorFilter);
+
                 List<String> sortedVehicles = new ArrayList<>(vehicles);
 
-                Collections.sort(sortedVehicles, (v1, v2) -> {
-                    String[] parts1 = v1.split("_");
-                    String[] parts2 = v2.split("_");
+                sortedVehicles.sort((v1, v2) -> {
 
-                    String type1 = parts1[0];
-                    String type2 = parts2[0];
+                    // Prefix = alles vor der letzten Zahl (z.B. "id", "car_", "truck")
+                    String type1 = v1.replaceAll("\\d+$", "");
+                    String type2 = v2.replaceAll("\\d+$", "");
 
-                    int num1 = parts1.length > 1 ? Integer.parseInt(parts1[1]) : 0;
-                    int num2 = parts2.length > 1 ? Integer.parseInt(parts2[1]) : 0;
+                    // Zahl am Ende extrahieren
+                    String numStr1 = v1.replaceAll("\\D+", "");
+                    String numStr2 = v2.replaceAll("\\D+", "");
 
-                    // Compare type first alphabetically
+                    int num1 = numStr1.isEmpty() ? 0 : Integer.parseInt(numStr1);
+                    int num2 = numStr2.isEmpty() ? 0 : Integer.parseInt(numStr2);
+
+                    // Typ alphabetisch
                     int typeCompare = type1.compareTo(type2);
                     if (typeCompare != 0) return typeCompare;
 
-                    // Then compare numbers descending
+                    // Nummer absteigend
                     return Integer.compare(num2, num1);
                 });
 
