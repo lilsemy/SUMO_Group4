@@ -897,9 +897,17 @@ public class GUI {
             int count = Integer.parseInt(stressTestCountField.getText());
 
             if (count <= 0) {
-                javafx.application.Platform.runLater(() ->log("Please enter a positive number for stress test."));
+                javafx.application.Platform.runLater(() ->log("Please enter a number between 1 and 100 for the stress test."));
 
                 // ensure icon is reset
+                setStressAlarmIcon(false);
+                return;
+            }
+
+            if (count > 100) {
+                javafx.application.Platform.runLater(() ->
+                        log("Maximum allowed vehicles for stress test is 100.")
+                );
                 setStressAlarmIcon(false);
                 return;
             }
