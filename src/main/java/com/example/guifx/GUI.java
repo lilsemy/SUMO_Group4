@@ -261,9 +261,9 @@ public class GUI {
             setupZoomAndDrag();
 
             /**
-            * Orders the vehicles in an alphabetically descending list
+            * Orders the vehicles in an alphabetically ascending list
             */
-            
+
             vehicleSelector.setOnShowing(event -> {
                 var vehicles = simController
                         .getVehicleController()
@@ -273,23 +273,23 @@ public class GUI {
 
                 sortedVehicles.sort((v1, v2) -> {
 
-                    // Prefix = alles vor der letzten Zahl
+                    // Prefix = everything before the number
                     String type1 = v1.replaceAll("\\d+$", "");
                     String type2 = v2.replaceAll("\\d+$", "");
 
-                    // Zahl am Ende extrahieren
+                    // Extract number at the end
                     String numStr1 = v1.replaceAll("\\D+", "");
                     String numStr2 = v2.replaceAll("\\D+", "");
 
                     int num1 = numStr1.isEmpty() ? 0 : Integer.parseInt(numStr1);
                     int num2 = numStr2.isEmpty() ? 0 : Integer.parseInt(numStr2);
 
-                    // Typ alphabetisch
+                    // Compare type alphabetically
                     int typeCompare = type1.compareTo(type2);
                     if (typeCompare != 0) return typeCompare;
 
-                    // Nummer absteigend
-                    return Integer.compare(num2, num1);
+                    // Compare number ASCENDING
+                    return Integer.compare(num1, num2);
                 });
 
                 vehicleSelector.getItems().setAll(sortedVehicles);
