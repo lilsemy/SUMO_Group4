@@ -1,5 +1,7 @@
 package com.example.guifx;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.sumo.libtraci.Simulation;
 import org.eclipse.sumo.libtraci.StringVector;
     /**
@@ -9,6 +11,7 @@ public class SumoConnection {
 
     // tracking if we have a connection or not
     private boolean connected = false;
+    private static final Logger LOG = LogManager.getLogger(SumoConnection.class.getName());
 
     public SumoConnection(){}
     /**
@@ -33,6 +36,7 @@ public class SumoConnection {
 
         Simulation.start(args);
         connected = true;
+        LOG.info("SUMO Connection successful!");
     }
     /**
     *Does a timestep in the simulation
@@ -40,6 +44,7 @@ public class SumoConnection {
     */
     public void doStep() throws Exception{
         if (!connected) {
+            LOG.fatal("Cannot step the simulation: not connected. " + "Call connect() before doStep().");
             throw new IllegalStateException(
                     "Cannot step the simulation: not connected. " +
                             "Call connect() before doStep().");

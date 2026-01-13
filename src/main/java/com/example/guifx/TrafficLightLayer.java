@@ -6,6 +6,8 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.StrokeType;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.sumo.libtraci.*;
 import java.util.HashMap;
 import java.util.List;
@@ -19,7 +21,7 @@ import javafx.scene.layout.StackPane;
  * TrafficLightManager: static manager class for visualizing and controlling SUMO traffic lights.
  */
 public class TrafficLightLayer {
-
+    private static final Logger LOG = LogManager.getLogger(TrafficLightLayer.class.getName());
     private final TrafficLightController tlC;
 
     // Pane for traffic light nodes, injected from Controller
@@ -49,13 +51,13 @@ public class TrafficLightLayer {
      */
     private void buildTrafficLightCircles() {
         if (trafficLightLayer == null || !MapUtil.boundsReady) {
-            System.err.println("TrafficLightLayer.init() called before MapUtil was ready.");
+            LOG.error("TrafficLightLayer.init() called before MapUtil was ready.");
             return;
         }
 
         // Get all traffic light IDs from SUMO
         List<String> trafficLightIds = tlC.getTlIds();
-        System.out.println("Found " + trafficLightIds.size() + " traffic lights.");
+        LOG.info("Found " + trafficLightIds.size() + " traffic lights.");
 
         for (String trafficLightId : trafficLightIds) {
             try {
@@ -102,7 +104,7 @@ public class TrafficLightLayer {
                 trafficLightCircles.put(trafficLightId, circle);
 
             } catch (Exception e) {
-                System.err.println("Failed to create node for traffic light '" + trafficLightId + "': " + e.getMessage());
+                LOG.error("Failed to create node for traffic light '" + trafficLightId + "': " + e.getMessage());
             }
         }
 
@@ -169,7 +171,7 @@ public class TrafficLightLayer {
             }
 
         } catch (Exception e) {
-            System.err.println("Failed to update state for traffic light '" + trafficLightId + "': " + e.getMessage());
+            LOG.error("Failed to update state for traffic light '" + trafficLightId + "': " + e.getMessage());
             circle.setFill(Color.BLACK); //err state
         }
 

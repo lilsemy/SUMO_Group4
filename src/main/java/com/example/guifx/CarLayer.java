@@ -8,6 +8,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.*;
 import javafx.scene.input.MouseEvent;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * CarLayer is responsible for displaying vehicles in the simulation on a JavaFX Pane
@@ -32,6 +34,7 @@ public class CarLayer {
     private final Image truckRedImage;
     private final Image truckWhiteImage;
     private final Image truckYellowImage;
+    private static final Logger LOG = LogManager.getLogger(CarLayer.class.getName());
 
     //private final SimulationController simController;
 
@@ -85,10 +88,10 @@ public class CarLayer {
         try {
             String absolutePath = getClass().getResource(imagePath).toExternalForm();
             Image img = new Image(absolutePath);
-            System.out.println("Loaded image: " + imagePath);
+            LOG.info("Loaded image: " + imagePath);
             return img;
         } catch (NullPointerException e) {
-            System.err.println("Failed to load image: " + imagePath);
+            LOG.error("Failed to load image: " + imagePath);
             return null;
         }
     }
@@ -192,7 +195,7 @@ public class CarLayer {
         Image vehicleImage = getImageForVehicleType(vs.type(),vs.color() );
         if (vehicleImage == null) {
 
-            System.err.println("No image available for vehicle: " + vs.id());
+            LOG.error("No image available for vehicle: " + vs.id());
             return;
         }
 

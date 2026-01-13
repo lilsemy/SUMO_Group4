@@ -1,0 +1,42 @@
+2026-01-13 16:35:45,890 [JavaFX Application Thread] INFO  com.example.guifx.Main - Starting Application
+2026-01-13 16:35:46,564 [JavaFX Application Thread] INFO  com.example.guifx.Main - Initializing GUI
+2026-01-13 16:35:46,565 [JavaFX Application Thread] INFO  com.example.guifx.Main - Setting Simulation Controller for GUI + starting SUMO connection
+2026-01-13 16:35:47,601 [JavaFX Application Thread] INFO  com.example.guifx.SumoConnection - SUMO Connection successful!
+2026-01-13 16:35:47,604 [JavaFX Application Thread] INFO  com.example.guifx.TrafficLightController - Scanned for Traffic Lights and found: 6!
+2026-01-13 16:35:47,636 [JavaFX Application Thread] INFO  com.example.guifx.SimulationController - Simulation Controller initialized successfully
+2026-01-13 16:35:47,684 [JavaFX Application Thread] INFO  com.example.guifx.TrafficLightLayer - Found 6 traffic lights.
+2026-01-13 16:35:47,744 [JavaFX Application Thread] INFO  com.example.guifx.CarLayer - Loaded image: /carBlack.png
+2026-01-13 16:35:47,801 [JavaFX Application Thread] INFO  com.example.guifx.CarLayer - Loaded image: /carRed.png
+2026-01-13 16:35:47,858 [JavaFX Application Thread] INFO  com.example.guifx.CarLayer - Loaded image: /carWhite.png
+2026-01-13 16:35:47,920 [JavaFX Application Thread] INFO  com.example.guifx.CarLayer - Loaded image: /carYellow.png
+2026-01-13 16:35:47,923 [JavaFX Application Thread] INFO  com.example.guifx.CarLayer - Loaded image: /busBlack.png
+2026-01-13 16:35:47,927 [JavaFX Application Thread] INFO  com.example.guifx.CarLayer - Loaded image: /busRed.png
+2026-01-13 16:35:47,930 [JavaFX Application Thread] INFO  com.example.guifx.CarLayer - Loaded image: /busWhite.png
+2026-01-13 16:35:47,933 [JavaFX Application Thread] INFO  com.example.guifx.CarLayer - Loaded image: /busYellow.png
+2026-01-13 16:35:47,936 [JavaFX Application Thread] INFO  com.example.guifx.CarLayer - Loaded image: /truckBlack.png
+2026-01-13 16:35:47,939 [JavaFX Application Thread] INFO  com.example.guifx.CarLayer - Loaded image: /truckRed.png
+2026-01-13 16:35:47,941 [JavaFX Application Thread] INFO  com.example.guifx.CarLayer - Loaded image: /truckWhite.png
+2026-01-13 16:35:47,944 [JavaFX Application Thread] INFO  com.example.guifx.CarLayer - Loaded image: /truckYellow.png
+2026-01-13 16:35:47,983 [JavaFX Application Thread] INFO  com.example.guifx.Main - Application Start successful
+2026-01-13 16:35:51,085 [JavaFX Application Thread] INFO  com.example.guifx.GUI - Spawning new vehicle!
+2026-01-13 16:35:51,088 [Thread-2] INFO  com.example.guifx.VehicleController - Injected vehicle: id1
+2026-01-13 16:35:51,089 [Thread-2] INFO  com.example.guifx.GUI - Spawned:id1
+2026-01-13 16:35:51,239 [JavaFX Application Thread] INFO  com.example.guifx.GUI - Spawning new vehicle!
+2026-01-13 16:35:51,287 [Thread-2] INFO  com.example.guifx.VehicleController - Injected vehicle: id2
+2026-01-13 16:35:51,287 [Thread-2] INFO  com.example.guifx.GUI - Spawned:id2
+2026-01-13 16:35:51,417 [JavaFX Application Thread] INFO  com.example.guifx.GUI - Spawning new vehicle!
+2026-01-13 16:35:51,437 [Thread-2] INFO  com.example.guifx.VehicleController - Injected vehicle: id3
+2026-01-13 16:35:51,437 [Thread-2] INFO  com.example.guifx.GUI - Spawned:id3
+2026-01-13 16:35:51,663 [JavaFX Application Thread] INFO  com.example.guifx.GUI - Spawning new vehicle!
+2026-01-13 16:35:51,688 [Thread-2] INFO  com.example.guifx.VehicleController - Injected vehicle: id4
+2026-01-13 16:35:51,688 [Thread-2] INFO  com.example.guifx.GUI - Spawned:id4
+2026-01-13 16:35:52,735 [JavaFX Application Thread] INFO  com.example.guifx.GUI - Spawning new vehicle!
+2026-01-13 16:35:52,739 [Thread-2] INFO  com.example.guifx.VehicleController - Injected vehicle: id5
+2026-01-13 16:35:52,739 [Thread-2] INFO  com.example.guifx.GUI - Spawned:id5
+2026-01-13 16:35:55,147 [JavaFX Application Thread] ERROR com.example.guifx.GUI - Please select a Traffic Light
+2026-01-13 16:36:00,797 [JavaFX Application Thread] INFO  com.example.guifx.GUI - Spawning new vehicle!
+2026-01-13 16:36:00,800 [Thread-2] INFO  com.example.guifx.VehicleController - Injected vehicle: id6
+2026-01-13 16:36:00,801 [Thread-2] INFO  com.example.guifx.GUI - Spawned:id6 on Lane: L1!
+2026-01-13 16:36:01,354 [JavaFX Application Thread] INFO  com.example.guifx.GUI - Spawning new vehicle!
+2026-01-13 16:36:01,401 [Thread-2] INFO  com.example.guifx.VehicleController - Injected vehicle: id7
+2026-01-13 16:36:01,401 [Thread-2] INFO  com.example.guifx.GUI - Spawned:id7 on Lane: L1!

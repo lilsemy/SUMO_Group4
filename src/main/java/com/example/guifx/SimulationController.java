@@ -1,5 +1,7 @@
 package com.example.guifx;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.sumo.libtraci.Simulation;
 import org.eclipse.sumo.libtraci.Vehicle;
 
@@ -15,7 +17,7 @@ public class SimulationController {
     private final VehicleController vehicleController;
     private final TrafficLightController tlController;
     private final LaneController laneCon;
-
+    private static final Logger LOG = LogManager.getLogger(SimulationController.class.getName());
     private volatile boolean running = true;   // starts true (volatile booleans have multi-thread visibility)
 
     //Stress test counters
@@ -38,6 +40,7 @@ public class SimulationController {
         vehicleController = new VehicleController();
         tlController = new TrafficLightController();
         laneCon = new LaneController();
+        LOG.info("Simulation Controller initialized successfully");
         //makeConnection(); happens in main
     }
     /**
@@ -142,6 +145,7 @@ public class SimulationController {
             try{
                 vehicleController.createAndInjectVehicle(type.getTypeId(), pickRoute(), "0", color);
             } catch (Exception e) {
+                LOG.error("Starting of Stress Test failed: " + e.getMessage());
                 e.printStackTrace();
             }
 
@@ -193,6 +197,7 @@ public class SimulationController {
             return v.getId();
 
         } catch (Exception e) {
+            LOG.error("Spawning of Vehicle failed: " + e.getMessage());
             e.printStackTrace();
             return null;
         }

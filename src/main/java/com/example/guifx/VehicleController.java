@@ -1,5 +1,7 @@
 package com.example.guifx;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.sumo.libtraci.StringVector;
 import org.eclipse.sumo.libtraci.Vehicle;
 import org.eclipse.sumo.libtraci.TraCIPosition;
@@ -16,6 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class VehicleController {
     private Map<String, VehicleModel> vehiclesList;
     private int vehicleCounter = 0;
+    private static final Logger LOG = LogManager.getLogger(VehicleController.class.getName());
 
     /**
      * Constructs a VehicleController
@@ -61,9 +64,9 @@ public class VehicleController {
                     vehicle.getLaneId());
 
             vehiclesList.put(vehicle.getId(), vehicle);
-            System.out.println("Injected vehicle: " + vehicle.getId());
+            LOG.info("Injected vehicle: " + vehicle.getId());
         } catch (Exception e) {
-            System.err.println("Failed to inject vehicle " + vehicle.getId() + ": " + e.getMessage());
+            LOG.warn("Failed to inject vehicle " + vehicle.getId() + ": " + e.getMessage());
         }
     }
 
@@ -79,7 +82,7 @@ public class VehicleController {
         if (vehiclesList.containsKey(vehicleId)) {
             return vehiclesList.get(vehicleId).getSpeed();
         } else {
-            System.out.println("Error! Vehicle " + vehicleId + " not found in simulation.");
+            LOG.warn("Error! Vehicle " + vehicleId + " not found in simulation.");
             return 0;
         }
     }

@@ -19,19 +19,20 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
 import javafx.util.Duration;
-import org.eclipse.sumo.libtraci.Vehicle;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 
 /**
  * GUI is the class that controls the JavaFX GUI
  */
 public class GUI {
+    private static final Logger LOG = LogManager.getLogger(GUI.class.getName());
+
     private SimulationController simController;
 
     @FXML
@@ -180,7 +181,7 @@ public class GUI {
     }
 
     // gui console
-    public void log(String message) {
+    public void show(String message) {
         consoleArea.appendText(message + "\n");
     }
 
@@ -302,7 +303,8 @@ public class GUI {
                     scale = 10.0;
                     scaleTransform.setX(0);
                     scaleTransform.setY(0);
-                    log("selected & Following:" + newValue);
+                    LOG.info("selected & Following:" + newValue);
+                    show("selected & Following:" + newValue);
                 }
             });
 
@@ -418,8 +420,8 @@ public class GUI {
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Failed to initialize visuals" + e.getMessage());
-            log("Failed to initialize visuals" + e.getMessage());
+            LOG.fatal("Failed to initialize visuals" + e.getMessage());
+            show("Failed to initialize visuals" + e.getMessage());
         }
     }
 
@@ -737,6 +739,7 @@ public class GUI {
 //                    simController.getTlController().updateTLModel();
 
                 } catch (Exception e) {
+                    LOG.fatal("Error in Simulation Loop: " + e.getMessage());
                     e.printStackTrace();
                     //stop();
                 }
@@ -774,8 +777,8 @@ public class GUI {
      */
 
     public void commandSpawnVehicle(ActionEvent e) {
-        System.out.println("Spawning new vehicle!");
-        log("Spawning new vehicle!");
+        LOG.info("Spawning new vehicle!");
+        show("Spawning new vehicle!");
         actionQueue.add(()-> {
         //String id = simController.spawnVehicle(spawnConfig);
         //if (id != null) {
@@ -784,15 +787,15 @@ public class GUI {
         if (InsertionSelector.getValue() == null) {
             String id = simController.spawnVehicle(spawnConfig, null);
             if (id != null) {
-                System.out.println("Spawned:" + id);
-                javafx.application.Platform.runLater(()->log("Spawned:" + id + " randomly!"));
+                LOG.info("Spawned:" + id);
+                javafx.application.Platform.runLater(()-> show("Spawned:" + id + " randomly!"));
             }
         }
         else {
             String id = simController.spawnVehicle(spawnConfig, InsertionSelector.getValue());
             if (id != null) {
-                System.out.println("Spawned:" + id + " on Lane: " + InsertionSelector.getValue() + "!");
-                javafx.application.Platform.runLater(()->log("Spawned:" + id + " on Lane: " + InsertionSelector.getValue() + "!"));
+                LOG.info("Spawned:" + id + " on Lane: " + InsertionSelector.getValue() + "!");
+                javafx.application.Platform.runLater(()-> show("Spawned:" + id + " on Lane: " + InsertionSelector.getValue() + "!"));
             }
         }
     });
@@ -814,8 +817,8 @@ public class GUI {
             targetId = lastId;
         }
         if (targetId == null) {
-            System.out.println("no vehicle selected!");
-            log("no vehicle  selected!");
+            LOG.info("no vehicle selected!");
+            show("no vehicle  selected!");
         }
 
 
@@ -826,8 +829,8 @@ public class GUI {
         scaleTransform.setX(scale);
         scaleTransform.setY(scale);
 
-        System.out.println("Following:" + targetId);
-        log("Following:" + targetId);
+        LOG.info("Following:" + targetId);
+        show("Following:" + targetId);
     }
 
     /**
@@ -843,14 +846,14 @@ public class GUI {
                 try {
                     double speed = simController.getVehicleController().getVehicleSpeed(lastId);
                     //java.text.DecimalFormat dv = new java.text.DecimalFormat("#.##");
-                    System.out.println("Speed of last vehicle " + lastId + ": " + df2.format(speed));
-                    javafx.application.Platform.runLater(() -> log("Speed of last vehicle " + lastId + ": " + df2.format(speed)));
+                    LOG.info("Speed of last vehicle " + lastId + ": " + df2.format(speed));
+                    javafx.application.Platform.runLater(() -> show("Speed of last vehicle " + lastId + ": " + df2.format(speed)));
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             } else {
-                System.out.println("No vehicles in simulation!");
-                javafx.application.Platform.runLater(() -> log("No vehicles in simulation!"));
+                LOG.warn("No vehicles in simulation!");
+                javafx.application.Platform.runLater(() -> show("No vehicles in simulation!"));
             }
         });
     }
@@ -861,7 +864,7 @@ public class GUI {
      * @param e ActionEvent from button click
      */
     public void commandChangePhase(ActionEvent e) {
-        if (!TLSelector.getValue().isEmpty()){
+        if (TLSelector.getValue() != null){
 
             if (!GetDuration.getText().isEmpty()) {
                 try {
@@ -869,20 +872,20 @@ public class GUI {
                     String tl = TLSelector.getValue();
                     actionQueue.add(() -> {
                         simController.changePhase(newDur, tl);
-                        System.out.println("Changing TrafficLight Phase of Traffic Light: " + tl + "with Phase Duration of: " + newDur + " seconds!");
-                        log("Changing TrafficLight Phase of Traffic Light: " + tl + "with Phase Duration of: " + newDur + " seconds!");
+                        LOG.info("Changing TrafficLight Phase of Traffic Light: " + tl + "with Phase Duration of: " + newDur + " seconds!");
+                        show("Changing TrafficLight Phase of Traffic Light: " + tl + "with Phase Duration of: " + newDur + " seconds!");
                     });
                 } catch (Exception ex) {
-                    System.out.println("Error! Please enter a valid number for the Phase duration!");
-                    log("Error! Please enter a valid number for the Phase duration!");
+                    LOG.error("Changing TrafficLight states failed");
+                    show("Changing TrafficLight states failed");
                 }
             }    else {
-                System.out.println("Error! Please enter a valid number for the Phase duration!");
-                log("Error! Please enter a valid number for the Phase duration!");
+                LOG.error("Error! Please enter a valid number for the Phase duration!");
+                show("Error! Please enter a valid number for the Phase duration!");
             }
         }
         else {
-            System.out.println("Please select a Traffic Light");
+            LOG.error("Please select a Traffic Light");
         }
     }
 
@@ -897,7 +900,7 @@ public class GUI {
             int count = Integer.parseInt(stressTestCountField.getText());
 
             if (count <= 0) {
-                javafx.application.Platform.runLater(() ->log("Please enter a number between 1 and 100 for the stress test."));
+                javafx.application.Platform.runLater(() -> show("Please enter a positive number for stress test."));
 
                 // ensure icon is reset
                 setStressAlarmIcon(false);
@@ -905,15 +908,16 @@ public class GUI {
             }
 
             if (count > 100) {
+                LOG.error("Maximum allowed vehicles for stress test is 100.");
                 javafx.application.Platform.runLater(() ->
-                        log("Maximum allowed vehicles for stress test is 100.")
+                        show("Maximum allowed vehicles for stress test is 100.")
                 );
                 setStressAlarmIcon(false);
                 return;
             }
 
-            System.out.println("Starting Stress Test with " + count + " vehicles");
-            log("Starting Stress Test with " + count + " vehicles");
+            LOG.info("Starting Stress Test with " + count + " vehicles");
+            show("Starting Stress Test with " + count + " vehicles");
 
             simController.startStressTest(count, spawnConfig);
 
@@ -921,8 +925,8 @@ public class GUI {
             startStressAlarmBlink(Duration.seconds(10));
 
         } catch (NumberFormatException ex) {
-            log("Invalid number. Please enter a valid integer.");
-            System.out.println("Invalid stress test number");
+            show("Invalid number. Please enter a valid integer.");
+            LOG.error("Invalid stress test number");
             setStressAlarmIcon(false);
         }
     }
@@ -1013,13 +1017,13 @@ public class GUI {
                     statistics.detectCongestionHotspots(time);
 
             if (congestions.isEmpty()) {
-                javafx.application.Platform.runLater(() -> log("No congestion found"));
-                System.out.println("No congestion found");
+                javafx.application.Platform.runLater(() -> show("No congestion found"));
+                LOG.info("No congestion found");
                 return;
             }
 
-            javafx.application.Platform.runLater(() -> log("Congestion detected:"));
-            System.out.println("Congestion detected:");
+            javafx.application.Platform.runLater(() -> show("Congestion detected:"));
+            LOG.info("Congestion detected:");
 
             for (Map.Entry<String, Double> entry : congestions.entrySet()) {
 
@@ -1029,8 +1033,8 @@ public class GUI {
                                 String.format("%.2f", entry.getValue()) +
                                 " m/s";
 
-                javafx.application.Platform.runLater(() -> log(message));
-                System.out.println(message);
+                javafx.application.Platform.runLater(() -> show(message));
+                LOG.info(message);
             }
         });
     }
@@ -1165,7 +1169,7 @@ public class GUI {
                     // buffer)
                     // and we are not in "Unlimited/Turbo" mode (delay != 0)
                     if (currentSimDelayMs > 0 && stepDuration > currentSimDelayMs + 50) {
-                        System.out.println("System Overload: Step took " + stepDuration + "ms (Target: "
+                        LOG.info("System Overload: Step took " + stepDuration + "ms (Target: "
                                 + currentSimDelayMs + "ms)");
                     }
 

@@ -2,6 +2,8 @@ package com.example.guifx;
 
 import java.util.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.sumo.libtraci.Junction;
 import org.eclipse.sumo.libtraci.TrafficLight;
 import org.eclipse.sumo.libtraci.TraCIPosition;
@@ -13,6 +15,7 @@ public class TrafficLightController {
 
     private List<String> tlIds;
     private Map<String, TrafficLightModel> tlList;
+    private static final Logger LOG = LogManager.getLogger(TrafficLightController.class.getName());
 
     /**
      * Constructs a TrafficLightController and initializes all traffic lights
@@ -27,7 +30,7 @@ public class TrafficLightController {
                     TrafficLight.getRedYellowGreenState(id));
             tlList.put(tl.getId(), tl);
         }
-        System.out.println("Scanned for Traffic Lights and found: " + tlList.size() + "!");
+        LOG.info("Scanned for Traffic Lights and found: " + tlList.size() + "!");
     }
 
     /**

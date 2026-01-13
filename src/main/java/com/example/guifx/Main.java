@@ -6,6 +6,8 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
     *Main is the Initializer of the GUI
@@ -14,6 +16,7 @@ import javafx.stage.Stage;
 
 public class Main extends Application {
     private GUI gui;
+    private static final Logger LOG = LogManager.getLogger(Main.class.getName());
     @Override
 
     /**
@@ -22,6 +25,7 @@ public class Main extends Application {
     */
 
     public void start(Stage stage) throws Exception {
+        LOG.info("Starting Application");
         FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("GUI-view.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
 
@@ -34,13 +38,16 @@ public class Main extends Application {
         stage.setScene(scene);
         stage.show();
 
+        LOG.info("Initializing GUI");
         GUI gui = fxmlLoader.getController();
         this.gui = gui;
 
+        LOG.info("Setting Simulation Controller for GUI + starting SUMO connection");
         SimulationController simController = new SimulationController();
         gui.setSimulationController(simController);
         simController.makeConnection();
 
+        LOG.info("Application Start successful");
     }
         @Override
         public void stop() throws Exception {
