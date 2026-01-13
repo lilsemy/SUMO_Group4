@@ -20,29 +20,22 @@ public class CsvWriter {
      */
 
     public CsvWriter(String filePath) throws IOException {
-        this.writer = new PrintWriter(new FileWriter(filePath)); //printWriter allows for formatted writing into CSV, not just characters
-    }
+        this.writer = new PrintWriter(new FileWriter(filePath));
 
-    /**
-     * Writes the CSV header once
-     */
-
-    private void writeHeader() {
-        if (!headerWritten) {
-            writer.println(
-                    "time;vehicleCount;avgSpeed;congestionPresent;redLights;yellowLights;greenLights"
-            );
-            headerWritten = true;
-        }
+        // Header is written exactly once here
+        writer.println("time;vehicleCount;avgSpeed;congestionPresent;redLights;yellowLights;greenLights");
+        writer.flush();
     }
 
     /**
      * Call this once every 20 steps
      * 1 real-world second = 1 / 0.05 = 20 steps
      */
-    public void writeStep(double time, int vehicleCount, double avgSpeed, boolean congestionPresent, Map<String, Integer> trafficLightStates) {
-
-        writeHeader();
+    public void writeStep(double time,
+                          int vehicleCount,
+                          double avgSpeed,
+                          boolean congestionPresent,
+                          Map<String, Integer> trafficLightStates) {
 
         int r = trafficLightStates.getOrDefault("R", 0);
         int y = trafficLightStates.getOrDefault("Y", 0);
@@ -56,57 +49,16 @@ public class CsvWriter {
                 congestionPresent,
                 r, y, g
         );
-
-        writer.flush(); // Makes sure the text is actually written to disk immediately
     }
 
-    public void close() {
-        writer.close();
-    } //Closes the file and releases system resources. Always call it after the simulation ends
-    // hook this into application shutdown as a GUI close event:
-    /*
-    primaryStage.setOnCloseRequest(event -> {
-    try {
-        csv.close();
-    } catch (Exception e) {
-        e.printStackTrace();
-    }
-});
+    /**
+     * Closes the CSV file.
+     * Must be called once when the simulation ends.
      */
+
+
+   public void close() {
+        writer.flush();
+        writer.close();
+   }
 }
-
-/*
-Code for simulation steps:
-Statistics stats = new Statistics(simController);
-CsvWriter csv = new CsvWriter("simulation.csv");
-
-double lastCsvWriteTime = 0.0;
-int stepCount = 0;
-
-while(simulationRunning) {
-
-    simController.singleStep();
-
-    double currentTime = stepCount * STEP_LENGTH;
-
-    stats.updateVehicles(currentTime);
-    stats.updateTrafficLights();
-
-    if(currentTime - lastCsvWriteTime >= 1.0) {
-        csv.writeStep(
-            currentTime,
-            stats.getVehicleCount(),
-            stats.getAverageSpeed(),
-            stats.isCongestionPresent(currentTime),
-            stats.getTrafficLightStates()
-        );
-        lastCsvWriteTime = currentTime;
-    }
-
-    stepCount++;
-}
-
-csv.close();
-
-
- */
