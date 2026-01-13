@@ -193,7 +193,7 @@
                   <NumberAxis label="Time (s)" side="BOTTOM" />
                </xAxis>
                <yAxis>
-                  <NumberAxis label="Speed (m/s)" side="LEFT" />
+                  <NumberAxis label="Avg Speed (m/s)" side="LEFT" />
                </yAxis>
             </LineChart>
 
