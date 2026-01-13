@@ -1195,6 +1195,9 @@ public class GUI {
                     e.printStackTrace();
                 }
             }
+            if (csv != null) {
+                csv.close();
+            }
 
         });
         simThread.setDaemon(true);
