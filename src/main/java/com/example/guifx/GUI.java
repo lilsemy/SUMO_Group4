@@ -819,6 +819,7 @@ public class GUI {
         if (targetId == null) {
             LOG.info("no vehicle selected!");
             show("no vehicle  selected!");
+            return;
         }
 
 
