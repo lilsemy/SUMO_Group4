@@ -42,10 +42,9 @@ public class Main extends Application {
         GUI gui = fxmlLoader.getController();
         this.gui = gui;
 
-        LOG.info("Setting Simulation Controller for GUI + starting SUMO connection");
+        LOG.info("Setting Simulation Controller for GUI");
         SimulationController simController = new SimulationController();
         gui.setSimulationController(simController);
-        simController.makeConnection();
 
         LOG.info("Application Start successful");
     }
