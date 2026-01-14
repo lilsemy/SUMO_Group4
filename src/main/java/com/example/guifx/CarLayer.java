@@ -3,7 +3,6 @@ package com.example.guifx;
 import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
 
-//import org.eclipse.sumo.libtraci.Vehicle;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.*;
@@ -38,8 +37,6 @@ public class CarLayer {
     private final Image truckYellowImage;
     private static final Logger LOG = LogManager.getLogger(CarLayer.class.getName());
 
-    //private final SimulationController simController;
-
     /**
      * Constructs a CarLayer and loads vehicle images
      * 
@@ -48,7 +45,6 @@ public class CarLayer {
     CarLayer(Pane carLayerPane) {
         carImageViews = new HashMap<>();
         this.carLayerPane = carLayerPane;
-        //this.simController = simController;
 
         this.carBlackImage = loadVehicleImage("/carBlack.png");
         this.carRedImage = loadVehicleImage("/carRed.png");
@@ -107,10 +103,7 @@ public class CarLayer {
      * @return array [width, height]
      */
     private double[] getSizeForVehicle(String typeId) {
-        //String typeId = Vehicle.getTypeID(vehicleId);
-        //String classId = Vehicle.getVehicleClass(vehicleId);
         String type = typeId == null ? "" : typeId.toLowerCase();
-        //String vclass = classId == null ? "" : classId.toLowerCase();
 
         if (type.contains("bus")) {
             return new double[]{9, 20};
@@ -252,7 +245,6 @@ public class CarLayer {
      * Updates all cars: adds new cars, updates positions and rotations, removes disappeared cars
      */
     public void updateCarsFromSnapshot(List<VehicleUiState> vehicleStates) {
-        //List<String> ids = Vehicle.getIDList();
         Set<String> activeCarIds = new HashSet<>();
         Map<String, VehicleUiState> stateMap = new HashMap<>();
 
@@ -293,7 +285,6 @@ public class CarLayer {
 
                 carView.setRotate(angle);
 
-                //
                 double radAngle = Math.toRadians(angle);
                 double offsetX = h / 2 * Math.sin(radAngle);
                 double offsetY = -(h / 2) * Math.cos(radAngle);
@@ -338,11 +329,9 @@ public class CarLayer {
                 carView.setRotate(angle);
             }
         }
-        //clear and fill up the last state with the current one
+        //clear and fill up the last state with the current one for future comparisons
         lastStates.clear();
         lastStates.putAll(stateMap);
     }
-
-
 
 }

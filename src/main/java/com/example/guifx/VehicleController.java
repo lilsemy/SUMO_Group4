@@ -193,25 +193,6 @@ public class VehicleController {
     }
 
     //filtering
-    public Collection<VehicleModel> getFilteredVehicles(TypeFilter typeFilter, VehicleColor colorFilter) {
-        Collection<VehicleModel> result = new ArrayList<>();
-
-        for(VehicleModel v : vehiclesList.values()){
-            //does the type of v match with the given filter? TRUE, if not, FALSE
-            boolean typeMatches = typeFilter == TypeFilter.NONE ||
-                                  typeFilter.getTypeId().equals(v.getTypeId());
-            //does the color of v match with the given filter? TRUE, if not, FALSE
-            boolean colorMatches = colorFilter == VehicleColor.NONE ||
-                                   colorFilter == v.getColor();
-            //if both true, add to list
-            boolean isActive = v.getState() == VehicleState.ACTIVE;
-            if (typeMatches && colorMatches && isActive){
-                result.add(v);}
-        }
-
-        return result;
-    }
-
     public Collection<String> getFilteredVehicleIds(TypeFilter typeFilter, VehicleColor colorFilter) {
         Collection<String> result = new ArrayList<>();
 
@@ -231,6 +212,5 @@ public class VehicleController {
 
         return result;
     }
-
 
 }
