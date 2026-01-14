@@ -1,9 +1,5 @@
 time;vehicleCount;avgSpeed;congestionPresent;redLights;yellowLights;greenLights
-1,00;0;0,000;false;0;0;6
-2,00;0;0,000;false;0;0;6
-3,00;3;1,410;false;0;0;6
-4,00;6;2,746;false;0;0;6
-5,00;8;3,904;false;0;0;6
-6,00;8;5,266;false;0;0;6
-7,00;8;6,731;false;0;0;6
-8,00;8;7,711;false;0;0;6
+1.00;3;1.772;false;0;0;6
+2.00;3;3.416;false;0;0;6
+3.00;3;4.905;false;0;0;6
+4.00;3;6.224;false;0;0;6
