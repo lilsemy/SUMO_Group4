@@ -106,12 +106,12 @@ public class CarLayer {
         String type = typeId == null ? "" : typeId.toLowerCase();
 
         if (type.contains("bus")) {
-            return new double[]{9, 20};
+            return new double[]{2.5, 7};
         }
         if (type.contains("truck") || type.contains("trailer") ) {
-            return new double[]{8, 17};
+            return new double[]{2.5, 6};
         }
-        return new double[]{7, 15};
+        return new double[]{2.5, 5};
     }
 
     /**
