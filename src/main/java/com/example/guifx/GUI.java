@@ -297,15 +297,15 @@ public class GUI {
             });
 
             vehicleSelector.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-                if (newValue != null) {
-                    followedVehicleId = newValue;
-                    isFollowing = true;
-                    scale = 10.0;
-                    scaleTransform.setX(0);
-                    scaleTransform.setY(0);
-                    LOG.info("selected & Following:" + newValue);
-                    show("selected & Following:" + newValue);
-                }
+//                if (newValue != null) {
+//                    followedVehicleId = newValue;
+//                    isFollowing = true;
+//                    scale = 10.0;
+//                    scaleTransform.setX(0);
+//                    scaleTransform.setY(0);
+//                    LOG.info("selected & Following:" + newValue);
+//                    show("selected & Following:" + newValue);
+//                }
             });
 
             //Initialize DropDown Menu for TrafficLights
