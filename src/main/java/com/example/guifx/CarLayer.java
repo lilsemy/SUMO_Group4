@@ -3,7 +3,6 @@ package com.example.guifx;
 import javafx.geometry.Point2D;
 import javafx.scene.layout.Pane;
 
-//import org.eclipse.sumo.libtraci.Vehicle;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.*;
@@ -17,6 +16,8 @@ import org.apache.logging.log4j.Logger;
 public class CarLayer {
     // Map to store cars with their ID and ImageView
     private final Map<String, ImageView> carImageViews;
+    //saving previous state for comparison
+    private final Map<String, VehicleUiState> lastStates = new HashMap<>();
     // Pane to display all car nodes
     private final Pane carLayerPane;
     // Images for different vehicle types
@@ -36,8 +37,6 @@ public class CarLayer {
     private final Image truckYellowImage;
     private static final Logger LOG = LogManager.getLogger(CarLayer.class.getName());
 
-    //private final SimulationController simController;
-
     /**
      * Constructs a CarLayer and loads vehicle images
      * 
@@ -46,7 +45,6 @@ public class CarLayer {
     CarLayer(Pane carLayerPane) {
         carImageViews = new HashMap<>();
         this.carLayerPane = carLayerPane;
-        //this.simController = simController;
 
         this.carBlackImage = loadVehicleImage("/carBlack.png");
         this.carRedImage = loadVehicleImage("/carRed.png");
@@ -105,10 +103,7 @@ public class CarLayer {
      * @return array [width, height]
      */
     private double[] getSizeForVehicle(String typeId) {
-        //String typeId = Vehicle.getTypeID(vehicleId);
-        //String classId = Vehicle.getVehicleClass(vehicleId);
         String type = typeId == null ? "" : typeId.toLowerCase();
-        //String vclass = classId == null ? "" : classId.toLowerCase();
 
         if (type.contains("bus")) {
             return new double[]{9, 20};
@@ -126,9 +121,6 @@ public class CarLayer {
      * @return Image for the vehicle
      */
     private Image getImageForVehicleType(String typeId, VehicleColor color) {
-        //VehicleModel v = simController.getVehicleController().getVehicle(vehicleId);
-        //String typeId = v.getTypeId();
-        //VehicleColor color = v.getColor();
         String type = typeId == null ? "" : typeId.toLowerCase();
 
         return switch (type) {
@@ -237,13 +229,25 @@ public class CarLayer {
         carLayerPane.getChildren().add(carView);
     }
 
+    private void refreshVehicleImageFromSnapshot(VehicleUiState vs){
+        ImageView view = carImageViews.get(vs.id());
+        double[] size = getSizeForVehicle(vs.type());
+        view.setFitWidth(size[0]);
+        view.setFitHeight(size[1]);
+        view.setPreserveRatio(true);
+        view.setSmooth(true);
+
+        Image image = getImageForVehicleType(vs.type(),vs.color());
+        view.setImage(image);
+    }
+
     /**
      * Updates all cars: adds new cars, updates positions and rotations, removes disappeared cars
      */
     public void updateCarsFromSnapshot(List<VehicleUiState> vehicleStates) {
-        //List<String> ids = Vehicle.getIDList();
         Set<String> activeCarIds = new HashSet<>();
         Map<String, VehicleUiState> stateMap = new HashMap<>();
+
         for (VehicleUiState vs : vehicleStates) {
             activeCarIds.add(vs.id());
             stateMap.put(vs.id(),vs);
@@ -260,16 +264,20 @@ public class CarLayer {
 
             if (activeCarIds.contains(carId)) {
                 newCarIds.remove(carId);
-                //safety check. If car is queued up and not yet active, don't call traas methods
-//                if(!Vehicle.getIDList().contains(carId)){
-//                    continue;
-//                }
 
-                //newVehicleIds.remove(carId);
-
-
-                //TraCIPosition sumoPos = Vehicle.getPosition(carId, false);
+                //Compare previous snapshot with current one
                 VehicleUiState vs = stateMap.get(carId);
+                VehicleUiState previous = lastStates.get(carId);
+                if(previous != null){
+                    //Is the new snapshot of a vehicle different from the previous one? If yes, update vehicle image
+                    if(previous.color() != vs.color() ||
+                       !previous.type().equals(vs.type())){
+                        refreshVehicleImageFromSnapshot(vs);
+                    }
+
+                }
+
+
                 Point2D javaPos = MapUtil.worldToScreen(new Point2D(vs.x(), vs.y()));
                 double w = carView.getFitWidth();
                 double h = carView.getFitHeight();
@@ -277,7 +285,6 @@ public class CarLayer {
 
                 carView.setRotate(angle);
 
-                //
                 double radAngle = Math.toRadians(angle);
                 double offsetX = h / 2 * Math.sin(radAngle);
                 double offsetY = -(h / 2) * Math.cos(radAngle);
@@ -322,10 +329,9 @@ public class CarLayer {
                 carView.setRotate(angle);
             }
         }
+        //clear and fill up the last state with the current one for future comparisons
+        lastStates.clear();
+        lastStates.putAll(stateMap);
     }
-
-
-
-
 
 }

@@ -20,11 +20,6 @@ public class SimulationController {
     private static final Logger LOG = LogManager.getLogger(SimulationController.class.getName());
     private volatile boolean running = true;   // starts true (volatile booleans have multi-thread visibility)
 
-    //Stress test counters
-    private int stressVehiclesRemaining = 0;
-    private int stepCounter = 0;
-    private int injectionStepInterval = 10; // every 10 steps -> 10*0.05s/step = every 0.5s
-    private boolean stressTestActive = false;
 
     private static List<String> routes = List.of("r1", "r2", "r3", "r4", "r6", "r7", "r8", "r9", "r10",
             "r11", "r12", "r13", "r14", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23");
@@ -41,50 +36,9 @@ public class SimulationController {
         tlController = new TrafficLightController();
         laneCon = new LaneController();
         LOG.info("Simulation Controller initialized successfully");
-        //makeConnection(); happens in main
     }
-    /**
-    * Establishes connection
-    */
 
-    public void makeConnection(){
-        /*
-         * EXPLANATION (Why this is commented out):
-         * Originally, this method started a separate background Thread to run the
-         * simulation loop continuously.
-         * However, when rendering the simulation in JavaFX (the GUI), we must update
-         * the screen on the "JavaFX Application Thread".
-         * If we have a background thread like this running 'while(running)', it often
-         * runs too fast or desynchronized from the screen refresh rate (60fps).
-         * Worse, updating UI elements from this background thread would cause
-         * "Not on FX Application Thread" errors.
-         *
-         * SOLUTION:
-         * We disable this loop. Instead, the 'GUI' class controls the loop using an
-         * 'AnimationTimer'.
-         * The GUI calls 'singleStep()' once per frame. This ensures the simulation
-         * advances exactly one step before we try to draw it.
-         */
 
-        /*new Thread(() -> {
-            try {
-                
-                while(running){
-                    connection.doStep();
-                    //vehicleController.updateCars or similar method needs to be implemented (also for every other controller)
-                }
-            } catch (Exception e) {
-                //System.err.println("Error during simulation step: " + stepEx.getMessage());
-                //stepEx.printStackTrace();
-                // Optionally: pause simulation or notify GUI
-                running = false;
-            } finally {
-                //the finally block ALWAYS executes: if try finishes; catch triggers or not; exception is thrown
-                connection.close();
-                System.out.println("Simulation stopped cleanly.");
-            }
-        }).start();*/
-    }
     /**
      * EXPLANATION:
      * This method advances the simulation by exactly one step (0.05s).
@@ -96,34 +50,6 @@ public class SimulationController {
     public void singleStep() throws Exception{
         if (running && connection.isConnected()){
             connection.doStep();
-            stepCounter++;
-
-            //stress testing only triggers when stressTestActive == true
-            /*if (stressTestActive &&
-                    stressVehiclesRemaining > 0 &&
-                    stepCounter % injectionStepInterval == 0) {
-
-                try {
-                    // Changed from (byte) 0 -> "0"
-                    vehicleController.createAndInjectVehicle(
-                            "car", "r1", "0", VehicleColor.BLACK
-                    );
-
-                    stressVehiclesRemaining--;
-
-                    if (stressVehiclesRemaining == 0) {
-                        stressTestActive = false;
-                    }
-
-                } catch (Exception e) {
-                    System.err.println(
-                            "Stress test injection failed, remaining="
-                                    + stressVehiclesRemaining
-                    );
-                    e.printStackTrace();
-                }
-            }
-            */
             vehicleController.updateFromSimulation();
         }
     }
@@ -134,11 +60,6 @@ public class SimulationController {
      */
 
     public void startStressTest(int count, SpawnConfig config) {
-        /*stressVehiclesRemaining = count;
-        stressTestActive = true;
-        stepCounter = 0;*/
-
-
         for(int i = count; i>0; i--){
             TypeFilter type = config.pickType();
             VehicleColor color = config.pickColor();
@@ -159,19 +80,24 @@ public class SimulationController {
         running = false;     // shutdown simulation
     }
 
-    /**
-     * Restarts the simulation loop after stopping.
-     */
-    public void startSimulation() {
-        if (running) return; // already running
+    public void changeVehicleAppearance(String id, TypeFilter newType, VehicleColor newColor){
+        if(newType == TypeFilter.NONE && newColor == VehicleColor.NONE){
+            LOG.error("Select a vehicle type or color before attempting editing!");
+            return;
+        }
 
-        running = true;
-        makeConnection();    // start new thread
+        VehicleModel v = vehicleController.getVehicle(id);
+        if (newType != TypeFilter.NONE) {
+            v.setTypeId(newType.getTypeId());
+        }
+        if (newColor != VehicleColor.NONE) {
+            v.setColor(newColor);
+        }
     }
 
     public String spawnVehicle(SpawnConfig config, String lane){
         try {
-            TypeFilter type = config.pickType(); //currently the config is set to cars, because I only have all the images for them
+            TypeFilter type = config.pickType();
             VehicleColor color = config.pickColor();
 
             VehicleModel v = vehicleController.createAndInjectVehicle(
@@ -182,7 +108,7 @@ public class SimulationController {
             );
 
             if(lane != null) {
-                //Random Edge choosen from List of all Edges, that are leaving the Map -> Endpoint of newly created Route
+                //Random Edge chosen from List of all Edges, that are leaving the Map -> Endpoint of newly created Route
                 String target = laneCon.getEndLanes().get(new Random().nextInt(laneCon.getEndLanes().size()));
 
                 //Calculate a route from the User selected Edge, to the just choosen End Edge

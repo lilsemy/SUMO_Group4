@@ -19,8 +19,8 @@ public enum TypeFilter {
         return typeId;
     }
 
-    //Returns every value, but NONE.
-    //Needed for spawning, as both enum classes are used for filtering AND spawning simultaneously
+    /*Returns every value, but NONE.
+    Needed for spawning, as both enum classes are used for filtering AND spawning simultaneously*/
     public static EnumSet<TypeFilter> spawnableAll(){
         return EnumSet.complementOf(EnumSet.of(TypeFilter.NONE));
     }

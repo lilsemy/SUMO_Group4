@@ -112,7 +112,7 @@ public class GUI {
     //FILTERING vehicleFilter = The possible filters the user can choose from the choice box
     @FXML
     private ChoiceBox<TypeFilter> vehicleTypeFilter;
-    //currentFilter = The applied filter that changes the GUI (For now only the statistics side)
+    //currentFilter = The applied filter that changes the GUI
     private TypeFilter currentTypeFilter = TypeFilter.NONE;
     @FXML
     private ChoiceBox<VehicleColor> vehicleColorFilter;
@@ -242,7 +242,7 @@ public class GUI {
             speedChart.setCreateSymbols(false);
 
             avgTravelTimeSeries = new XYChart.Series<>();
-            avgTravelTimeSeries.setName("Avg Travel Time");
+            avgTravelTimeSeries.setName("Avg Travel Time (disappeared cars)");
             travelTimeChart.getData().add(avgTravelTimeSeries);
             travelTimeChart.setCreateSymbols(false);
 
@@ -625,11 +625,11 @@ public class GUI {
                 // 1) Cars zeichnen: snapshot nutzen
                 if (carLayerInstance != null) {
                             //carLayerInstance.updateCarsFromSnapshot(simController.getVehicleController().getFilteredVehicleIds(currentTypeFilter, currentColorFilter));
-                    carLayerInstance.updateCarsFromSnapshot(snap.vehicles());
+                            carLayerInstance.updateCarsFromSnapshot(snap.vehicles());
                         }
                 // 2) Traffic lights: Draw traffic lights from Snapshot
                 if (trafficLightLayerInstance != null) {
-                            trafficLightLayerInstance.updateTrafficLightStatesFromSnapshot(snap.trafficLights());
+                    trafficLightLayerInstance.updateTrafficLightStatesFromSnapshot(snap.trafficLights());
                 }
 
                 // 3) Follow/Rotation:
@@ -1099,6 +1099,14 @@ public class GUI {
 
     private static String safe(String s) {
         return s == null ? "-" : s;
+    }
+    @FXML
+    private void commandChangeVehicleAppearance(ActionEvent e){
+        if(pinnedVehicleInfoId != null){
+            simController.changeVehicleAppearance(pinnedVehicleInfoId, typeSpawnChoice.getValue(), colorSpawnChoice.getValue());
+        }else{
+            LOG.error("No vehicle selected!");
+        }
     }
 
 

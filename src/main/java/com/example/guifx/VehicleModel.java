@@ -20,27 +20,6 @@ public class VehicleModel {
     private double pos;
     private double speed;
 
-    // constructors
-
-
-    /**
-    *@param id, typeId, routeId, laneId, depart, pos, speed
-    */
-
-    public VehicleModel(String id, String typeId, String routeId, String laneId, int depart, double pos, double speed){
-        this.id = id;
-        this.typeId = typeId;
-        this.routeId = routeId;
-        this.laneId = laneId;
-        this.depart = depart;
-        this.pos = pos;
-        this.speed = speed;
-        this.x = 0.0;
-        this.y = 0.0;
-        this.angle = 0.0;
-    }
-
-    // default constructor for depart, pos, speed
     
     /**
     *@param id, typeId, routeId, laneId
@@ -59,22 +38,6 @@ public class VehicleModel {
         this.y = 0.0;
         this.angle = 0.0;
     }
-
-    public VehicleModel(String id) {
-        this.id = id;
-        this.typeId = "car";
-        this.routeId = "";
-        this.laneId = "";
-        this.depart = 0;
-        this.color = VehicleColor.BLACK;
-        state = VehicleState.QUEUED;
-        this.pos = 0.0;
-        this.speed = 1.0;
-        this.x = 0.0;
-        this.y = 0.0;
-        this.angle = 0.0;
-    }
-
 
         //Getter
 
@@ -166,8 +129,8 @@ public class VehicleModel {
     public void setAngle(double angle){
         this.angle = angle;
     }
-    public void setTypeId(String id){
-        this.typeId=id;
+    public void setTypeId(String typeId){
+        this.typeId=typeId;
     }
 
     public void setRouteId(String routeId){

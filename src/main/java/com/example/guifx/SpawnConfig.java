@@ -14,7 +14,7 @@ public class SpawnConfig {
         this.random = new Random();
     }
 
-    //selects ALL attributes for spawning. It then returns the whole config for use. It will be used later to pick randomly from the whole set of attributes
+    //selects ALL attributes for spawning. It then returns the whole config for use. It is used to pick randomly from the whole set of attributes
     public static SpawnConfig random() {
         return new SpawnConfig(TypeFilter.spawnableAll(), VehicleColor.spawnableAll());
     }
