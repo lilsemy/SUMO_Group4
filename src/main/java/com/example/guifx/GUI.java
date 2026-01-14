@@ -164,7 +164,7 @@ public class GUI {
     private volatile SimSnapshot latest = null;
 
     // chart throttle
-    private static final long UI_UPDATE_NANOS = 200_000_000L; // update charts only every 200ms ;
+    private final long UI_UPDATE_NANOS = 200_000_000L; // update charts only every 200ms ;
     private long lastUiNow = 0 ;
     private static final int MAX_CHART_POINTS = 300;// limitless charts cause memory leaks and lag
 

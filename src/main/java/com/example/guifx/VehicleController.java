@@ -7,7 +7,6 @@ import org.eclipse.sumo.libtraci.Vehicle;
 import org.eclipse.sumo.libtraci.TraCIPosition;
 import org.eclipse.sumo.libtraci.Simulation;
 
-import java.nio.file.attribute.UserDefinedFileAttributeView;
 import java.util.*;
 
 import java.util.concurrent.ConcurrentHashMap;
@@ -162,6 +161,11 @@ public class VehicleController {
         return Vehicle.getIDList();
     }
 
+
+
+    private final long UI_UPDATE_NANOS = 200_000_000L;
+    private long lastUiNow = 0L;
+
     /**
      * Updates the local vehicle states from the simulation
      * 
@@ -169,26 +173,58 @@ public class VehicleController {
      */
 
     public void updateFromSimulation() throws Exception {
-        Set<String> liveIds = new HashSet<>(Vehicle.getIDList());
 
-        for(VehicleModel v : vehiclesList.values()){
 
-            if(liveIds.contains(v.getId())){
-                v.setState(VehicleState.ACTIVE);
 
-                TraCIPosition pos = Vehicle.getPosition(v.getId());
+            long now = System.nanoTime();
+            if (now - lastUiNow < UI_UPDATE_NANOS) {
+                return; // keep last cached values
+            }
+            lastUiNow = now;
 
-                v.setPosition(pos.getX(),pos.getY());
-                v.setSpeed(Vehicle.getSpeed(v.getId()));
-                v.setAngle(Vehicle.getAngle(v.getId()));
-                v.setLaneId(Vehicle.getLaneID(v.getId()));
+
+            Set<String> liveIds = new HashSet<>(Vehicle.getIDList());
+
+            for (VehicleModel v : vehiclesList.values()) {
+                String id = v.getId();
+
+                if (liveIds.contains(id)) {
+                    v.setState(VehicleState.ACTIVE);
+
+                    TraCIPosition pos = Vehicle.getPosition(id);
+                    v.setPosition(pos.getX(), pos.getY());
+                    v.setSpeed(Vehicle.getSpeed(id));
+                    v.setAngle(Vehicle.getAngle(id));
+                    v.setLaneId(Vehicle.getLaneID(id));
+                }
             }
 
-        }
-        //if vehicle is flagged as ACTIVE and left the simulation, delete it.
-        vehiclesList.values().removeIf(vehicleModel ->
-                                        vehicleModel.getState() == VehicleState.ACTIVE &&
-                                                !(liveIds.contains(vehicleModel.getId())));
+            vehiclesList.values().removeIf(vm ->
+                    vm.getState() == VehicleState.ACTIVE &&
+                            !liveIds.contains(vm.getId())
+            );
+
+
+//        Set<String> liveIds = new HashSet<>(Vehicle.getIDList());
+//
+//        for(VehicleModel v : vehiclesList.values()){
+//
+//            if(liveIds.contains(v.getId())){
+//                v.setState(VehicleState.ACTIVE);
+//
+//                TraCIPosition pos = Vehicle.getPosition(v.getId());
+//
+//                v.setPosition(pos.getX(),pos.getY());
+//                v.setSpeed(Vehicle.getSpeed(v.getId()));
+//                v.setAngle(Vehicle.getAngle(v.getId()));
+//                v.setLaneId(Vehicle.getLaneID(v.getId()));
+//            }
+//
+//        }
+//        //if vehicle is flagged as ACTIVE and left the simulation, delete it.
+//        vehiclesList.values().removeIf(vehicleModel ->
+//                                        vehicleModel.getState() == VehicleState.ACTIVE &&
+//                                                !(liveIds.contains(vehicleModel.getId())));
 
     }
 
