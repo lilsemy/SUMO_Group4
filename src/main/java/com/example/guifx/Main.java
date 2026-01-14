@@ -90,9 +90,9 @@ public class Main extends Application {
                 File file = new File("simulation.csv");
                 if(file.exists()){
                     if(file.delete()){
-                        System.out.println("CSV file deleted successfully");
+                        LOG.info("CSV file deleted successfully");
                     } else {
-                        System.out.println("Failed to delete CSV");
+                        LOG.error("Failed to delete CSV");
                 }
             }
         }
