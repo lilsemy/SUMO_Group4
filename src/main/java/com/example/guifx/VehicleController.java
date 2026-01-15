@@ -164,7 +164,7 @@ public class VehicleController {
 
 
 
-    private final long UI_UPDATE_NANOS = 100_000_000L;
+    private final long UI_UPDATE_NANOS = 75_000_000L;
     private long lastUiNow = 0L;
 
     /**
