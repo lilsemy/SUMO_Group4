@@ -113,10 +113,10 @@ public class GUI {
     @FXML
     private ChoiceBox<TypeFilter> vehicleTypeFilter;
     //currentFilter = The applied filter that changes the GUI
-    private TypeFilter currentTypeFilter = TypeFilter.NONE;
+    private volatile TypeFilter currentTypeFilter = TypeFilter.NONE;
     @FXML
     private ChoiceBox<VehicleColor> vehicleColorFilter;
-    private VehicleColor currentColorFilter = VehicleColor.NONE;
+    private volatile VehicleColor currentColorFilter = VehicleColor.NONE;
 
     //LOGIC FOR SPAWNING
     private SpawnConfig spawnConfig = SpawnConfig.random();
@@ -908,19 +908,19 @@ public class GUI {
                 return;
             }
 
-            if (count > 100) {
-                LOG.error("Maximum allowed vehicles for stress test is 100.");
-                javafx.application.Platform.runLater(() ->
-                        show("Maximum allowed vehicles for stress test is 100.")
-                );
-                setStressAlarmIcon(false);
-                return;
-            }
+//            if (count > 100) {
+//                LOG.error("Maximum allowed vehicles for stress test is 100.");
+//                javafx.application.Platform.runLater(() ->
+//                        show("Maximum allowed vehicles for stress test is 100.")
+//                );
+//                setStressAlarmIcon(false);
+//                return;
+//            }
 
             LOG.info("Starting Stress Test with " + count + " vehicles");
             show("Starting Stress Test with " + count + " vehicles");
 
-            simController.startStressTest(count, spawnConfig);
+            actionQueue.add(() -> simController.startStressTest(count, spawnConfig));
 
             // Trigger 10s alarm blink + gif icon
             startStressAlarmBlink(Duration.seconds(10));

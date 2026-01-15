@@ -63,6 +63,7 @@ public class VehicleController {
                     vehicle.getLaneId());
 
             vehiclesList.put(vehicle.getId(), vehicle);
+
             LOG.info("Injected vehicle: " + vehicle.getId());
         } catch (Exception e) {
             LOG.warn("Failed to inject vehicle " + vehicle.getId() + ": " + e.getMessage());
@@ -163,7 +164,7 @@ public class VehicleController {
 
 
 
-    private final long UI_UPDATE_NANOS = 200_000_000L;
+    private final long UI_UPDATE_NANOS = 100_000_000L;
     private long lastUiNow = 0L;
 
     /**

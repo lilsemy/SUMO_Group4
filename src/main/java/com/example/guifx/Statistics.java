@@ -44,7 +44,8 @@ public class Statistics {
     Map<String, VehicleModel> latest =
             simCon.getVehicleController().getVehiclesMap();
 
-    currentVehicles = new HashMap<>(latest);
+    //currentVehicles = new HashMap<>(latest);
+    currentVehicles = latest;
 
     for (String id : currentVehicles.keySet()) {
       departureTimes.putIfAbsent(id, currentTime);
