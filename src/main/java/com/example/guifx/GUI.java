@@ -373,7 +373,7 @@ public class GUI {
      */
     private void setupZoomAndDrag() {
         mapContainer.setFocusTraversable(true);
-        mapContainer.setOnKeyPressed(event -> {
+        mapContainer.getScene().setOnKeyPressed(event -> {
             boolean rotate = false;
             double dAngle = 0;
             switch (event.getCode()) {
