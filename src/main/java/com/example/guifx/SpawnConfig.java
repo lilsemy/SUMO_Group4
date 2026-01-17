@@ -5,7 +5,6 @@ import java.util.*;
 public class SpawnConfig {
     private final List<TypeFilter> allowedTypes;
     private final List<VehicleColor> allowedColors;
-    //randomly generated number is needed to randomly pick attributes
     private final Random random;
 
     private SpawnConfig(Collection<TypeFilter> types, Collection<VehicleColor> colors) {

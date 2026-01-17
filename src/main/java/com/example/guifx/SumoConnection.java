@@ -9,7 +9,6 @@ import org.eclipse.sumo.libtraci.StringVector;
     */
 public class SumoConnection {
 
-    // tracking if we have a connection or not
     private boolean connected = false;
     private static final Logger LOG = LogManager.getLogger(SumoConnection.class.getName());
 
@@ -21,10 +20,9 @@ public class SumoConnection {
     
     public void connect()throws Exception{
         if (connected){
-            // Already connected, nothing to do
             return;
         }
-        //To load the native libraries that libtraci needs.
+
         Simulation.preloadLibraries();
 
         StringVector args = new StringVector(new String[]{

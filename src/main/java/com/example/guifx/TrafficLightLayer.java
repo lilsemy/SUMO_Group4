@@ -24,10 +24,8 @@ public class TrafficLightLayer {
     private static final Logger LOG = LogManager.getLogger(TrafficLightLayer.class.getName());
     private final TrafficLightController tlC;
 
-    // Pane for traffic light nodes, injected from Controller
     private Pane trafficLightLayer;
 
-    // Map SUMO traffic light (junction) ID to its JavaFX Circle node
     private final Map<String, Circle> trafficLightCircles = new HashMap<>();
 
     /**
@@ -40,8 +38,6 @@ public class TrafficLightLayer {
         this.trafficLightLayer.getChildren().clear();
         this.tlC = tlC;
 
-
-        // Build visual nodes for all traffic lights
         buildTrafficLightCircles();
     }
 
@@ -55,7 +51,6 @@ public class TrafficLightLayer {
             return;
         }
 
-        // Get all traffic light IDs from SUMO
         List<String> trafficLightIds = tlC.getTlIds();
         LOG.info("Found " + trafficLightIds.size() + " traffic lights.");
 
@@ -108,8 +103,6 @@ public class TrafficLightLayer {
             }
         }
 
-        // Do one initial update to set correct colors
-        //updateTrafficLightStatesFromSnapshot();
     }
 
     /**
@@ -134,15 +127,6 @@ public class TrafficLightLayer {
                 continue;
             }
             setCircleColorFromState(circle, state, trafficLightId);
-
-//            try {
-//                // Get current state string like "GGggrrrr"
-//                //String state = TrafficLight.getRedYellowGreenState(trafficLightId);
-//                String state = tlC.getTlList().get(trafficLightId).getRedYellowGreenState(); //--> Currently doesnt work, because states are not frequently updatet.
-//                if (state == null || state.isEmpty()) {
-//                    circle.setFill(Color.GRAY); // Unknown state
-//                    continue;
-//                }
 
 
         }
@@ -172,7 +156,7 @@ public class TrafficLightLayer {
 
         } catch (Exception e) {
             LOG.error("Failed to update state for traffic light '" + trafficLightId + "': " + e.getMessage());
-            circle.setFill(Color.BLACK); //err state
+            circle.setFill(Color.BLACK);
         }
 
     }

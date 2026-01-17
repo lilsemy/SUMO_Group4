@@ -23,7 +23,6 @@ public class TrafficLightController {
     public TrafficLightController() {
         this.tlList = new HashMap<>();
 
-        // Getting all predefined Traffic Lights
         tlIds = TrafficLight.getIDList();
         for (String id : tlIds) {
             TrafficLightModel tl = new TrafficLightModel(id, TrafficLight.getPhase(id),

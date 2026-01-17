@@ -11,10 +11,10 @@ public class Statistics {
     private final SimulationController simCon;
     private Map<String, VehicleModel> currentVehicles = new HashMap<>();
     private Map<String, Double> departureTimes = new HashMap<>();
-    private Map<String, Integer> vehicleCountsPerEdge = new HashMap<>();
     private double totalTravelTime = 0.0;
     private int finishedVehicleCount = 0;
-    private Map<String, Integer> currentTrafficLightStates = new HashMap<>(); // Count of Traffic lights per phase
+    private Map<String, Integer> currentTrafficLightStates = new HashMap<>();
+
     public Statistics(SimulationController simCon) {
         this.simCon = simCon;
     }

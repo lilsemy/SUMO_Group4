@@ -3,8 +3,6 @@ package com.example.guifx;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.sumo.libtraci.Simulation;
-import org.eclipse.sumo.libtraci.Vehicle;
-
 import java.util.List;
 import java.util.Random;
 
@@ -18,12 +16,11 @@ public class SimulationController {
     private final TrafficLightController tlController;
     private final LaneController laneCon;
     private static final Logger LOG = LogManager.getLogger(SimulationController.class.getName());
-    private volatile boolean running = true;   // starts true (volatile booleans have multi-thread visibility)
-
-
+    private volatile boolean running = true;
     private static List<String> routes = List.of("r1", "r2", "r3", "r4", "r6", "r7", "r8", "r9", "r10",
             "r11", "r12", "r13", "r14", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23");
     private Random random = new Random();
+
     /**
     *
     *@throws Exception
@@ -111,13 +108,10 @@ public class SimulationController {
                 //Random Edge chosen from List of all Edges, that are leaving the Map -> Endpoint of newly created Route
                 String target = laneCon.getEndLanes().get(new Random().nextInt(laneCon.getEndLanes().size()));
 
-                //Calculate a route from the User selected Edge, to the just choosen End Edge
                 var route = Simulation.findRoute(laneCon.getLaneModel(lane).getEdge(), target);
 
-                //Change Route of Vehicle to new Route
                 vehicleController.setRoute(v.getId(), route.getEdges());
 
-                //Teleport Vehicle to actual Lane, which was selected
                 vehicleController.moveToLane(v.getId(), lane);
             }
             return v.getId();
@@ -144,10 +138,13 @@ public class SimulationController {
     public TrafficLightController getTlController() {
         return tlController;
     }
+
     public SumoConnection getConnection() {
         return connection;
     }
+
     public LaneController getLaneController(){return laneCon;}
+
     public double getTime() {
         return org.eclipse.sumo.libtraci.Simulation.getTime();
     }

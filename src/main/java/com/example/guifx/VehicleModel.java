@@ -3,7 +3,6 @@ package com.example.guifx;
     /**
     *VehicleState is a model class for Vehicles in the Simulation
     */
-//Renamed "myVehicle", since it only stores states, it is a much more fitting name
 public class VehicleModel {
 
     private double x;

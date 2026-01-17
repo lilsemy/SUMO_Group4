@@ -170,7 +170,6 @@ public class VehicleController {
         return countAll - activeCount;
     }
 
-    //filtering
     public Collection<String> getFilteredVehicleIds(TypeFilter typeFilter, VehicleColor colorFilter) {
         Collection<String> result = new ArrayList<>();
 
