@@ -552,10 +552,10 @@ public class GUI {
                 // 4) Labels + Chart nur alle 200ms (throttled)
                     if (now - lastUiNow >= UI_UPDATE_NANOS){
                         lastUiNow = now;
-                        avgSpeedLabel.setText("Avg Speed: " + df0.format(snap.avgSpeed()) + "ms");
+                        avgSpeedLabel.setText("Avg speed: " + df0.format(snap.avgSpeed()) + "m/s");
                         timeLabel.setText("Time in simulation: " + (int) simController.getTime() + "s");
                         vehicleCountLabel.setText("Vehicles: " + snap.count());
-                        vehicleQueuedCountLabel.setText("Queued Vehicles: " + simController.getVehicleController().countQueuedVehicles(snap.count()));
+                        vehicleQueuedCountLabel.setText("Queued vehicles: " + simController.getVehicleController().countQueuedVehicles(snap.count()));
                         speedSeries.getData().add(new XYChart.Data<>(snap.time(), snap.avgSpeed()));
                         avgTravelTimeSeries.getData().add(new XYChart.Data<>(snap.time(), snap.avgTravelTime()));
 
