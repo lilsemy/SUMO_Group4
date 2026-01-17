@@ -17,7 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class VehicleController {
     private Map<String, VehicleModel> vehiclesList;
     private int vehicleCounter = 0;
-    private int CurrentVehicles = 0;
+    private int currentVehicles = 0;
     private static final Logger LOG = LogManager.getLogger(VehicleController.class.getName());
     private final long UI_UPDATE_NANOS = 75_000_000L;
     private long lastUiNow = 0L;
@@ -160,7 +160,7 @@ public class VehicleController {
                             !liveIds.contains(vm.getId())
             );
 
-            CurrentVehicles = Vehicle.getIDCount();
+            currentVehicles = liveIds.size();
 
 
     }
@@ -188,7 +188,7 @@ public class VehicleController {
     }
 
     public int getCurrentVehicles() {
-        return CurrentVehicles;
+        return currentVehicles;
     }
 
 }
