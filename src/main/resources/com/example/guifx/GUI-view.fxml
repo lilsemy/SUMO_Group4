@@ -165,6 +165,7 @@
                <children>
                   <Label styleClass="label-section" text="Statistics:" />
                   <Label id="vehicleCountLabel" fx:id="vehicleCountLabel" text="Vehicles: 0" />
+                  <Label id="vehicleQueuedCountLabel" fx:id="vehicleQueuedCountLabel" layoutX="10.0" layoutY="43.0" text="Queued Vehicles: 0" />
                   <Label id="avgSpeedLabel" fx:id="avgSpeedLabel" text="Avg Speed: 0 m/s" />
                   <Label id="Tl1Dur" fx:id="Tl1Dur" text="TL1: 0" />
                   <Label id="Tl2Dur" fx:id="Tl2Dur" text="TL2: 0" />
