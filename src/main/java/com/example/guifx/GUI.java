@@ -408,6 +408,7 @@ public class GUI {
                         zoomGroup.setTranslateX(zoomGroup.getTranslateX() - dx);
                         zoomGroup.setTranslateY(zoomGroup.getTranslateY() - dy);
                     } catch (Exception e) {
+                        LOG.error("Failer to Setup Zoom and Drag: " + e.getMessage());
                         e.printStackTrace();
                     }
                 }
@@ -482,6 +483,7 @@ public class GUI {
             scale = newScale;
             scaleTransform.setX(scale);
             scaleTransform.setY(scale);
+            LOG.error(e.getMessage());
         }
     }
 
@@ -547,7 +549,7 @@ public class GUI {
                                     zoomGroup.setTranslateY(currrentTy + (targetTy - currrentTy) * smoothFactor);
                                 }
                     } catch (Exception e) {
-
+                        LOG.error(e.getMessage());
                     }
                 }
                 // 4) Labels + Chart nur alle 200ms (throttled)
@@ -926,6 +928,7 @@ public class GUI {
             try {
                csv =  new CsvWriter("simulation.csv");
             }catch (Exception e) {
+                LOG.error("Failed to initialize CSV: " + e.getMessage());
                 e.printStackTrace();
             }
             double lastCsvWriteTime = 0.0;
@@ -939,6 +942,7 @@ public class GUI {
                         try {
                             task.run();
                         } catch (Exception ex) {
+                            LOG.error(ex.getMessage());
                             ex.printStackTrace();
                         }
 
@@ -961,7 +965,7 @@ public class GUI {
                                 validSpeedCount++;
                             }
                         } catch (Exception ex) {
-
+                            LOG.error("Failure in saving Vehicles in VehicleUIState: " + ex.getMessage());
                         }
                     }
                     double avg = (validSpeedCount > 0) ?  sumSpeed / validSpeedCount :0.0;
@@ -1007,6 +1011,7 @@ public class GUI {
                         Thread.sleep(wait);
                     }
                 } catch (Exception e) {
+                    LOG.fatal("Failure in Simulation Thread start: " + e.getMessage());
                     e.printStackTrace();
                 }
             }
