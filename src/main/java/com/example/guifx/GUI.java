@@ -90,6 +90,8 @@ public class GUI {
     @FXML
     private Label vehicleQueuedCountLabel;
     @FXML
+    private Label timeLabel;
+    @FXML
     private Label Tl1Dur;
     @FXML
     private Label Tl2Dur;
@@ -551,6 +553,7 @@ public class GUI {
                     if (now - lastUiNow >= UI_UPDATE_NANOS){
                         lastUiNow = now;
                         avgSpeedLabel.setText("Avg Speed: " + df0.format(snap.avgSpeed()) + "ms");
+                        timeLabel.setText("Time in simulation: " + (int) simController.getTime() + "s");
                         vehicleCountLabel.setText("Vehicles: " + snap.count());
                         vehicleQueuedCountLabel.setText("Queued Vehicles: " + simController.getVehicleController().countQueuedVehicles(snap.count()));
                         speedSeries.getData().add(new XYChart.Data<>(snap.time(), snap.avgSpeed()));
