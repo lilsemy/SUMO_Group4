@@ -121,7 +121,7 @@
                               </ImageView>
                            </graphic>
                         </Button>
-                        <TextField fx:id="stressTestCountField" prefHeight="28.0" prefWidth="220.0" promptText="Vehicle count (1-10.000)" styleClass="control-field" />
+                        <TextField fx:id="stressTestCountField" prefHeight="28.0" prefWidth="220.0" promptText="Vehicle count (1-15.000)" styleClass="control-field" />
 
                         <Button mnemonicParsing="false" onAction="#commandPrintCongestion" prefHeight="42.0" prefWidth="220.0" styleClass="secondary-button" text="Congestions">
                            <graphic>
