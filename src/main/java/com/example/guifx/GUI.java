@@ -418,20 +418,6 @@ public class GUI {
             }
             mapContainer.requestFocus();
 
-            try {
-                Point2D localPoint = zoomGroup.parentToLocal(event.getX(), event.getY());
-                rotateTransform.setAngle(0);
-                rotateTransform.setPivotX(0);
-                rotateTransform.setPivotY(0);
-                scaleTransform.setPivotX(0);
-                scaleTransform.setPivotY(0);
-
-                double currentScale = scaleTransform.getX();
-                zoomGroup.setTranslateX(event.getX() - zoomGroup.getLayoutX() - localPoint.getX() * currentScale);
-                zoomGroup.setTranslateY(event.getY() - zoomGroup.getLayoutY() - localPoint.getY() * currentScale);
-            } catch (Exception e) {
-
-            }
             dragStartX = event.getSceneX();
             dragStartY = event.getSceneY();
             startTranslateX = zoomGroup.getTranslateX();
