@@ -205,7 +205,7 @@ public class GUI {
             speedChart.setCreateSymbols(false);
 
             avgTravelTimeSeries = new XYChart.Series<>();
-            avgTravelTimeSeries.setName("Avg Travel Time (disappeared cars)");
+            avgTravelTimeSeries.setName("Avg Travel Time");
             travelTimeChart.getData().add(avgTravelTimeSeries);
             travelTimeChart.setCreateSymbols(false);
 
