@@ -22,7 +22,7 @@
                      <children>
                         <Button mnemonicParsing="false" onAction="#commandSpawnVehicle" prefHeight="42.0" prefWidth="220.0" styleClass="primary-button" text="Insert Car">
                            <graphic>
-                              <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@proxy-image.png" />
                                  </image>
@@ -37,7 +37,7 @@
                      <children>
                         <Button fx:id="commandFolowVehicle" mnemonicParsing="false" onAction="#commandFollowVehicle" prefHeight="42.0" prefWidth="220.0" styleClass="secondary-button" text="Follow Vehicle">
                            <graphic>
-                              <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@Search.png" />
                                  </image>
@@ -52,9 +52,9 @@
                      <children>
                         <Button mnemonicParsing="false" onAction="#commandChangeVehicleAppearance" prefHeight="42.0" prefWidth="220.0" styleClass="secondary-button" text="Change Appearance">
                            <graphic>
-                              <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="34.0" fitWidth="34.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
-                                    <Image url="@proxy-image.png" />
+                                    <Image url="@appearance.png" />
                                  </image>
                               </ImageView>
                            </graphic>
@@ -95,7 +95,7 @@
                         <Label styleClass="label-tl" text="Traffic lights:" />
                         <Button mnemonicParsing="false" onAction="#commandChangePhase" prefHeight="42.0" prefWidth="220.0" styleClass="secondary-button" text="Change Phase">
                            <graphic>
-                              <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@trafficlight.png" />
                                  </image>
@@ -125,7 +125,7 @@
 
                         <Button mnemonicParsing="false" onAction="#commandPrintCongestion" prefHeight="42.0" prefWidth="220.0" styleClass="secondary-button" text="Congestions">
                            <graphic>
-                              <ImageView fitHeight="18.0" fitWidth="18.0" pickOnBounds="true" preserveRatio="true">
+                              <ImageView fitHeight="25.0" fitWidth="25.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@Congestion.png" />
                                  </image>
