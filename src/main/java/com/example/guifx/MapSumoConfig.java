@@ -14,7 +14,4 @@ public class MapSumoConfig {
     public static final double STEP_LENGTH = 0.05;
     //time step in seconds (0.1 means 10 steps per second)
 
-
-
-
 }

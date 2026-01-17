@@ -5,7 +5,6 @@ import java.util.*;
 public class SpawnConfig {
     private final List<TypeFilter> allowedTypes;
     private final List<VehicleColor> allowedColors;
-    //randomly generated number is needed to randomly pick attributes
     private final Random random;
 
     private SpawnConfig(Collection<TypeFilter> types, Collection<VehicleColor> colors) {
@@ -14,20 +13,19 @@ public class SpawnConfig {
         this.random = new Random();
     }
 
-    //selects ALL attributes for spawning. It then returns the whole config for use. It will be used later to pick randomly from the whole set of attributes
+    //selects ALL attributes for spawning. It then returns the whole config for use. It is used to pick randomly from the whole set of attributes
     public static SpawnConfig random() {
-        return new SpawnConfig(EnumSet.allOf(TypeFilter.class), EnumSet.allOf(VehicleColor.class));
+        return new SpawnConfig(TypeFilter.spawnableAll(), VehicleColor.spawnableAll());
     }
 
     //restricts TYPE, but allows ALL colors. It then returns the whole config for use
     public static SpawnConfig restrictTypes(Collection<TypeFilter> types) {
-        return new SpawnConfig(types,EnumSet.allOf(VehicleColor.class)
-        );
+        return new SpawnConfig(types,VehicleColor.spawnableAll());
     }
 
     //restricts COLOR, but allows all types, it then returns the whole config for use
     public static SpawnConfig restrictColors(Collection<VehicleColor> colors) {
-        return new SpawnConfig(EnumSet.allOf(TypeFilter.class), colors);
+        return new SpawnConfig(TypeFilter.spawnableAll(), colors);
     }
 
     //restricts both type AND color, it then returns the whole config for use

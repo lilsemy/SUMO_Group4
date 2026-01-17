@@ -1,38 +1,78 @@
 package com.example.guifx;
 
 import javafx.animation.AnimationTimer;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Point2D;
+import javafx.scene.Group;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.image.Image;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
-import javafx.scene.Group;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Scale;
-import javafx.scene.control.Label;
-import javafx.scene.control.ChoiceBox;
-import javafx.geometry.Point2D;
-import org.eclipse.sumo.libtraci.Vehicle;
-
-import java.util.Collection;
-import java.util.Map;
-import java.util.Set;
+import javafx.util.Duration;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import java.text.DecimalFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 
 /**
  * GUI is the class that controls the JavaFX GUI
  */
 public class GUI {
+    private static final Logger LOG = LogManager.getLogger(GUI.class.getName());
     private SimulationController simController;
+    private static final String ALARM_PNG = "/com/example/guifx/alarm.png";
+    private static final String ALARM_GIF = "/com/example/guifx/alarm.gif";
+    private XYChart.Series<Number, Number> speedSeries;
+    private XYChart.Series<Number, Number> avgTravelTimeSeries;
+    private LaneLayer laneLayerInstance;
+    private CarLayer carLayerInstance;
+    private TrafficLightLayer trafficLightLayerInstance;
+    private AnimationTimer timer;
+    private Statistics statistics;
+    private Group zoomGroup = new Group();
+    private Scale scaleTransform = new Scale(1, 1, 0, 0);
+    private Rotate rotateTransform = new Rotate(0, 0, 0);// Added rotation transform
+    private boolean isFollowing = false;// Added tracking state
+    private String followedVehicleId = null;// Added tracked vehicle ID
+    private double scale = 1.0;
+    private final double MIN_SCALE = 0.5;
+    private final double MAX_SCALE = 20.0;
+    private double dragStartX, dragStartY;
+    private double startTranslateX, startTranslateY;
+    private double contentWidth, contentHeight;
+    private volatile VehicleColor currentColorFilter = VehicleColor.NONE;
+    private SpawnConfig spawnConfig = SpawnConfig.random();
+    private Thread simThread;
+    private final ConcurrentLinkedQueue<Runnable> actionQueue = new ConcurrentLinkedQueue<>();
+    private volatile boolean running = false;
+    private volatile long currentSimDelayMs = 50;
+    private volatile SimSnapshot latest = null;
+    private final long UI_UPDATE_NANOS = 200_000_000L; // update charts only every 200ms ;
+    private long lastUiNow = 0 ;
+    private static final int MAX_CHART_POINTS = 300;// limitless charts cause memory leaks and lag
+    private final DecimalFormat df2 = new DecimalFormat("#.##");
+    private final DecimalFormat df0 = new DecimalFormat("#");
+    private Timeline alarmBlinkTimeline;
+    private Timeline alarmAutoStopTimeline;
+    private boolean alarmBlinkOn = false;
+    private String pinnedVehicleInfoId;
+    private String hoveredVehicleInfoId;
 
-
-
+    //Initialization of FXML components
+    @FXML
+    private javafx.scene.image.ImageView stressAlarmIcon;
     @FXML
     private StackPane mapContainer;
     @FXML
@@ -43,20 +83,22 @@ public class GUI {
     private Pane trafficLightLayer;
     @FXML
     private Pane carLayer;
-
-    @FXML
-    private Label realTimeSpeedLabel;
     @FXML
     private Label avgSpeedLabel;
     @FXML
     private Label vehicleCountLabel;
+    @FXML
+    private Label vehicleQueuedCountLabel;
+    @FXML
+    private Label timeLabel;
     @FXML
     private Label Tl1Dur;
     @FXML
     private Label Tl2Dur;
     @FXML
     private LineChart<Number, Number> speedChart;
-
+    @FXML
+    private LineChart<Number, Number> travelTimeChart;
     @FXML
     private TextArea consoleArea;
     @FXML
@@ -67,48 +109,37 @@ public class GUI {
     private ChoiceBox<String> TLSelector;
     @FXML
     private TextField stressTestCountField;
-
-    private XYChart.Series<Number, Number> speedSeries;
-
-    private LaneLayer laneLayerInstance;
-    private CarLayer carLayerInstance;
-    private TrafficLightLayer trafficLightLayerInstance;
-    private AnimationTimer timer;
-
-    private String trackedVehicleId = null;
-    private Statistics statistics;
-
-    private Group zoomGroup = new Group();
-    private Scale scaleTransform = new Scale(1, 1, 0, 0);
-    private Rotate rotateTransform = new Rotate(0, 0, 0);// Added rotation transform
-    private boolean isFollowing = false;// Added tracking state
-    private String followedVehicleId = null;// Added tracked vehicle ID
-
-    private double scale = 1.0;
-    private final double MIN_SCALE = 0.5;
-    private final double MAX_SCALE = 20.0;
-
-    private double dragStartX, dragStartY;
-    private double startTranslateX, startTranslateY;
-
-    private double contentWidth, contentHeight;
-
-    //FILTERING vehicleFilter = The possible filters the user can choose from the choice box
+    @FXML
+    private Slider simSpeedSlider;
+    @FXML
+    private ChoiceBox<String> InsertionSelector;
     @FXML
     private ChoiceBox<TypeFilter> vehicleTypeFilter;
-    //currentFilter = The applied filter that changes the GUI (For now only the statistics side)
-    private TypeFilter currentTypeFilter = TypeFilter.NONE;
+    private volatile TypeFilter currentTypeFilter = TypeFilter.NONE;
     @FXML
     private ChoiceBox<VehicleColor> vehicleColorFilter;
-    private VehicleColor currentColorFilter = VehicleColor.NONE;
-
-    //LOGIC FOR SPAWNING
-    private SpawnConfig spawnConfig = SpawnConfig.restrictTypes(Set.of(TypeFilter.CAR));
-    private ChoiceBox<TypeFilter> typeChoice;
-    private ChoiceBox<VehicleColor> colorChoice;
-
-
-    private double remainingTime;
+    @FXML
+    private ChoiceBox<TypeFilter> typeSpawnChoice;
+    @FXML
+    private ChoiceBox<VehicleColor> colorSpawnChoice;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoHeader;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoId;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoType;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoColor;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoSpeed;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoLane;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoRoute;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoPos;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoAngle;
 
     /**
      * Constructor for GUI.
@@ -118,8 +149,7 @@ public class GUI {
     public GUI() throws Exception {
     }
 
-    // gui console
-    public void log(String message) {
+    public void show(String message) {
         consoleArea.appendText(message + "\n");
     }
 
@@ -135,7 +165,6 @@ public class GUI {
         initVisuals();
     }
 
-
     /**
      * Initializes the visual layers and starts the animation loop
      */
@@ -146,23 +175,46 @@ public class GUI {
 
             MapUtil.setup(contentWidth, contentHeight, 15);
 
-            laneLayerInstance = new LaneLayer(laneLayer);
+            laneLayerInstance = new LaneLayer(laneLayer, simController.getLaneController());
             trafficLightLayerInstance = new TrafficLightLayer(trafficLightLayer, null, simController.getTlController());
-            carLayerInstance = new CarLayer(carLayer, simController);
+            carLayerInstance = new CarLayer(carLayer);
+            carLayerInstance.setVehicleClickListener((vehicleId, isPinned) -> {
+                if (isPinned) {
+                    pinnedVehicleInfoId = vehicleId;
+                    updateVehicleInfoSidebar(vehicleId);
+                } else {
+                    if (pinnedVehicleInfoId == null) {
+                        updateVehicleInfoSidebar(vehicleId);
+                    }
+                }
+            });
+
+            mapContainer.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, evt -> {
+                if (evt.getTarget() == mapContainer || evt.getTarget() == backgroundCanvas) {
+                    pinnedVehicleInfoId = null;
+                    if (carLayerInstance != null) carLayerInstance.clearSelection();
+                    updateVehicleInfoSidebar(null);
+                }
+            });
+
+            updateVehicleInfoSidebar(null);
 
             speedSeries = new XYChart.Series<>();
             speedSeries.setName("Avg Speed");
             speedChart.getData().add(speedSeries);
             speedChart.setCreateSymbols(false);
 
+            avgTravelTimeSeries = new XYChart.Series<>();
+            avgTravelTimeSeries.setName("Avg Travel Time (disappeared cars)");
+            travelTimeChart.getData().add(avgTravelTimeSeries);
+            travelTimeChart.setCreateSymbols(false);
+
             mapContainer.getChildren().clear();
             zoomGroup.getChildren().addAll(backgroundCanvas, laneLayer, trafficLightLayer, carLayer);
 
-            //zoomGroup.getTransforms().add(scaleTransform);
             zoomGroup.getTransforms().addAll(scaleTransform, rotateTransform);
             mapContainer.getChildren().add(zoomGroup);
-            mapContainer.setAlignment(javafx.geometry.Pos.TOP_LEFT); // Ensure Top-Left alignment to prevent centering
-            //                                                                     // jumps
+            mapContainer.setAlignment(javafx.geometry.Pos.CENTER_RIGHT); // Ensure Center-Right alignment
 
             Rectangle clip = new Rectangle();
             clip.widthProperty().bind(mapContainer.widthProperty());
@@ -171,68 +223,56 @@ public class GUI {
 
             setupZoomAndDrag();
 
-            //TODO vehicleselctor
+            //Orders the vehicles in an alphabetically ascending list
             vehicleSelector.setOnShowing(event -> {
+                var vehicles = simController
+                        .getVehicleController()
+                        .getFilteredVehicleIds(currentTypeFilter, currentColorFilter);
 
-    Set<String> vehicles =
-            simController.getVehicleController().getVehiclesMap().keySet();
+                List<String> sortedVehicles = new ArrayList<>(vehicles);
 
-    List<String> sortedVehicles = new ArrayList<>(vehicles);
+                sortedVehicles.sort((v1, v2) -> {
 
-    Collections.sort(sortedVehicles, new Comparator<String>() {
-        @Override
-        public int compare(String a, String b) {
 
-            // remove "id" part
-            String numAString = a.substring(2);
-            String numBString = b.substring(2);
+                    String type1 = v1.replaceAll("\\d+$", "");
+                    String type2 = v2.replaceAll("\\d+$", "");
 
-            int numA = 0;
-            int numB = 0;
 
-            try {
-                numA = Integer.parseInt(numAString);
-                numB = Integer.parseInt(numBString);
-            } catch (NumberFormatException e) {
-                // if something weird happens, keep original order
-                return 0;
-            }
+                    String numStr1 = v1.replaceAll("\\D+", "");
+                    String numStr2 = v2.replaceAll("\\D+", "");
 
-            // descending order
-            return numB - numA;
-        }
-    });
+                    int num1 = numStr1.isEmpty() ? 0 : Integer.parseInt(numStr1);
+                    int num2 = numStr2.isEmpty() ? 0 : Integer.parseInt(numStr2);
 
-    vehicleSelector.getItems().setAll(sortedVehicles);
-});
+
+                    int typeCompare = type1.compareTo(type2);
+                    if (typeCompare != 0) return typeCompare;
+
+                    return Integer.compare(num1, num2);
+                });
+
+                vehicleSelector.getItems().setAll(sortedVehicles);
+            });
+
             vehicleSelector.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-                if (newValue != null) {
-                    followedVehicleId = newValue;
-                    isFollowing = false;
-                    //scale = 10.0;
-                    //scaleTransform.setX(0);
-                    //scaleTransform.setY(0);
-                    log("selected & Following:" + newValue);
-                }
             });
 
             //Initialize DropDown Menu for TrafficLights
-            TLSelector.setOnShowing(event -> {
-                TLSelector.getItems().setAll("TL1", "TL2");
+            TLSelector.setOnShowing(event -> TLSelector.getItems().setAll("TL1", "TL2"));
+
+            //Initialize DropDown Menu for EdgeInsertion
+            InsertionSelector.setOnShowing(event -> {
+                InsertionSelector.getItems().setAll(simController.getLaneController().getPrintLanes());
             });
 
-
-            //setting up the 4 choices in the choice box
+            //DropDown Menu for TYPE FILTER
             vehicleTypeFilter.getItems().addAll(
                     TypeFilter.NONE,
                     TypeFilter.CAR,
                     TypeFilter.TRUCK,
                     TypeFilter.BUS
             );
-            //initially the applied filter is set to NONE
             vehicleTypeFilter.setValue(TypeFilter.NONE);
-
-            //updating the applied filter after user input
             vehicleTypeFilter
                     .getSelectionModel()
                     .selectedItemProperty()
@@ -242,7 +282,7 @@ public class GUI {
                         }
                     });
 
-            //Drop down menu for COLORS
+            //Drop down menu for COLOR FILTER
             vehicleColorFilter.getItems().addAll(
                     VehicleColor.NONE,
                     VehicleColor.RED,
@@ -250,7 +290,7 @@ public class GUI {
                     VehicleColor.WHITE,
                     VehicleColor.YELLOW
             );
-            //Color filter is initially set to NONE
+
             vehicleColorFilter.setValue(VehicleColor.NONE);
             //updating the color filter
             vehicleColorFilter
@@ -262,12 +302,71 @@ public class GUI {
                         }
                     });
 
+            // Listen to Slider to adjust delay dynamically
+            // Left (0) = Very Slow (2000ms delay)
+            // Middle (50) = Normal (100ms delay)
+            // Right (100) = Very Fast (0ms delay)
+            simSpeedSlider.valueProperty().addListener((observableValue, oldValue, newValue) -> {
+                double val = newValue.doubleValue();
+                if(val >= 50) {
+                    // Range 50 to 100 -> Mapping to 100ms down to 0ms
+                    // Formula: (100 - val) * 2
+                    // Ex: 50 -> 50*2 = 100ms. 100 -> 0*2 = 0ms.
+                    currentSimDelayMs = (long) ((100 - val)*2);
+
+
+                } else {
+                    // Range 0 to 50 -> Mapping to 2000ms down to 100ms
+                    // Formula: 100 + (50 - val) * 40
+                    // Ex: 50 -> 100 + 0 = 100ms. 0 -> 100 + 50*40 = 2100ms.
+                    currentSimDelayMs = (long) (100 +(50 - val)*40);
+                }
+            });
+
+
+            typeSpawnChoice.getItems().addAll(
+                    TypeFilter.NONE,
+                    TypeFilter.CAR,
+                    TypeFilter.TRUCK,
+                    TypeFilter.BUS
+            );
+
+            typeSpawnChoice.setValue(TypeFilter.NONE);
+
+            typeSpawnChoice
+                    .getSelectionModel()
+                    .selectedItemProperty()
+                    .addListener((observableValue, oldValue, newValue) -> {
+                        if(newValue != null) {
+                            updateSpawnConfig(typeSpawnChoice.getValue(), colorSpawnChoice.getValue());
+                        }
+                    });
+
+            colorSpawnChoice.getItems().addAll(
+                    VehicleColor.NONE,
+                    VehicleColor.WHITE,
+                    VehicleColor.BLACK,
+                    VehicleColor.RED,
+                    VehicleColor.YELLOW
+            );
+
+            colorSpawnChoice.setValue(VehicleColor.NONE);
+
+            colorSpawnChoice
+                    .getSelectionModel()
+                    .selectedItemProperty()
+                    .addListener((observableValue, oldValue, newValue) -> {
+                        if(newValue != null) {
+                            updateSpawnConfig(typeSpawnChoice.getValue(), colorSpawnChoice.getValue());
+                        }
+                    });
+
             startLoop();
 
         } catch (Exception e) {
             e.printStackTrace();
-            System.err.println("Failed to initialize visuals" + e.getMessage());
-            log("Failed to initialize visuals" + e.getMessage());
+            LOG.fatal("Failed to initialize visuals" + e.getMessage());
+            show("Failed to initialize visuals" + e.getMessage());
         }
     }
 
@@ -276,7 +375,7 @@ public class GUI {
      */
     private void setupZoomAndDrag() {
         mapContainer.setFocusTraversable(true);
-        mapContainer.setOnKeyPressed(event -> {
+        mapContainer.getScene().setOnKeyPressed(event -> {
             boolean rotate = false;
             double dAngle = 0;
             switch (event.getCode()) {
@@ -321,20 +420,6 @@ public class GUI {
             }
             mapContainer.requestFocus();
 
-            try {
-                Point2D localPoint = zoomGroup.parentToLocal(event.getX(), event.getY());
-                rotateTransform.setAngle(0);
-                rotateTransform.setPivotX(0);
-                rotateTransform.setPivotY(0);
-                scaleTransform.setPivotX(0);
-                scaleTransform.setPivotY(0);
-
-                double currentScale = scaleTransform.getX();
-                zoomGroup.setTranslateX(event.getX() - zoomGroup.getLayoutX() - localPoint.getX() * currentScale);
-                zoomGroup.setTranslateY(event.getY() - zoomGroup.getLayoutY() - localPoint.getY() * currentScale);
-            } catch (Exception e) {
-
-            }
             dragStartX = event.getSceneX();
             dragStartY = event.getSceneY();
             startTranslateX = zoomGroup.getTranslateX();
@@ -346,7 +431,6 @@ public class GUI {
             double offsetY = event.getSceneY() - dragStartY;
             zoomGroup.setTranslateX(startTranslateX + offsetX);
             zoomGroup.setTranslateY(startTranslateY + offsetY);
-            clampTranslation();
         });
     }
 
@@ -398,58 +482,6 @@ public class GUI {
             scaleTransform.setX(scale);
             scaleTransform.setY(scale);
         }
-
-
-        /*double contentX = (mouseX - zoomGroup.getTranslateX()) / scale;
-        double contentY = (mouseY - zoomGroup.getTranslateY()) / scale;
-
-        double oldScale = scale;
-        scale = newScale;
-        scaleTransform.setX(scale);
-        scaleTransform.setY(scale);
-
-        double newTranslateX = mouseX - contentX * scale;
-        double newTranslateY = mouseY - contentY * scale;
-        zoomGroup.setTranslateX(newTranslateX);
-        zoomGroup.setTranslateY(newTranslateY);*/
-
-        clampTranslation();
-    }
-
-    /**
-     * Clamps translation to prevent gaps when panning
-     */
-    private void clampTranslation() {
-       /* double containerWidth = mapContainer.getWidth();
-        double containerHeight = mapContainer.getHeight();
-
-        double scaledWidth = contentWidth * scale;
-        double scaledHeight = contentHeight * scale;
-        double tx = zoomGroup.getTranslateX();
-        double ty = zoomGroup.getTranslateY();
-
-        if (scaledWidth <= containerWidth) {
-            tx = (containerWidth - scaledWidth) / 2;
-        } else {
-            if (tx > 0)
-                tx = 0;
-            if (tx + scaledWidth < containerWidth) {
-                tx = containerWidth - scaledWidth;
-            }
-        }
-
-        if (scaledHeight <= containerHeight) {
-            ty = (containerHeight - scaledHeight) / 2;
-        } else {
-            if (ty > 0)
-                ty = 0;
-            if (ty + scaledHeight < containerHeight) {
-                ty = containerHeight - scaledHeight;
-            }
-        }
-
-        zoomGroup.setTranslateX(tx);
-        zoomGroup.setTranslateY(ty);*/
     }
 
     /**
@@ -459,37 +491,49 @@ public class GUI {
         timer = new AnimationTimer() {
             @Override
             public void handle(long now) {
-                try {
-                    if (simController != null) {
-                        simController.singleStep();
-
-                        if (carLayerInstance != null) {
-                            carLayerInstance.updateCars(simController.getVehicleController().getFilteredVehicleIds(currentTypeFilter, currentColorFilter));
+                try{
+                if (!running){
+                    stop();
+                    return;
+                }
+                SimSnapshot snap = latest;
+                if ( snap == null){
+                    return;
+                }
+                // 1) Cars zeichnen
+                if (carLayerInstance != null) {
+                            carLayerInstance.updateCarsFromSnapshot(snap.vehicles());
                         }
 
-                        if (trafficLightLayerInstance != null) {
-                            trafficLightLayerInstance.updateTrafficLightStates();
+                // 2) Traffic lights: Draw traffic lights
+                if (trafficLightLayerInstance != null) {
+                    trafficLightLayerInstance.updateTrafficLightStatesFromSnapshot(snap.trafficLights());
+                }
+
+                // 3) Follow/Rotation:
+                if (isFollowing && followedVehicleId != null) {
+                    try {
+                        VehicleUiState targetVs = null;
+                        for(VehicleUiState vs : snap.vehicles()){
+                            if ( vs.id().equals(followedVehicleId)){
+                                targetVs = vs;
+                                break;
+                            }
                         }
-
-                        //
-                        if (isFollowing && followedVehicleId != null) {
-                            try {
-                                if (simController.getVehicleController().getVehicle(followedVehicleId) == null) {
-
-                                } else {
-                                    var sumoPos = Vehicle.getPosition(followedVehicleId, false);
-                                    double angle = Vehicle.getAngle(followedVehicleId);
-                                    Point2D worldPos = new Point2D(sumoPos.getX(), sumoPos.getY());
+                        if (targetVs != null){
+                                    Point2D worldPos = new Point2D(targetVs.x(), targetVs.y());
                                     Point2D targetLocalPos = MapUtil.worldToScreen(worldPos);
-                                    double targetAngleVal = angle;
+                                    double targetAngleVal = targetVs.angle();
                                     double smoothFactor = 0.1;
                                     double currentAngle = rotateTransform.getAngle();
                                     double nextAngle = currentAngle + (-targetAngleVal - currentAngle) * smoothFactor;
+
                                     rotateTransform.setAngle(nextAngle);
                                     rotateTransform.setPivotX(targetLocalPos.getX());
                                     rotateTransform.setPivotY(targetLocalPos.getY());
                                     scaleTransform.setPivotX(targetLocalPos.getX());
                                     scaleTransform.setPivotY(targetLocalPos.getY());
+
                                     double containerW = mapContainer.getWidth();
                                     double containerH = mapContainer.getHeight();
 
@@ -501,49 +545,81 @@ public class GUI {
                                     zoomGroup.setTranslateX(currrentTx + (targetTx - currrentTx) * smoothFactor);
                                     zoomGroup.setTranslateY(currrentTy + (targetTy - currrentTy) * smoothFactor);
                                 }
-                            } catch (Exception e) {
+                    } catch (Exception e) {
 
+                    }
+                }
+                // 4) Labels + Chart nur alle 200ms (throttled)
+                    if (now - lastUiNow >= UI_UPDATE_NANOS){
+                        lastUiNow = now;
+                        avgSpeedLabel.setText("Avg Speed: " + df0.format(snap.avgSpeed()) + "ms");
+                        timeLabel.setText("Time in simulation: " + (int) simController.getTime() + "s");
+                        vehicleCountLabel.setText("Vehicles: " + snap.count());
+                        vehicleQueuedCountLabel.setText("Queued Vehicles: " + simController.getVehicleController().countQueuedVehicles(snap.count()));
+                        speedSeries.getData().add(new XYChart.Data<>(snap.time(), snap.avgSpeed()));
+                        avgTravelTimeSeries.getData().add(new XYChart.Data<>(snap.time(), snap.avgTravelTime()));
+
+                        //Traffic Light 1/2 Remaining time..
+                        double tl1Rem = 0, tl2Rem = 0;
+                        for ( TrafficLightUIState tl : snap.trafficLights()){
+                            if(tl.id().equals("tl1")){
+                                tl1Rem = tl.remainingTime();
+                            }
+                            if( tl.id().equals("tl4")){
+                                tl2Rem = tl.remainingTime();
                             }
                         }
+                        Tl1Dur.setText("Traffic Light 1: " + df0.format(tl1Rem) + "s");
+                        Tl2Dur.setText("Traffic Light 2: " + df0.format(tl2Rem) + "s");
+                        if (speedSeries.getData().size() > MAX_CHART_POINTS) {
+                            speedSeries.getData().remove(0, speedSeries.getData().size() - MAX_CHART_POINTS);
+                        }
+                        if (avgTravelTimeSeries.getData().size() > MAX_CHART_POINTS) {
+                            avgTravelTimeSeries.getData().remove(0,
+                                    avgTravelTimeSeries.getData().size() - MAX_CHART_POINTS);
+                        }
+
                     }
 
-                    //
-                    double time = org.eclipse.sumo.libtraci.Simulation.getTime();
-
-                    if (statistics != null) {
-                        statistics.updateVehicles(time);
-                      /*
-                        double avgSpeed = statistics.getAverageSpeed();
-                        int count = simController.getVehicleController().getVehiclesMap().size();*/
-                        Collection<VehicleModel> filteredVehiclesList =
-                                simController
-                                        .getVehicleController()
-                                        .getFilteredVehicles(currentTypeFilter, currentColorFilter);
-                        double avgSpeed = statistics.getAverageSpeed(filteredVehiclesList);
-                        int count = filteredVehiclesList.size();
-
-                        java.text.DecimalFormat df = new java.text.DecimalFormat("#.##");
-
-                        avgSpeedLabel.setText("Avg Speed: " + df.format(avgSpeed) + "ms");
-                        vehicleCountLabel.setText("Vehicles: " + count);
-                        speedSeries.getData().add(new XYChart.Data<>(time, avgSpeed));
-                    }
-
-                    //TrafficLight Durations
-                    java.text.DecimalFormat df = new java.text.DecimalFormat("#");
-                    remainingTime = simController.getTlController().remainingTime("tl1") - time;
-                    Tl1Dur.setText("Traffic Light 1: " + df.format(remainingTime) + "s");
-                    remainingTime = simController.getTlController().remainingTime("tl4") - time;
-                    Tl2Dur.setText("Traffic Light 2: " + df.format(remainingTime) + "s");
+//                    //TrafficLight Durations
+//                    java.text.DecimalFormat df = new java.text.DecimalFormat("#");
+//                    remainingTime = simController.getTlController().remainingTime("tl1") - time;
+//                    Tl1Dur.setText("Traffic Light 1: " + df.format(remainingTime) + "s");
+//                    remainingTime = simController.getTlController().remainingTime("tl4") - time;
+//                    Tl2Dur.setText("Traffic Light 2: " + df.format(remainingTime) + "s");
+//                    //synchronize TrafficLightModels with TL values in Simualtion
+//                    simController.getTlController().updateTLModel();
 
                 } catch (Exception e) {
+                    LOG.fatal("Error in Simulation Loop: " + e.getMessage());
                     e.printStackTrace();
-                    stop();
+                    //stop();
                 }
             }
         };
-
+        startSimulationThread();
         timer.start();
+    }
+
+    public void updateSpawnConfig(TypeFilter selectedType, VehicleColor selectedColor){
+
+        if(selectedType == TypeFilter.NONE && selectedColor == VehicleColor.NONE){
+            spawnConfig = SpawnConfig.random();
+        }
+
+        if(selectedType == TypeFilter.NONE && selectedColor != VehicleColor.NONE){
+            spawnConfig = SpawnConfig.restrictColors(EnumSet.of(selectedColor));
+        }
+
+        if(selectedType != TypeFilter.NONE && selectedColor == VehicleColor.NONE){
+            spawnConfig = SpawnConfig.restrictTypes(EnumSet.of(selectedType));
+        }
+
+        if(selectedType != TypeFilter.NONE && selectedColor != VehicleColor.NONE){
+            spawnConfig = SpawnConfig.restrictAll(EnumSet.of(selectedType), EnumSet.of(selectedColor));
+        }
+
+
     }
 
     /**
@@ -551,18 +627,29 @@ public class GUI {
      *
      * @param e ActionEvent from button click
      */
-    @FXML
+
     public void commandSpawnVehicle(ActionEvent e) {
-        System.out.println("Spawning new vehicle!");
-        log("Spawning new vehicle!");
-        String id = simController.spawnVehicle(spawnConfig);
-        if (id != null) {
-            System.out.println("Spawned:" + id);
-            log("Spawned:" + id);
+        LOG.info("Spawning new vehicle!");
+        show("Spawning new vehicle!");
+        actionQueue.add(()-> {
+        if (InsertionSelector.getValue() == null) {
+            String id = simController.spawnVehicle(spawnConfig, null);
+            if (id != null) {
+                LOG.info("Spawned:" + id);
+                javafx.application.Platform.runLater(()-> show("Spawned:" + id + " randomly!"));
+            }
         }
+        else {
+            String id = simController.spawnVehicle(spawnConfig, InsertionSelector.getValue());
+            if (id != null) {
+                LOG.info("Spawned:" + id + " on Lane: " + InsertionSelector.getValue() + "!");
+                javafx.application.Platform.runLater(()-> show("Spawned:" + id + " on Lane: " + InsertionSelector.getValue() + "!"));
+            }
+        }
+    });
     }
 
-    @FXML
+
     public void commandFollowVehicle(ActionEvent e) {
         String selectedId = null;
         String targetId = null;
@@ -577,11 +664,11 @@ public class GUI {
         } else {
             targetId = lastId;
         }
-        if (targetId != null) {
-            System.out.println("no vehicle selected!");
-            log("no vehicle  selected!");
+        if (targetId == null) {
+            LOG.info("no vehicle selected!");
+            show("no vehicle  selected!");
+            return;
         }
-
 
         followedVehicleId = targetId;
         isFollowing = true;
@@ -590,31 +677,8 @@ public class GUI {
         scaleTransform.setX(scale);
         scaleTransform.setY(scale);
 
-        System.out.println("Following:" + lastId);
-        log("Following:" + lastId);
-    }
-
-    /**
-     * Gets the speed of the last vehicle
-     *
-     * @param e ActionEvent from button click
-     */
-    @FXML
-    public void commandGetVehicleSpeed(ActionEvent e) {
-        String lastId = simController.getVehicleController().getLastVehicleId();
-        if (lastId != null) {
-            try {
-                double speed = simController.getVehicleController().getVehicleSpeed(lastId);
-                java.text.DecimalFormat dv = new java.text.DecimalFormat("#.##");
-                System.out.println("Speed of last vehicle " + lastId + ": " + dv.format(speed));
-                log("Speed of last vehicle " + lastId + ": " + dv.format(speed));
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            System.out.println("No vehicles in simulation!");
-            log("No vehicles in simulation!");
-        }
+        LOG.info("Following:" + targetId);
+        show("Following:" + targetId);
     }
 
     /**
@@ -623,19 +687,28 @@ public class GUI {
      * @param e ActionEvent from button click
      */
     public void commandChangePhase(ActionEvent e) {
-        if (!TLSelector.getValue().isEmpty()){
+        if (TLSelector.getValue() != null){
+
             if (!GetDuration.getText().isEmpty()) {
-                double newDur = Double.parseDouble(GetDuration.getText());
-                simController.changePhase(newDur, TLSelector.getValue());
-                System.out.println("Changing TrafficLight Phase of Traffic Light: " + TLSelector.getValue() + "with Phase Duration of: " + newDur + " seconds!");
-                log("Changing TrafficLight Phase of Traffic Light: " + TLSelector.getValue() + "with Phase Duration of: " + newDur + " seconds!");
-            } else {
-                System.out.println("Error! Please enter a valid number for the Phase duration!");
-                log("Error! Please enter a valid number for the Phase duration!");
+                try {
+                    double newDur = Double.parseDouble(GetDuration.getText());
+                    String tl = TLSelector.getValue();
+                    actionQueue.add(() -> {
+                        simController.changePhase(newDur, tl);
+                        LOG.info("Changing TrafficLight Phase of Traffic Light: " + tl + "with Phase Duration of: " + newDur + " seconds!");
+                        show("Changing TrafficLight Phase of Traffic Light: " + tl + "with Phase Duration of: " + newDur + " seconds!");
+                    });
+                } catch (Exception ex) {
+                    LOG.error("Changing TrafficLight states failed");
+                    show("Changing TrafficLight states failed");
+                }
+            }    else {
+                LOG.error("Error! Please enter a valid number for the Phase duration!");
+                show("Error! Please enter a valid number for the Phase duration!");
             }
         }
         else {
-            System.out.println("Please select a Traffic Light");
+            LOG.error("Please select a Traffic Light");
         }
     }
 
@@ -644,55 +717,307 @@ public class GUI {
      *
      * @param e ActionEvent from button click
      */
-    @FXML
+
     public void commandStressTest(ActionEvent e) {
         try {
             int count = Integer.parseInt(stressTestCountField.getText());
 
             if (count <= 0) {
-                log("Please enter a positive number for stress test.");
+                javafx.application.Platform.runLater(() -> show("Please enter a positive number for stress test"));
+
+                // ensure icon is reset
+                setStressAlarmIcon(false);
                 return;
             }
 
-            System.out.println("Starting Stress Test with " + count + " vehicles");
-            log("Starting Stress Test with " + count + " vehicles");
+            if (count > 15000) {
+                LOG.error("Maximum allowed vehicles for stress test is 15.000");
+                javafx.application.Platform.runLater(() ->
+                        show("Maximum allowed vehicles for stress test is 15.000")
+                );
+                setStressAlarmIcon(false);
+                return;
+            }
 
-            simController.startStressTest(count);
+            LOG.info("Starting Stress Test with " + count + " vehicles");
+            show("Starting Stress Test with " + count + " vehicles");
+
+            actionQueue.add(() -> simController.startStressTest(count, spawnConfig));
+            startStressAlarmBlink(Duration.seconds(10));
 
         } catch (NumberFormatException ex) {
-            log("Invalid number. Please enter a valid integer.");
-            System.out.println("Invalid stress test number");
+            show("Invalid number. Please enter a valid integer.");
+            LOG.error("Invalid stress test number");
+            setStressAlarmIcon(false);
         }
     }
 
-    @FXML
-    public void commandPrintCongestion(ActionEvent e) {
+    private void setStressAlarmIcon(boolean active) {
+        if (stressAlarmIcon == null) return;
 
-        double time = org.eclipse.sumo.libtraci.Simulation.getTime();
+        String res = active ? ALARM_GIF : ALARM_PNG;
+        try {
+            var url = getClass().getResource(res);
+            if (url != null) {
+                stressAlarmIcon.setImage(new Image(url.toExternalForm()));
+            }
+        } catch (Exception ignored) {
+        }
+    }
 
-        Map<String, Double> congestions =
-                statistics.detectCongestionHotspots(time);
+    /**
+     * Starts a red blink alarm on the whole UI for a fixed duration.
+     * This only changes a CSS class on the root, so it won't affect the map container styling.
+     */
+    private void startStressAlarmBlink(Duration totalDuration) {
+        stopStressAlarmBlink();
 
-        if (congestions.isEmpty()) {
-            log("No congestion found");
-            System.out.println("No congestion found");
+        javafx.scene.Parent root = (mapContainer != null && mapContainer.getScene() != null)
+                ? mapContainer.getScene().getRoot()
+                : null;
+        if (root == null) {
             return;
         }
 
-        log("Congestion detected:");
-        System.out.println("Congestion detected:");
+        setStressAlarmIcon(true);
+        alarmBlinkOn = false;
 
-        for (Map.Entry<String, Double> entry : congestions.entrySet()) {
+        alarmBlinkTimeline = new Timeline(
+                new KeyFrame(Duration.millis(200), evt -> {
+                    if (alarmBlinkOn) {
+                        root.getStyleClass().remove("alarm-blink");
+                    } else {
+                        if (!root.getStyleClass().contains("alarm-blink")) {
+                            root.getStyleClass().add("alarm-blink");
+                        }
+                    }
+                    alarmBlinkOn = !alarmBlinkOn;
+                })
+        );
+        alarmBlinkTimeline.setCycleCount(Timeline.INDEFINITE);
+        alarmBlinkTimeline.play();
 
-            String message =
-                    "Lane " + entry.getKey() +
-                            " → avg speed: " +
-                            String.format("%.2f", entry.getValue()) +
-                            " m/s";
+        alarmAutoStopTimeline = new Timeline(new KeyFrame(totalDuration, evt -> stopStressAlarmBlink()));
+        alarmAutoStopTimeline.setCycleCount(1);
+        alarmAutoStopTimeline.play();
+    }
 
-            log(message);
-            System.out.println(message);
+    private void stopStressAlarmBlink() {
+        javafx.scene.Parent root = (mapContainer != null && mapContainer.getScene() != null)
+                ? mapContainer.getScene().getRoot()
+                : null;
+
+        if (alarmBlinkTimeline != null) {
+            alarmBlinkTimeline.stop();
+            alarmBlinkTimeline = null;
+        }
+        if (alarmAutoStopTimeline != null) {
+            alarmAutoStopTimeline.stop();
+            alarmAutoStopTimeline = null;
+        }
+
+        alarmBlinkOn = false;
+        setStressAlarmIcon(false);
+
+        if (root != null) {
+            root.getStyleClass().remove("alarm-blink");
         }
     }
 
+
+    public void commandPrintCongestion(ActionEvent e) {
+        actionQueue.add(() -> {
+            double time = org.eclipse.sumo.libtraci.Simulation.getTime();
+
+            Map<String, Double> congestions =
+                    statistics.detectCongestionHotspots(time);
+
+            if (congestions.isEmpty()) {
+                javafx.application.Platform.runLater(() -> show("No congestion found"));
+                LOG.info("No congestion found");
+                return;
+            }
+
+            javafx.application.Platform.runLater(() -> show("Congestion detected:"));
+            LOG.info("Congestion detected:");
+
+            for (Map.Entry<String, Double> entry : congestions.entrySet()) {
+
+                String message =
+                        "Lane " + entry.getKey() +
+                                " → avg speed: " +
+                                String.format("%.2f", entry.getValue()) +
+                                " m/s";
+
+                javafx.application.Platform.runLater(() -> show(message));
+                LOG.info(message);
+            }
+        });
+    }
+
+    private void updateVehicleInfoSidebar(String vehicleId) {
+        if (vehicleInfoHeader == null) return;
+        if (Objects.equals(vehicleId, pinnedVehicleInfoId)) {
+        } else {
+            hoveredVehicleInfoId = vehicleId;
+        }
+
+        if (vehicleId == null || simController == null) {
+            vehicleInfoHeader.setText("No vehicle selected");
+            if (vehicleInfoId != null) vehicleInfoId.setText("ID: -");
+            if (vehicleInfoType != null) vehicleInfoType.setText("Type: -");
+            if (vehicleInfoColor != null) vehicleInfoColor.setText("Color: -");
+            if (vehicleInfoSpeed != null) vehicleInfoSpeed.setText("Speed: -");
+            if (vehicleInfoLane != null) vehicleInfoLane.setText("Lane: -");
+            if (vehicleInfoRoute != null) vehicleInfoRoute.setText("Route: -");
+            if (vehicleInfoPos != null) vehicleInfoPos.setText("Pos: -");
+            if (vehicleInfoAngle != null) vehicleInfoAngle.setText("Angle: -");
+            return;
+        }
+
+        VehicleModel v = simController.getVehicleController().getVehicle(vehicleId);
+        if (v == null) {
+            updateVehicleInfoSidebar(null);
+            return;
+        }
+
+        java.text.DecimalFormat df2 = new java.text.DecimalFormat("#.##");
+        java.text.DecimalFormat df0 = new java.text.DecimalFormat("#");
+
+        vehicleInfoHeader.setText("Selected: " + vehicleId);
+        if (vehicleInfoId != null) vehicleInfoId.setText("ID: " + v.getId());
+        if (vehicleInfoType != null) vehicleInfoType.setText("Type: " + safe(v.getTypeId()));
+        if (vehicleInfoColor != null) vehicleInfoColor.setText("Color: " + String.valueOf(v.getColor()));
+        if (vehicleInfoSpeed != null) vehicleInfoSpeed.setText("Speed: " + df2.format(v.getSpeed()) + " m/s");
+        if (vehicleInfoLane != null) vehicleInfoLane.setText("Lane: " + safe(v.getLaneId()));
+        if (vehicleInfoRoute != null) vehicleInfoRoute.setText("Route: " + safe(v.getRouteId()));
+        if (vehicleInfoPos != null) vehicleInfoPos.setText("Pos: " + df2.format(v.getX()) + ", " + df2.format(v.getY()));
+        if (vehicleInfoAngle != null) vehicleInfoAngle.setText("Angle: " + df0.format(v.getAngle()));
+    }
+
+    private static String safe(String s) {
+        return s == null ? "-" : s;
+    }
+
+    @FXML
+    private void commandChangeVehicleAppearance(ActionEvent e){
+        if(pinnedVehicleInfoId != null){
+            simController.changeVehicleAppearance(pinnedVehicleInfoId, typeSpawnChoice.getValue(), colorSpawnChoice.getValue());
+        }else{
+            LOG.error("No vehicle selected!");
+        }
+    }
+
+    private void startSimulationThread() {
+        running = true;
+        simThread = new Thread(() -> {
+            CsvWriter csv = null;
+            try {
+               csv =  new CsvWriter("simulation.csv");
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
+            double lastCsvWriteTime = 0.0;
+
+
+            while (running) {
+                try {
+                    long startTime = System.currentTimeMillis();
+                    Runnable task;
+                    while ((task = actionQueue.poll()) != null) {
+                        try {
+                            task.run();
+                        } catch (Exception ex) {
+                            ex.printStackTrace();
+                        }
+
+                    }
+
+                    simController.singleStep();
+                    double time = simController.getTime();
+
+                    Collection<String> ids = simController.getVehicleController().getFilteredVehicleIds(currentTypeFilter, currentColorFilter);
+                    List<VehicleUiState> states = new ArrayList<>(Math.max(1, ids.size()));
+
+                    double sumSpeed = 0;
+                    int validSpeedCount = 0;
+                    for (String id : ids) {
+                        try {
+                            VehicleModel v = simController.getVehicleController().getVehicle(id);
+                            if (v != null) {
+                                states.add(new VehicleUiState(id, v.getX(), v.getY(), v.getAngle(), v.getTypeId(), v.getColor()));
+                                sumSpeed += v.getSpeed();
+                                validSpeedCount++;
+                            }
+                        } catch (Exception ex) {
+
+                        }
+                    }
+                    double avg = (validSpeedCount > 0) ?  sumSpeed / validSpeedCount :0.0;
+                    int count = states.size();
+                    double avgTrvelTime = 0;
+                    if (statistics != null) {
+                        statistics.updateVehicles(time);
+                        avgTrvelTime = statistics.updateAndGetAverageTravelTime(time);
+                        statistics.updateTrafficLights();
+                    }
+                    long stepDuration = System.currentTimeMillis() - startTime;
+
+                    if (currentSimDelayMs > 0 && stepDuration > currentSimDelayMs + 50) {
+                        LOG.info("System Overload: Step took " + stepDuration + "ms (Target: "
+                                + currentSimDelayMs + "ms)");
+                    }
+
+                    simController.getTlController().updateTLModel();
+
+                    List<TrafficLightUIState> tlStates = new ArrayList<>();
+                    for (var entry : simController.getTlController().getTlList().entrySet()) {
+                        String id = entry.getKey();
+                        String state = entry.getValue().getRedYellowGreenState();
+                        double rem = simController.getTlController().remainingTime(id) - time;
+                        tlStates.add(new TrafficLightUIState(id, state, Math.max(0, rem)));
+                    }
+                    latest = new SimSnapshot(time, states, avg, avgTrvelTime, count, tlStates);
+
+                    if( csv != null && time - lastCsvWriteTime >= 1.0) {
+                        csv.writeStep(
+                                time,
+                                statistics.getVehicleCount(),
+                                statistics.getAverageSpeed(),
+                                statistics.isCongestionPresent(time),
+                                statistics.getTrafficLightStates()
+                        );
+                        lastCsvWriteTime = time;
+                    }
+
+                    long elapsedTime = System.currentTimeMillis() - startTime;
+                    long wait = currentSimDelayMs - elapsedTime;
+                    if (wait > 0) {
+                        Thread.sleep(wait);
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            if (csv != null) {
+                csv.close();
+            }
+
+        });
+        simThread.setDaemon(true);
+        simThread.start();
+    }
+    public void stopAll(){
+        running = false;
+        if(timer != null){
+            timer.stop();
+        }
+        if(simController != null){
+            simController.stopSimulation();
+
+        }
+        if(simController != null && simController.getConnection() != null){
+            simController.getConnection().close();
+        }
+    }
 }

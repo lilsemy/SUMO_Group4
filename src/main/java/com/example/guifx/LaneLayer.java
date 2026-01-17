@@ -7,35 +7,33 @@ import javafx.scene.shape.Polyline;
 import org.eclipse.sumo.libtraci.*;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.scene.text.Text;
+import javafx.scene.text.Font;
 
 /**
  * LaneLayer is responsible for drawing lane shapes on a JavaFX Pane
  */
 public class LaneLayer {
-    // Pane where we place lane shapes
     private Pane laneLayer;
-
-    // Keep references to lane shapes
     private final List<Polyline> lanePolylines = new ArrayList<>();
-
-    // List of all route IDs in the network
-    static List<String> allRouteIds = Route.getIDList();
+    private final List<Text> laneLabels = new ArrayList<>();
+    private final LaneController laneCon;
 
     /**
      * Constructs a LaneLayer and builds lane polylines
      * 
      * @param laneLayer Pane to draw lanes on
      */
-    LaneLayer(Pane laneLayer) {
+    LaneLayer(Pane laneLayer, LaneController laneCon) {
         this.laneLayer = laneLayer;
         lanePolylines.clear();
         this.laneLayer.getChildren().clear();
-
+        this.laneCon = laneCon;
         buildLanePolylines();
     }
 
     /**
-     * Builds Polyline nodes for each SUMO lane and adds them to the layer
+     * Builds Polyline nodes for each SUMO lane + creates Labels for some Lanes for better overiew + adds them to the layer
      */
     private void buildLanePolylines() {
         if (laneLayer == null) {
@@ -46,10 +44,10 @@ public class LaneLayer {
             throw new IllegalStateException("MapUtil is not ready. Call MapUtil.setup(...) before Network.init().");
         }
 
-        List<String> laneIds = Lane.getIDList();
+        List<String> laneIds = laneCon.getLaneIds();
 
         for (String laneId : laneIds) {
-            TraCIPositionVector vec = Lane.getShape(laneId);
+            TraCIPositionVector vec = laneCon.getLaneModel(laneId).getShape();
             List<TraCIPosition> pts = vec.getValue();
             if (pts == null || pts.isEmpty()) continue;
 
@@ -68,6 +66,32 @@ public class LaneLayer {
 
             laneLayer.getChildren().add(polyline);
             lanePolylines.add(polyline);
+
+            //Calculate Positions of Lane Labels -> at the middle of the Lane
+            int midIndex = pts.size() / 2;
+            TraCIPosition midPoint = pts.get(midIndex);
+
+            Point2D sumoMid = new Point2D(midPoint.getX(), midPoint.getY());
+            Point2D javaMid = MapUtil.worldToScreen(sumoMid);
+
+            //Only a handfull of Lanes are printed to ensure readability
+            if (laneCon.getPrintLanes().contains(laneId)) {
+                        Text label = new Text(laneId);
+                        label.setX(javaMid.getX());
+                        label.setY(javaMid.getY());
+                        label.setFill(Color.DARKGRAY);
+                        label.setFont(Font.font(5));
+
+                        //Center the Text lightly
+                        label.setTranslateX(2);
+                        label.setTranslateY(-2);
+
+
+                        laneLayer.getChildren().add(label);
+                        laneLabels.add(label);
+
+            }
+
         }
     }
 
@@ -77,6 +101,7 @@ public class LaneLayer {
     public void rebuild() {
         if (laneLayer == null) return;
         lanePolylines.clear();
+        laneLabels.clear();
         laneLayer.getChildren().clear();
         buildLanePolylines();
     }

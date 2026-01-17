@@ -13,13 +13,11 @@ import java.util.List;
  * MapUtil provides utility methods to convert SUMO world coordinates to JavaFX screen coordinates
  */
 public class MapUtil {
-    // List of all lane polylines in world coordinates
     private static final List<List<Point2D>> lanePolylinesWorld = new ArrayList<>();
-    // World bounds and scale
     private static double minX, maxX, minY, maxY;
-    private static double scale; // from meters in SUMO to pixels in JavaFX
+    private static double scale;
     private static double canvasWidth, canvasHeight, MARGIN;
-    public static boolean boundsReady = false; // true if bounds/scale are set
+    public static boolean boundsReady = false;
 
     /**
      * Sets up the map graphics, computes bounds and scale

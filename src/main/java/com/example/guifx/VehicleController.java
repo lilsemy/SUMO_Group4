@@ -1,10 +1,15 @@
 package com.example.guifx;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.eclipse.sumo.libtraci.StringVector;
 import org.eclipse.sumo.libtraci.Vehicle;
 import org.eclipse.sumo.libtraci.TraCIPosition;
 import org.eclipse.sumo.libtraci.Simulation;
 
 import java.util.*;
+
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * VehicleController controls vehicles in the simulation
@@ -12,12 +17,16 @@ import java.util.*;
 public class VehicleController {
     private Map<String, VehicleModel> vehiclesList;
     private int vehicleCounter = 0;
+    private int currentVehicles = 0;
+    private static final Logger LOG = LogManager.getLogger(VehicleController.class.getName());
+    private final long UI_UPDATE_NANOS = 75_000_000L;
+    private long lastUiNow = 0L;
 
     /**
      * Constructs a VehicleController
      */
     public VehicleController() {
-        this.vehiclesList = new HashMap<>();
+        this.vehiclesList = new ConcurrentHashMap<>();
     }
 
     /**
@@ -57,25 +66,10 @@ public class VehicleController {
                     vehicle.getLaneId());
 
             vehiclesList.put(vehicle.getId(), vehicle);
-            System.out.println("Injected vehicle: " + vehicle.getId());
-        } catch (Exception e) {
-            System.err.println("Failed to inject vehicle " + vehicle.getId() + ": " + e.getMessage());
-        }
-    }
 
-    /**
-     * Returns the speed of a vehicle
-     * 
-     * @param vehicleId ID of the vehicle
-     * @return speed of vehicle or 0 if not found
-     * @throws Exception if retrieval fails
-     */
-    public double getVehicleSpeed(String vehicleId) throws Exception {
-        if (vehiclesList.containsKey(vehicleId)) {
-            return vehiclesList.get(vehicleId).getSpeed();
-        } else {
-            System.out.println("Error! Vehicle " + vehicleId + " not found in simulation.");
-            return 0;
+            LOG.info("Injected vehicle: " + vehicle.getId());
+        } catch (Exception e) {
+            LOG.warn("Failed to inject vehicle " + vehicle.getId() + ": " + e.getMessage());
         }
     }
 
@@ -87,6 +81,26 @@ public class VehicleController {
     public String getLastVehicleId() {
         if (vehiclesList.isEmpty()) return null;
         return "id" + vehicleCounter;
+    }
+
+    /**
+     * Teleports Vehicle to given Lane.
+     * @param vehID
+     * @param lane
+     */
+    public void moveToLane(String vehID, String lane){
+        Vehicle.moveTo(vehID, lane, 0);
+    }
+
+    /**
+     * Sets Vehicles Route to newly given Route.
+     * @param vehId
+     * @param route
+     */
+    public void setRoute(String vehId, StringVector route){
+        VehicleModel v = getVehicle(vehId);
+        v.setRouteId("c"); //"c" stands for custom RouteID, since we calculate a random one, which is not saved in rou.xml -> has no ID
+        Vehicle.setRoute(vehId, route);
     }
 
     /**
@@ -108,78 +122,52 @@ public class VehicleController {
         return vehiclesList.get(id);
     }
 
-    /**
-     * Sets the camera to track a specific vehicle
-     * 
-     * @param viwId view ID
-     * @param vehId vehicle ID
-     * @throws Exception if tracking fails
-     */
-    public void trackVehicle(String viwId, String vehId) throws Exception {
-        if (getIds().contains(vehId)) {
-            // GUI.trackVehicle(viwId, vehId); // commented out
-        } else {
-            System.out.println("Warning! Car left the Map or was deleted.");
-        }
-    }
-
-    /**
-     * Returns IDs of all vehicles in the simulation
-     * 
-     * @return List of vehicle IDs
-     * @throws Exception if retrieval fails
-     */
-    public List<String> getIds() throws Exception {
-        List<String> IDList = Vehicle.getIDList();
-        return IDList;
-    }
 
     /**
      * Updates the local vehicle states from the simulation
      * 
      * @throws Exception if update fails
      */
-    //TODO THIS CURRENTLY BREAKS FILTERING. IF CARS ARE QUEUED UP IT CHANGES THEIR COLOR TO DEFAULT VALUE WHICH ISN'T IDEAL
     public void updateFromSimulation() throws Exception {
-        List<String> liveIds = Vehicle.getIDList();
 
-        vehiclesList.keySet().retainAll(liveIds);
 
-        for (String id : liveIds) {
-            double speed = Vehicle.getSpeed(id);
-            TraCIPosition pos = Vehicle.getPosition(id, false);
-            double angle = Vehicle.getAngle(id);
-            String laneId = Vehicle.getLaneID(id);
-            String typeId = Vehicle.getTypeID(id);
 
-            VehicleModel v = vehiclesList.getOrDefault(id, new VehicleModel(id));
+            long now = System.nanoTime();
+            if (now - lastUiNow < UI_UPDATE_NANOS) {
+                return; // keep last cached values
+            }
+            lastUiNow = now;
 
-            v.setSpeed(speed);
-            v.setPosition(pos.getX(), pos.getY());
-            v.setAngle(angle);
-            v.setLaneId(laneId);
-            v.setTypeId(typeId);
 
-            vehiclesList.put(id, v);
-        }
+            Set<String> liveIds = new HashSet<>(Vehicle.getIDList());
+
+            for (VehicleModel v : vehiclesList.values()) {
+                String id = v.getId();
+
+                if (liveIds.contains(id)) {
+                    v.setState(VehicleState.ACTIVE);
+
+                    TraCIPosition pos = Vehicle.getPosition(id);
+                    v.setPosition(pos.getX(), pos.getY());
+                    v.setSpeed(Vehicle.getSpeed(id));
+                    v.setAngle(Vehicle.getAngle(id));
+                    v.setLaneId(Vehicle.getLaneID(id));
+                }
+            }
+
+            vehiclesList.values().removeIf(vm ->
+                    vm.getState() == VehicleState.ACTIVE &&
+                            !liveIds.contains(vm.getId())
+            );
+
+            currentVehicles = liveIds.size();
+
+
     }
 
-    //filtering
-    public Collection<VehicleModel> getFilteredVehicles(TypeFilter typeFilter, VehicleColor colorFilter) {
-        Collection<VehicleModel> result = new ArrayList<>();
-
-        for(VehicleModel v : vehiclesList.values()){
-            //does the type of v match with the given filter? TRUE, if not, FALSE
-            boolean typeMatches = typeFilter == TypeFilter.NONE ||
-                                  typeFilter.getTypeId().equals(v.getTypeId());
-            //does the color of v match with the given filter? TRUE, if not, FALSE
-            boolean colorMatches = colorFilter == VehicleColor.NONE ||
-                                   colorFilter == v.getColor();
-            //if both true, add to list
-            if(typeMatches && colorMatches) result.add(v);
-        }
-
-        return result;
+    public int countQueuedVehicles(int activeCount){
+        int countAll = vehiclesList.size();
+        return countAll - activeCount;
     }
 
     public Collection<String> getFilteredVehicleIds(TypeFilter typeFilter, VehicleColor colorFilter) {
@@ -188,14 +176,19 @@ public class VehicleController {
         for(VehicleModel v : vehiclesList.values()){
             boolean typeMatches = typeFilter == TypeFilter.NONE ||
                                   typeFilter.getTypeId().equals(v.getTypeId());
-
             boolean colorMatches = colorFilter == VehicleColor.NONE ||
                                    colorFilter == v.getColor();
-
-            if(typeMatches && colorMatches) result.add(v.getId());
+            boolean isActive = v.getState() == VehicleState.ACTIVE;
+            if (typeMatches && colorMatches && isActive){
+                result.add(v.getId());}
 
         }
 
         return result;
     }
+
+    public int getCurrentVehicles() {
+        return currentVehicles;
+    }
+
 }

@@ -3,7 +3,6 @@ package com.example.guifx;
     /**
     *VehicleState is a model class for Vehicles in the Simulation
     */
-//Renamed "myVehicle", since it only stores states, it is a much more fitting name
 public class VehicleModel {
 
     private double x;
@@ -15,31 +14,11 @@ public class VehicleModel {
     private String routeId;
     private String laneId;
     private VehicleColor color;
+    private VehicleState state;
     private double depart;
     private double pos;
     private double speed;
 
-    // constructors
-
-
-    /**
-    *@param id, typeId, routeId, laneId, depart, pos, speed
-    */
-
-    public VehicleModel(String id, String typeId, String routeId, String laneId, int depart, double pos, double speed){
-        this.id = id;
-        this.typeId = typeId;
-        this.routeId = routeId;
-        this.laneId = laneId;
-        this.depart = depart;
-        this.pos = pos;
-        this.speed = speed;
-        this.x = 0.0;
-        this.y = 0.0;
-        this.angle = 0.0;
-    }
-
-    // default constructor for depart, pos, speed
     
     /**
     *@param id, typeId, routeId, laneId
@@ -51,27 +30,13 @@ public class VehicleModel {
         this.laneId = laneId;
         this.depart = depart;
         this.color = color;
+        state = VehicleState.QUEUED;
         this.pos = 0.0;
         this.speed = 1.0;
         this.x = 0.0;
         this.y = 0.0;
         this.angle = 0.0;
     }
-
-    public VehicleModel(String id) {
-        this.id = id;
-        this.typeId = "car";
-        this.routeId = "";
-        this.laneId = "";
-        this.depart = 0;
-        this.color = VehicleColor.BLACK;
-        this.pos = 0.0;
-        this.speed = 1.0;
-        this.x = 0.0;
-        this.y = 0.0;
-        this.angle = 0.0;
-    }
-
 
         //Getter
 
@@ -115,7 +80,6 @@ public class VehicleModel {
     public double getPos(){
         return pos;
     }
-
     
     /**
     *@return speed of car
@@ -139,8 +103,13 @@ public class VehicleModel {
     public VehicleColor getColor() {
         return color;
     }
-    
-    /**
+
+    public VehicleState getState(){
+        return state;
+    }
+
+
+        /**
     *@param laneId
     */
     public void setLaneId(String laneId){ this.laneId = laneId; }
@@ -159,13 +128,21 @@ public class VehicleModel {
     public void setAngle(double angle){
         this.angle = angle;
     }
-    public void setTypeId(String id){
-        this.typeId=id;
+    public void setTypeId(String typeId){
+        this.typeId=typeId;
     }
 
-
+    public void setRouteId(String routeId){
+        this.routeId = routeId;
+    }
 
     public void setColor(VehicleColor color) {
         this.color = color;
     }
+
+    public void setState(VehicleState state) {
+        this.state = state;
+    }
+
+
 }

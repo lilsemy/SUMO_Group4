@@ -2,6 +2,8 @@ package com.example.guifx;
 
 import java.util.*;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.eclipse.sumo.libtraci.Junction;
 import org.eclipse.sumo.libtraci.TrafficLight;
 import org.eclipse.sumo.libtraci.TraCIPosition;
@@ -13,6 +15,7 @@ public class TrafficLightController {
 
     private List<String> tlIds;
     private Map<String, TrafficLightModel> tlList;
+    private static final Logger LOG = LogManager.getLogger(TrafficLightController.class.getName());
 
     /**
      * Constructs a TrafficLightController and initializes all traffic lights
@@ -20,14 +23,13 @@ public class TrafficLightController {
     public TrafficLightController() {
         this.tlList = new HashMap<>();
 
-        // Getting all predefined Traffic Lights
         tlIds = TrafficLight.getIDList();
         for (String id : tlIds) {
             TrafficLightModel tl = new TrafficLightModel(id, TrafficLight.getPhase(id),
                     TrafficLight.getRedYellowGreenState(id));
             tlList.put(tl.getId(), tl);
         }
-        System.out.println("Scanned for Traffic Lights and found: " + tlList.size() + "!");
+        LOG.info("Scanned for Traffic Lights and found: " + tlList.size() + "!");
     }
 
     /**
@@ -99,5 +101,17 @@ public class TrafficLightController {
      */
     public TraCIPosition getTlPosition(TrafficLightModel tl) {
         return Junction.getPosition(tl.getId());
+    }
+
+    /**
+     * This function is called every simulation step, to synchronize our local TrafficLightModel instances with the TrafficLight values, e.g. current Phase, inside of SUMO
+     */
+    public void updateTLModel(){
+        for (String id : tlIds){
+            TrafficLightModel tl = tlList.get(id);
+            tl.setDuration(TrafficLight.getPhaseDuration(id));
+            tl.setPhase(TrafficLight.getPhase(id));
+            tl.setRedYellowGreenState(TrafficLight.getRedYellowGreenState(id));
+        }
     }
 }
