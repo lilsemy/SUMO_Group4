@@ -1,11 +1,5 @@
 package com.example.guifx;
 
-/*
-Controller needs to pass SUMO simulation time from outside
-import org.eclipse.sumo.libtraci.Simulation;
-double currentTime = Simulation.getTime();
-*/
-
 import java.util.*;
 
 /**
@@ -15,24 +9,12 @@ import java.util.*;
 public class Statistics {
 
     private final SimulationController simCon;
-
-    //Vehicle Data Structure
-    private Map<String, VehicleModel> currentVehicles = new HashMap<>();    // All vehicles in simulation
-    private Map<String, Double> departureTimes = new HashMap<>();           // Departure times of vehicles
-    private Map<String, Integer> vehicleCountsPerEdge = new HashMap<>();    // Vehicles per Edge (density)
-
-    // Travel time statistics (persistent across simulation steps)
+    private Map<String, VehicleModel> currentVehicles = new HashMap<>();
+    private Map<String, Double> departureTimes = new HashMap<>();
+    private Map<String, Integer> vehicleCountsPerEdge = new HashMap<>();
     private double totalTravelTime = 0.0;
     private int finishedVehicleCount = 0;
-
-
-    // Traffic Light Data Structure
     private Map<String, Integer> currentTrafficLightStates = new HashMap<>(); // Count of Traffic lights per phase
-
-    // Congestion detection (per lane)
-    private Map<String, List<Double>> speedsPerLane = new HashMap<>();
-    private Map<String, Double> congestedLanes = new HashMap<>();
-
     public Statistics(SimulationController simCon) {
         this.simCon = simCon;
     }
@@ -41,10 +23,8 @@ public class Statistics {
     * Refresh vehicles list at a point in time of simulation
     */
     public void updateVehicles(double currentTime) {
-    Map<String, VehicleModel> latest =
-            simCon.getVehicleController().getVehiclesMap();
+    Map<String, VehicleModel> latest = simCon.getVehicleController().getVehiclesMap();
 
-    //currentVehicles = new HashMap<>(latest);
     currentVehicles = latest;
 
     for (String id : currentVehicles.keySet()) {
@@ -63,30 +43,6 @@ public class Statistics {
             sum += v.getSpeed();
         }
         return sum / currentVehicles.size();
-    }
-
-    public double getAverageSpeed(Collection<VehicleModel> filteredVehicles) {
-        if (filteredVehicles.isEmpty()) return 0;
-
-        double sum = 0;
-        for (VehicleModel v : filteredVehicles) {
-            sum += v.getSpeed();
-        }
-        return sum / filteredVehicles.size();
-    }
-
-    /**
-     * Calculates how many vehicles there are per edge
-     */
-    public void updateVehicleDensity() {
-        vehicleCountsPerEdge.clear();
-
-        for (VehicleModel v : currentVehicles.values()) {
-            String edgeId = v.getLaneId();
-
-            vehicleCountsPerEdge.putIfAbsent(edgeId, 0);
-            vehicleCountsPerEdge.put(edgeId, vehicleCountsPerEdge.get(edgeId) + 1);
-        }
     }
 
 
@@ -108,7 +64,6 @@ public class Statistics {
             }
         }
 
-        // Remove vehicles that have left the simulation
         for (String vehicleId : finishedVehicles) {
             departureTimes.remove(vehicleId);
         }
@@ -123,7 +78,6 @@ public class Statistics {
      */
     public double updateAndGetAverageTravelTime(double currentTime) {
 
-        // Handle newly finished vehicles (same as before)
         Map<String, Double> finishedTravelTimes = calculateTravelTimes(currentTime);
 
         for (double travelTime : finishedTravelTimes.values()) {
@@ -131,7 +85,6 @@ public class Statistics {
             finishedVehicleCount++;
         }
 
-        // Add time-so-far for all currently active vehicles
         double activeTravelTimeSum = 0.0;
 
         for (Map.Entry<String, Double> entry : departureTimes.entrySet()) {
@@ -181,10 +134,8 @@ public class Statistics {
         Map<String, List<Double>> speedsPerLane = new HashMap<>();
         Map<String, Double> congestedLanes = new HashMap<>();
 
-        // Group vehicle speeds by REAL lane ID
         for (VehicleModel v : currentVehicles.values()) {
 
-            // IMPORTANT: this must be the SUMO lane ID (e.g. "edge_12_0")
             String laneId = v.getLaneId();
             double speed = v.getSpeed();
 
@@ -193,11 +144,10 @@ public class Statistics {
                     .add(speed);
         }
 
-        // Compute average speed per lane
         for (Map.Entry<String, List<Double>> entry : speedsPerLane.entrySet()) {
 
             List<Double> speeds = entry.getValue();
-            if (speeds.size() < 2) continue; // optional stability filter
+            if (speeds.size() < 2) continue;
 
             double sum = 0.0;
             for (double s : speeds) {
@@ -206,7 +156,6 @@ public class Statistics {
 
             double avgSpeed = sum / speeds.size();
 
-            // Congestion condition (adjustable)
             if (avgSpeed < 1.0) {
                 congestedLanes.put(entry.getKey(), avgSpeed);
             }
