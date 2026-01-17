@@ -381,7 +381,7 @@ public class GUI {
             double dAngle = 0;
             switch (event.getCode()) {
                 case Q:
-                    dAngle = -3;
+                    dAngle = -5;
                     rotate = true;
                     break;
                 case E:
