@@ -102,7 +102,6 @@ public class Statistics {
         return (totalTravelTime + activeTravelTimeSum) / totalVehicleCount;
     }
 
-
     /**
     * Fetches the current state of all traffic lights from the simulation and counts how many are currently red, yellow, or green
     */
