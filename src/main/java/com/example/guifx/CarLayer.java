@@ -46,20 +46,20 @@ public class CarLayer {
         carImageViews = new HashMap<>();
         this.carLayerPane = carLayerPane;
 
-        this.carBlackImage = loadVehicleImage("/carBlack.png");
-        this.carRedImage = loadVehicleImage("/carRed.png");
-        this.carWhiteImage = loadVehicleImage("/carWhite.png");
-        this.carYellowImage = loadVehicleImage("/carYellow.png");
+        this.carBlackImage = loadVehicleImage("/VehiclesImages/carBlack.png");
+        this.carRedImage = loadVehicleImage("/VehiclesImages/carRed.png");
+        this.carWhiteImage = loadVehicleImage("/VehiclesImages/carWhite.png");
+        this.carYellowImage = loadVehicleImage("/VehiclesImages/carYellow.png");
 
-        this.busBlackImage = loadVehicleImage("/busBlack.png");
-        this.busRedImage = loadVehicleImage("/busRed.png");
-        this.busWhiteImage = loadVehicleImage("/busWhite.png");
-        this.busYellowImage = loadVehicleImage("/busYellow.png");
+        this.busBlackImage = loadVehicleImage("/VehiclesImages/busBlack.png");
+        this.busRedImage = loadVehicleImage("/VehiclesImages/busRed.png");
+        this.busWhiteImage = loadVehicleImage("/VehiclesImages/busWhite.png");
+        this.busYellowImage = loadVehicleImage("/VehiclesImages/busYellow.png");
 
-        this.truckBlackImage = loadVehicleImage("/truckBlack.png");
-        this.truckRedImage = loadVehicleImage("/truckRed.png");
-        this.truckWhiteImage = loadVehicleImage("/truckWhite.png");
-        this.truckYellowImage = loadVehicleImage("/truckYellow.png");
+        this.truckBlackImage = loadVehicleImage("/VehiclesImages/truckBlack.png");
+        this.truckRedImage = loadVehicleImage("/VehiclesImages/truckRed.png");
+        this.truckWhiteImage = loadVehicleImage("/VehiclesImages/truckWhite.png");
+        this.truckYellowImage = loadVehicleImage("/VehiclesImages/truckYellow.png");
 
 
         // Click on empty space => clear pinned selection
