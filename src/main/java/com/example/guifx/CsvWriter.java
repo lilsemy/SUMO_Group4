@@ -8,7 +8,6 @@ import java.util.Map;
 public class CsvWriter {
 
     private final PrintWriter writer; // object writing text to firle
-    private boolean headerWritten = false; // tracks whether the CSV header row has already been written to avoid duplicates
 
     /**
      * creating CsvWriter object -> new FileWriter(filePath) opens the file at that moment
@@ -31,11 +30,7 @@ public class CsvWriter {
      * Call this once every 20 steps
      * 1 real-world second = 1 / 0.05 = 20 steps
      */
-    public void writeStep(double time,
-                          int vehicleCount,
-                          double avgSpeed,
-                          boolean congestionPresent,
-                          Map<String, Integer> trafficLightStates) {
+    public void writeStep(double time, int vehicleCount, double avgSpeed, boolean congestionPresent, Map<String, Integer> trafficLightStates) {
 
         int r = trafficLightStates.getOrDefault("R", 0);
         int y = trafficLightStates.getOrDefault("Y", 0);
@@ -55,7 +50,6 @@ public class CsvWriter {
      * Closes the CSV file.
      * Must be called once when the simulation ends.
      */
-
 
    public void close() {
         writer.flush();
