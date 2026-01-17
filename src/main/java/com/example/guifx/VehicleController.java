@@ -20,6 +20,7 @@ public class VehicleController {
     private int CurrentVehicles = 0;
     private static final Logger LOG = LogManager.getLogger(VehicleController.class.getName());
 
+
     /**
      * Constructs a VehicleController
      */
@@ -230,6 +231,11 @@ public class VehicleController {
 //                                        vehicleModel.getState() == VehicleState.ACTIVE &&
 //                                                !(liveIds.contains(vehicleModel.getId())));
 
+    }
+
+    public int countQueuedVehicles(int activeCount){
+        int countAll = vehiclesList.size();
+        return countAll - activeCount;
     }
 
     //filtering
