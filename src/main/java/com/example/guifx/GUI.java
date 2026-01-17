@@ -70,6 +70,7 @@ public class GUI {
     private String pinnedVehicleInfoId;
     private String hoveredVehicleInfoId;
 
+
     //Initialization of FXML components
     @FXML
     private javafx.scene.image.ImageView stressAlarmIcon;
@@ -727,20 +728,37 @@ public class GUI {
                 return;
             }
 
-            if (count > 15000) {
-                LOG.error("Maximum allowed vehicles for stress test is 15.000");
-                javafx.application.Platform.runLater(() ->
-                        show("Maximum allowed vehicles for stress test is 15.000")
-                );
-                setStressAlarmIcon(false);
-                return;
-            }
+//            if (count > 10000) {
+//                LOG.error("Maximum allowed vehicles for stress test is 10.000");
+//                javafx.application.Platform.runLater(() ->
+//                        show("Maximum allowed vehicles for stress test is 10.000")
+//                );
+//                setStressAlarmIcon(false);
+//                return;
+//            }
 
             LOG.info("Starting Stress Test with " + count + " vehicles");
             show("Starting Stress Test with " + count + " vehicles");
 
-            actionQueue.add(() -> simController.startStressTest(count, spawnConfig));
             startStressAlarmBlink(Duration.seconds(10));
+
+            actionQueue.add(() -> {
+                int spawned = simController.startStressTest(count, spawnConfig);
+                if(spawned == 0) {
+                    //LOG.error("Limit Reached! Maximum vehicles allowed: 10000. No cars added.");
+                    javafx.application.Platform.runLater(() ->
+                            show("Limit Reached! Maximum vehicles allowed: 10000. No cars added."));
+
+                }else if (spawned < count) {
+                    javafx.application.Platform.runLater(() ->
+                            show("Limit Hit! Only spawned " + spawned + " cars instead of " + count + "."));
+                }else {
+
+                    javafx.application.Platform.runLater(() ->
+                            show("Stress test started: " + spawned + " cars added."));
+                    javafx.application.Platform.runLater(() -> startStressAlarmBlink(Duration.seconds(10)));
+                }
+            });
 
         } catch (NumberFormatException ex) {
             show("Invalid number. Please enter a valid integer.");

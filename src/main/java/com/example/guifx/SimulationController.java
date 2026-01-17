@@ -20,6 +20,7 @@ public class SimulationController {
     private static List<String> routes = List.of("r1", "r2", "r3", "r4", "r6", "r7", "r8", "r9", "r10",
             "r11", "r12", "r13", "r14", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23");
     private Random random = new Random();
+    private final int MAX_VEHICLES = 10000;
 
     /**
     *
@@ -56,8 +57,18 @@ public class SimulationController {
      * @param count the amount of cars for the stress test
      */
 
-    public void startStressTest(int count, SpawnConfig config) {
-        for(int i = count; i>0; i--){
+    public int startStressTest(int count, SpawnConfig config) {
+        int currenVehicles = vehicleController.getVehiclesMap().size();
+        int allowedToSpawn = MAX_VEHICLES - currenVehicles;
+
+        if (allowedToSpawn <= 0){
+            LOG.warn("Stress test refused: Vehicle limit of " + MAX_VEHICLES + " reached.");
+            return 0;
+        }
+        // If the user wants 1000 cars, but we only have space for 50,
+        // we only spawn 50. We take the smaller number.
+        int actualSpawnCount = Math.min(count, allowedToSpawn);
+        for(int i = actualSpawnCount; i>0; i--){
             TypeFilter type = config.pickType();
             VehicleColor color = config.pickColor();
             try{
@@ -68,6 +79,7 @@ public class SimulationController {
             }
 
         }
+        return actualSpawnCount;
     }
 
     /**
