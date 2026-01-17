@@ -19,7 +19,8 @@ public class VehicleController {
     private int vehicleCounter = 0;
     private int CurrentVehicles = 0;
     private static final Logger LOG = LogManager.getLogger(VehicleController.class.getName());
-
+    private final long UI_UPDATE_NANOS = 75_000_000L;
+    private long lastUiNow = 0L;
 
     /**
      * Constructs a VehicleController
@@ -72,23 +73,6 @@ public class VehicleController {
         }
     }
 
-
-    /**
-     * Returns the speed of a vehicle
-     * 
-     * @param vehicleId ID of the vehicle
-     * @return speed of vehicle or 0 if not found
-     * @throws Exception if retrieval fails
-     */
-    public double getVehicleSpeed(String vehicleId) throws Exception {
-        if (vehiclesList.containsKey(vehicleId)) {
-            return vehiclesList.get(vehicleId).getSpeed();
-        } else {
-            LOG.warn("Error! Vehicle " + vehicleId + " not found in simulation.");
-            return 0;
-        }
-    }
-
     /**
      * Returns the last created vehicle ID
      * 
@@ -138,43 +122,12 @@ public class VehicleController {
         return vehiclesList.get(id);
     }
 
-    /**
-     * Sets the camera to track a specific vehicle
-     * 
-     * @param viwId view ID
-     * @param vehId vehicle ID
-     * @throws Exception if tracking fails
-     */
-    /*public void trackVehicle(String viwId, String vehId) throws Exception {
-        if (getIds().contains(vehId)) {
-            // GUI.trackVehicle(viwId, vehId); // commented out
-        } else {
-            System.out.println("Warning! Car left the Map or was deleted.");
-        }
-    }*/
-
-    /**
-     * Returns IDs of all vehicles in the simulation
-     * 
-     * @return List of vehicle IDs
-     * @throws Exception if retrieval fails
-     */
-    public List<String> getIds() throws Exception {
-        //List<String> IDList = Vehicle.getIDList();
-        return Vehicle.getIDList();
-    }
-
-
-
-    private final long UI_UPDATE_NANOS = 75_000_000L;
-    private long lastUiNow = 0L;
 
     /**
      * Updates the local vehicle states from the simulation
      * 
      * @throws Exception if update fails
      */
-
     public void updateFromSimulation() throws Exception {
 
 
@@ -210,27 +163,6 @@ public class VehicleController {
             CurrentVehicles = Vehicle.getIDCount();
 
 
-//        Set<String> liveIds = new HashSet<>(Vehicle.getIDList());
-//
-//        for(VehicleModel v : vehiclesList.values()){
-//
-//            if(liveIds.contains(v.getId())){
-//                v.setState(VehicleState.ACTIVE);
-//
-//                TraCIPosition pos = Vehicle.getPosition(v.getId());
-//
-//                v.setPosition(pos.getX(),pos.getY());
-//                v.setSpeed(Vehicle.getSpeed(v.getId()));
-//                v.setAngle(Vehicle.getAngle(v.getId()));
-//                v.setLaneId(Vehicle.getLaneID(v.getId()));
-//            }
-//
-//        }
-//        //if vehicle is flagged as ACTIVE and left the simulation, delete it.
-//        vehiclesList.values().removeIf(vehicleModel ->
-//                                        vehicleModel.getState() == VehicleState.ACTIVE &&
-//                                                !(liveIds.contains(vehicleModel.getId())));
-
     }
 
     public int countQueuedVehicles(int activeCount){
@@ -243,13 +175,10 @@ public class VehicleController {
         Collection<String> result = new ArrayList<>();
 
         for(VehicleModel v : vehiclesList.values()){
-            //does the type of v match with the given filter? TRUE, if not, FALSE
             boolean typeMatches = typeFilter == TypeFilter.NONE ||
                                   typeFilter.getTypeId().equals(v.getTypeId());
-            //does the color of v match with the given filter? TRUE, if not, FALSE
             boolean colorMatches = colorFilter == VehicleColor.NONE ||
                                    colorFilter == v.getColor();
-            //if both true, add to list
             boolean isActive = v.getState() == VehicleState.ACTIVE;
             if (typeMatches && colorMatches && isActive){
                 result.add(v.getId());}
