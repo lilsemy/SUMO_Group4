@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class VehicleController {
     private Map<String, VehicleModel> vehiclesList;
     private int vehicleCounter = 0;
+    private int CurrentVehicles = 0;
     private static final Logger LOG = LogManager.getLogger(VehicleController.class.getName());
 
     /**
@@ -205,6 +206,8 @@ public class VehicleController {
                             !liveIds.contains(vm.getId())
             );
 
+            CurrentVehicles = Vehicle.getIDCount();
+
 
 //        Set<String> liveIds = new HashSet<>(Vehicle.getIDList());
 //
@@ -248,6 +251,10 @@ public class VehicleController {
         }
 
         return result;
+    }
+
+    public int getCurrentVehicles() {
+        return CurrentVehicles;
     }
 
 }

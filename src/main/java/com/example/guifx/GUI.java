@@ -21,7 +21,6 @@ import javafx.scene.transform.Scale;
 import javafx.util.Duration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -32,15 +31,48 @@ import java.util.concurrent.ConcurrentLinkedQueue;
  */
 public class GUI {
     private static final Logger LOG = LogManager.getLogger(GUI.class.getName());
-
     private SimulationController simController;
-
-    @FXML
-    private javafx.scene.image.ImageView stressAlarmIcon;
-
     private static final String ALARM_PNG = "/com/example/guifx/alarm.png";
     private static final String ALARM_GIF = "/com/example/guifx/alarm.gif";
+    private XYChart.Series<Number, Number> speedSeries;
+    private XYChart.Series<Number, Number> avgTravelTimeSeries;
+    private LaneLayer laneLayerInstance;
+    private CarLayer carLayerInstance;
+    private TrafficLightLayer trafficLightLayerInstance;
+    private AnimationTimer timer;
+    private Statistics statistics;
+    private Group zoomGroup = new Group();
+    private Scale scaleTransform = new Scale(1, 1, 0, 0);
+    private Rotate rotateTransform = new Rotate(0, 0, 0);// Added rotation transform
+    private boolean isFollowing = false;// Added tracking state
+    private String followedVehicleId = null;// Added tracked vehicle ID
+    private double scale = 1.0;
+    private final double MIN_SCALE = 0.5;
+    private final double MAX_SCALE = 20.0;
+    private double dragStartX, dragStartY;
+    private double startTranslateX, startTranslateY;
+    private double contentWidth, contentHeight;
+    private volatile VehicleColor currentColorFilter = VehicleColor.NONE;
+    private SpawnConfig spawnConfig = SpawnConfig.random();
+    private Thread simThread;
+    private final ConcurrentLinkedQueue<Runnable> actionQueue = new ConcurrentLinkedQueue<>();
+    private volatile boolean running = false;
+    private volatile long currentSimDelayMs = 50;
+    private volatile SimSnapshot latest = null;
+    private final long UI_UPDATE_NANOS = 200_000_000L; // update charts only every 200ms ;
+    private long lastUiNow = 0 ;
+    private static final int MAX_CHART_POINTS = 300;// limitless charts cause memory leaks and lag
+    private final DecimalFormat df2 = new DecimalFormat("#.##");
+    private final DecimalFormat df0 = new DecimalFormat("#");
+    private Timeline alarmBlinkTimeline;
+    private Timeline alarmAutoStopTimeline;
+    private boolean alarmBlinkOn = false;
+    private String pinnedVehicleInfoId;
+    private String hoveredVehicleInfoId;
 
+    //Initialization of FXML components
+    @FXML
+    private javafx.scene.image.ImageView stressAlarmIcon;
     @FXML
     private StackPane mapContainer;
     @FXML
@@ -51,9 +83,6 @@ public class GUI {
     private Pane trafficLightLayer;
     @FXML
     private Pane carLayer;
-
-    @FXML
-    private Label realTimeSpeedLabel;
     @FXML
     private Label avgSpeedLabel;
     @FXML
@@ -64,10 +93,8 @@ public class GUI {
     private Label Tl2Dur;
     @FXML
     private LineChart<Number, Number> speedChart;
-
     @FXML
     private LineChart<Number, Number> travelTimeChart;
-
     @FXML
     private TextArea consoleArea;
     @FXML
@@ -78,99 +105,37 @@ public class GUI {
     private ChoiceBox<String> TLSelector;
     @FXML
     private TextField stressTestCountField;
-    @FXML private Slider simSpeedSlider;
-
+    @FXML
+    private Slider simSpeedSlider;
     @FXML
     private ChoiceBox<String> InsertionSelector;
-
-    private XYChart.Series<Number, Number> speedSeries;
-
-    private XYChart.Series<Number, Number> avgTravelTimeSeries;
-
-    private LaneLayer laneLayerInstance;
-    private CarLayer carLayerInstance;
-    private TrafficLightLayer trafficLightLayerInstance;
-    private AnimationTimer timer;
-
-    private String trackedVehicleId = null;
-    private Statistics statistics;
-
-    private Group zoomGroup = new Group();
-    private Scale scaleTransform = new Scale(1, 1, 0, 0);
-    private Rotate rotateTransform = new Rotate(0, 0, 0);// Added rotation transform
-    private boolean isFollowing = false;// Added tracking state
-    private String followedVehicleId = null;// Added tracked vehicle ID
-    private double scale = 1.0;
-    private final double MIN_SCALE = 0.5;
-    private final double MAX_SCALE = 20.0;
-
-    private double dragStartX, dragStartY;
-    private double startTranslateX, startTranslateY;
-
-    private double contentWidth, contentHeight;
-
-    //FILTERING vehicleFilter = The possible filters the user can choose from the choice box
     @FXML
     private ChoiceBox<TypeFilter> vehicleTypeFilter;
-    //currentFilter = The applied filter that changes the GUI
     private volatile TypeFilter currentTypeFilter = TypeFilter.NONE;
     @FXML
     private ChoiceBox<VehicleColor> vehicleColorFilter;
-    private volatile VehicleColor currentColorFilter = VehicleColor.NONE;
-
-    //LOGIC FOR SPAWNING
-    private SpawnConfig spawnConfig = SpawnConfig.random();
     @FXML
     private ChoiceBox<TypeFilter> typeSpawnChoice;
     @FXML
     private ChoiceBox<VehicleColor> colorSpawnChoice;
-
-
-
-    private double remainingTime;
-
-    // thread //
-    // EXPLANATION: We replaced ScheduledExecutorService with a standard Thread.
-    // Why? The executor would "queue up" tasks if the simulation got slow,
-    // eventually
-    // causing a massive memory leak and "freeze".
-    // A simple "while(running)" loop waits passively until the previous step is
-    // done,
-    // so it naturally allows the CPU to breathe.
-    private Thread simThread;
-    // ACTION QUEUE for Thread Safety
-    // EXPLANATION: The User Interface (UI) runs on one thread, and the Simulation
-    // runs on another.
-    // If the UI tries to "Spawn Car" directly while the Simulation is reading the
-    // car list,
-    // they crash (ConcurrentModificationException).
-    // SOLUTION: The UI just puts a "Note" (Runnable) into this thread-safe Queue.
-    // The Simulation thread picks up the notes and executes them safely when it's
-    // ready.
-    private final ConcurrentLinkedQueue<Runnable> actionQueue = new ConcurrentLinkedQueue<>();
-    // 'volatile' ensures that changes to this variable are immediately visible to
-    // other threads.
-    // We use it to safely signal the background thread to stop.
-    private volatile boolean running = false;
-    private volatile long currentSimDelayMs = 50;
-    // --- Snapshot: Letzter Zustand für UI ---
-    // EXPLANATION: We cannot access SUMO or the SimulationController directly from
-    // the UI thread
-    // while the background thread is writing to it. This would cause "Race
-    // Conditions" or crashes.
-    // The "Snapshot Pattern" solves this: The background thread creates a read-only
-    // copy (Snapshot)
-    // of the current state. The UI thread reads only this snapshot.
-    private volatile SimSnapshot latest = null;
-
-    // chart throttle
-    private final long UI_UPDATE_NANOS = 200_000_000L; // update charts only every 200ms ;
-    private long lastUiNow = 0 ;
-    private static final int MAX_CHART_POINTS = 300;// limitless charts cause memory leaks and lag
-
-    // Formatters reuse (creating new objects every frame is bad for performance)
-    private final DecimalFormat df2 = new DecimalFormat("#.##");
-    private final DecimalFormat df0 = new DecimalFormat("#");
+    @FXML
+    private javafx.scene.control.Label vehicleInfoHeader;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoId;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoType;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoColor;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoSpeed;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoLane;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoRoute;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoPos;
+    @FXML
+    private javafx.scene.control.Label vehicleInfoAngle;
 
     /**
      * Constructor for GUI.
@@ -180,7 +145,6 @@ public class GUI {
     public GUI() throws Exception {
     }
 
-    // gui console
     public void show(String message) {
         consoleArea.appendText(message + "\n");
     }
@@ -196,7 +160,6 @@ public class GUI {
         this.statistics = new Statistics(simController); //!!!!! Insert a getStatistics function im simulation Controller, beacuse we are creating there a statistic instance for CSV and thus we would have two instances of Statistics.
         initVisuals();
     }
-
 
     /**
      * Initializes the visual layers and starts the animation loop
@@ -216,15 +179,12 @@ public class GUI {
                     pinnedVehicleInfoId = vehicleId;
                     updateVehicleInfoSidebar(vehicleId);
                 } else {
-                    // hover only updates when nothing is pinned
                     if (pinnedVehicleInfoId == null) {
                         updateVehicleInfoSidebar(vehicleId);
                     }
                 }
             });
 
-            // clicking empty map area should clear selection ("No vehicle selected")
-            // Use event filter so we don't override zoom/drag handlers.
             mapContainer.addEventFilter(javafx.scene.input.MouseEvent.MOUSE_PRESSED, evt -> {
                 if (evt.getTarget() == mapContainer || evt.getTarget() == backgroundCanvas) {
                     pinnedVehicleInfoId = null;
@@ -233,7 +193,6 @@ public class GUI {
                 }
             });
 
-            // initial state
             updateVehicleInfoSidebar(null);
 
             speedSeries = new XYChart.Series<>();
@@ -249,7 +208,6 @@ public class GUI {
             mapContainer.getChildren().clear();
             zoomGroup.getChildren().addAll(backgroundCanvas, laneLayer, trafficLightLayer, carLayer);
 
-            //zoomGroup.getTransforms().add(scaleTransform);
             zoomGroup.getTransforms().addAll(scaleTransform, rotateTransform);
             mapContainer.getChildren().add(zoomGroup);
             mapContainer.setAlignment(javafx.geometry.Pos.CENTER_RIGHT); // Ensure Center-Right alignment
@@ -261,10 +219,7 @@ public class GUI {
 
             setupZoomAndDrag();
 
-            /**
-            * Orders the vehicles in an alphabetically ascending list
-            */
-
+            //Orders the vehicles in an alphabetically ascending list
             vehicleSelector.setOnShowing(event -> {
                 var vehicles = simController
                         .getVehicleController()
@@ -274,22 +229,21 @@ public class GUI {
 
                 sortedVehicles.sort((v1, v2) -> {
 
-                    // Prefix = everything before the number
+
                     String type1 = v1.replaceAll("\\d+$", "");
                     String type2 = v2.replaceAll("\\d+$", "");
 
-                    // Extract number at the end
+
                     String numStr1 = v1.replaceAll("\\D+", "");
                     String numStr2 = v2.replaceAll("\\D+", "");
 
                     int num1 = numStr1.isEmpty() ? 0 : Integer.parseInt(numStr1);
                     int num2 = numStr2.isEmpty() ? 0 : Integer.parseInt(numStr2);
 
-                    // Compare type alphabetically
+
                     int typeCompare = type1.compareTo(type2);
                     if (typeCompare != 0) return typeCompare;
 
-                    // Compare number ASCENDING
                     return Integer.compare(num1, num2);
                 });
 
@@ -297,22 +251,12 @@ public class GUI {
             });
 
             vehicleSelector.getSelectionModel().selectedItemProperty().addListener((observableValue, oldValue, newValue) -> {
-//                if (newValue != null) {
-//                    followedVehicleId = newValue;
-//                    isFollowing = true;
-//                    scale = 10.0;
-//                    scaleTransform.setX(0);
-//                    scaleTransform.setY(0);
-//                    LOG.info("selected & Following:" + newValue);
-//                    show("selected & Following:" + newValue);
-//                }
             });
 
             //Initialize DropDown Menu for TrafficLights
             TLSelector.setOnShowing(event -> TLSelector.getItems().setAll("TL1", "TL2"));
 
             //Initialize DropDown Menu for EdgeInsertion
-            //Inserting is only available for the Lanes, that are rendered on the Map
             InsertionSelector.setOnShowing(event -> {
                 InsertionSelector.getItems().setAll(simController.getLaneController().getPrintLanes());
             });
@@ -324,10 +268,7 @@ public class GUI {
                     TypeFilter.TRUCK,
                     TypeFilter.BUS
             );
-            //initially the applied filter is set to NONE
             vehicleTypeFilter.setValue(TypeFilter.NONE);
-
-            //updating the applied filter after user input
             vehicleTypeFilter
                     .getSelectionModel()
                     .selectedItemProperty()
@@ -345,7 +286,7 @@ public class GUI {
                     VehicleColor.WHITE,
                     VehicleColor.YELLOW
             );
-            //Color filter is initially set to NONE
+
             vehicleColorFilter.setValue(VehicleColor.NONE);
             //updating the color filter
             vehicleColorFilter
@@ -500,7 +441,6 @@ public class GUI {
             double offsetY = event.getSceneY() - dragStartY;
             zoomGroup.setTranslateX(startTranslateX + offsetX);
             zoomGroup.setTranslateY(startTranslateY + offsetY);
-            clampTranslation();
         });
     }
 
@@ -552,58 +492,6 @@ public class GUI {
             scaleTransform.setX(scale);
             scaleTransform.setY(scale);
         }
-
-
-        /*double contentX = (mouseX - zoomGroup.getTranslateX()) / scale;
-        double contentY = (mouseY - zoomGroup.getTranslateY()) / scale;
-
-        double oldScale = scale;
-        scale = newScale;
-        scaleTransform.setX(scale);
-        scaleTransform.setY(scale);
-
-        double newTranslateX = mouseX - contentX * scale;
-        double newTranslateY = mouseY - contentY * scale;
-        zoomGroup.setTranslateX(newTranslateX);
-        zoomGroup.setTranslateY(newTranslateY);*/
-
-        clampTranslation();
-    }
-
-    /**
-     * Clamps translation to prevent gaps when panning
-     */
-    private void clampTranslation() {
-       /* double containerWidth = mapContainer.getWidth();
-        double containerHeight = mapContainer.getHeight();
-
-        double scaledWidth = contentWidth * scale;
-        double scaledHeight = contentHeight * scale;
-        double tx = zoomGroup.getTranslateX();
-        double ty = zoomGroup.getTranslateY();
-
-        if (scaledWidth <= containerWidth) {
-            tx = (containerWidth - scaledWidth) / 2;
-        } else {
-            if (tx > 0)
-                tx = 0;
-            if (tx + scaledWidth < containerWidth) {
-                tx = containerWidth - scaledWidth;
-            }
-        }
-
-        if (scaledHeight <= containerHeight) {
-            ty = (containerHeight - scaledHeight) / 2;
-        } else {
-            if (ty > 0)
-                ty = 0;
-            if (ty + scaledHeight < containerHeight) {
-                ty = containerHeight - scaledHeight;
-            }
-        }
-
-        zoomGroup.setTranslateX(tx);
-        zoomGroup.setTranslateY(ty);*/
     }
 
     /**
@@ -622,12 +510,12 @@ public class GUI {
                 if ( snap == null){
                     return;
                 }
-                // 1) Cars zeichnen: snapshot nutzen
+                // 1) Cars zeichnen
                 if (carLayerInstance != null) {
-                            //carLayerInstance.updateCarsFromSnapshot(simController.getVehicleController().getFilteredVehicleIds(currentTypeFilter, currentColorFilter));
                             carLayerInstance.updateCarsFromSnapshot(snap.vehicles());
                         }
-                // 2) Traffic lights: Draw traffic lights from Snapshot
+
+                // 2) Traffic lights: Draw traffic lights
                 if (trafficLightLayerInstance != null) {
                     trafficLightLayerInstance.updateTrafficLightStatesFromSnapshot(snap.trafficLights());
                 }
@@ -641,13 +529,8 @@ public class GUI {
                                 targetVs = vs;
                                 break;
                             }
-                        //if (simController.getVehicleController().getVehicle(followedVehicleId) == null) {
-
                         }
                         if (targetVs != null){
-                                    //var sumoPos = Vehicle.getPosition(followedVehicleId, false);
-                                    //double angle = Vehicle.getAngle(followedVehicleId);
-
                                     Point2D worldPos = new Point2D(targetVs.x(), targetVs.y());
                                     Point2D targetLocalPos = MapUtil.worldToScreen(worldPos);
                                     double targetAngleVal = targetVs.angle();
@@ -677,30 +560,8 @@ public class GUI {
                     }
                 }
                 // 4) Labels + Chart nur alle 200ms (throttled)
-
                     if (now - lastUiNow >= UI_UPDATE_NANOS){
                         lastUiNow = now;
-
-
-
-                    //
-                    //double time = org.eclipse.sumo.libtraci.Simulation.getTime();
-
-//                    if (statistics != null) {
-//                        statistics.updateVehicles(time);
-//                      /*
-//                        double avgSpeed = statistics.getAverageSpeed();
-//                        int count = simController.getVehicleController().getVehiclesMap().size();*/
-//                        Collection<VehicleModel> filteredVehiclesList =
-//                                simController
-//                                        .getVehicleController()
-//                                        .getFilteredVehicles(currentTypeFilter, currentColorFilter);
-//                        double avgSpeed = statistics.getAverageSpeed(filteredVehiclesList);
-//                        double avgTravelTime = statistics.updateAndGetAverageTravelTime(time);
-//                        int count = filteredVehiclesList.size();
-
-                        //java.text.DecimalFormat df = new java.text.DecimalFormat("#.##");
-
                         avgSpeedLabel.setText("Avg Speed: " + df0.format(snap.avgSpeed()) + "ms");
                         vehicleCountLabel.setText("Vehicles: " + snap.count());
                         speedSeries.getData().add(new XYChart.Data<>(snap.time(), snap.avgSpeed()));
@@ -718,7 +579,6 @@ public class GUI {
                         }
                         Tl1Dur.setText("Traffic Light 1: " + df0.format(tl1Rem) + "s");
                         Tl2Dur.setText("Traffic Light 2: " + df0.format(tl2Rem) + "s");
-                        // Performance: Cap the number of points in charts to prevent lag
                         if (speedSeries.getData().size() > MAX_CHART_POINTS) {
                             speedSeries.getData().remove(0, speedSeries.getData().size() - MAX_CHART_POINTS);
                         }
@@ -780,10 +640,6 @@ public class GUI {
         LOG.info("Spawning new vehicle!");
         show("Spawning new vehicle!");
         actionQueue.add(()-> {
-        //String id = simController.spawnVehicle(spawnConfig);
-        //if (id != null) {
-         //   System.out.println("Spawned:" + id);
-         //   javafx.application.Platform.runLater(()-> log("Spawned:" + id));
         if (InsertionSelector.getValue() == null) {
             String id = simController.spawnVehicle(spawnConfig, null);
             if (id != null) {
@@ -822,7 +678,6 @@ public class GUI {
             return;
         }
 
-
         followedVehicleId = targetId;
         isFollowing = true;
 
@@ -832,31 +687,6 @@ public class GUI {
 
         LOG.info("Following:" + targetId);
         show("Following:" + targetId);
-    }
-
-    /**
-     * Gets the speed of the last vehicle
-     *
-     * @param e ActionEvent from button click
-     */
-
-    public void commandGetVehicleSpeed(ActionEvent e) {
-        actionQueue.add(() -> {
-            String lastId = simController.getVehicleController().getLastVehicleId();
-            if (lastId != null) {
-                try {
-                    double speed = simController.getVehicleController().getVehicleSpeed(lastId);
-                    //java.text.DecimalFormat dv = new java.text.DecimalFormat("#.##");
-                    LOG.info("Speed of last vehicle " + lastId + ": " + df2.format(speed));
-                    javafx.application.Platform.runLater(() -> show("Speed of last vehicle " + lastId + ": " + df2.format(speed)));
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }
-            } else {
-                LOG.warn("No vehicles in simulation!");
-                javafx.application.Platform.runLater(() -> show("No vehicles in simulation!"));
-            }
-        });
     }
 
     /**
@@ -908,21 +738,19 @@ public class GUI {
                 return;
             }
 
-//            if (count > 100) {
-//                LOG.error("Maximum allowed vehicles for stress test is 100.");
-//                javafx.application.Platform.runLater(() ->
-//                        show("Maximum allowed vehicles for stress test is 100.")
-//                );
-//                setStressAlarmIcon(false);
-//                return;
-//            }
+            if (count > 15000) {
+                LOG.error("Maximum allowed vehicles for stress test is 100.");
+                javafx.application.Platform.runLater(() ->
+                        show("Maximum allowed vehicles for stress test is 100.")
+                );
+                setStressAlarmIcon(false);
+                return;
+            }
 
             LOG.info("Starting Stress Test with " + count + " vehicles");
             show("Starting Stress Test with " + count + " vehicles");
 
             actionQueue.add(() -> simController.startStressTest(count, spawnConfig));
-
-            // Trigger 10s alarm blink + gif icon
             startStressAlarmBlink(Duration.seconds(10));
 
         } catch (NumberFormatException ex) {
@@ -944,11 +772,6 @@ public class GUI {
         } catch (Exception ignored) {
         }
     }
-
-    // Alarm (10s blink) for stress test
-    private Timeline alarmBlinkTimeline;
-    private Timeline alarmAutoStopTimeline;
-    private boolean alarmBlinkOn = false;
 
     /**
      * Starts a red blink alarm on the whole UI for a fixed duration.
@@ -1040,27 +863,9 @@ public class GUI {
         });
     }
 
-    // Right sidebar vehicle info
-    @FXML private javafx.scene.control.Label vehicleInfoHeader;
-    @FXML private javafx.scene.control.Label vehicleInfoId;
-    @FXML private javafx.scene.control.Label vehicleInfoType;
-    @FXML private javafx.scene.control.Label vehicleInfoColor;
-    @FXML private javafx.scene.control.Label vehicleInfoSpeed;
-    @FXML private javafx.scene.control.Label vehicleInfoLane;
-    @FXML private javafx.scene.control.Label vehicleInfoRoute;
-    @FXML private javafx.scene.control.Label vehicleInfoPos;
-    @FXML private javafx.scene.control.Label vehicleInfoAngle;
-
-    private String pinnedVehicleInfoId;
-    private String hoveredVehicleInfoId;
-
     private void updateVehicleInfoSidebar(String vehicleId) {
-        // sidebar might not exist in some older FXMLs
         if (vehicleInfoHeader == null) return;
-
-        // keep track of hover vs pinned to allow real-time refresh
         if (Objects.equals(vehicleId, pinnedVehicleInfoId)) {
-            // pinned is tracked separately
         } else {
             hoveredVehicleInfoId = vehicleId;
         }
@@ -1101,6 +906,7 @@ public class GUI {
     private static String safe(String s) {
         return s == null ? "-" : s;
     }
+
     @FXML
     private void commandChangeVehicleAppearance(ActionEvent e){
         if(pinnedVehicleInfoId != null){
@@ -1110,13 +916,9 @@ public class GUI {
         }
     }
 
-
-    // Neue Methode zum Starten des Sim-Threads (Self-Throttling Loop)
     private void startSimulationThread() {
         running = true;
         simThread = new Thread(() -> {
-            // CsvWriter initialization here
-
             CsvWriter csv = null;
             try {
                csv =  new CsvWriter("simulation.csv");
@@ -1139,13 +941,10 @@ public class GUI {
 
                     }
 
-
                     simController.singleStep();
                     double time = simController.getTime();
 
-
                     Collection<String> ids = simController.getVehicleController().getFilteredVehicleIds(currentTypeFilter, currentColorFilter);
-
                     List<VehicleUiState> states = new ArrayList<>(Math.max(1, ids.size()));
 
                     double sumSpeed = 0;
@@ -1155,8 +954,6 @@ public class GUI {
                             VehicleModel v = simController.getVehicleController().getVehicle(id);
                             if (v != null) {
                                 states.add(new VehicleUiState(id, v.getX(), v.getY(), v.getAngle(), v.getTypeId(), v.getColor()));
-
-                                // Calculate Stats "on the fly"
                                 sumSpeed += v.getSpeed();
                                 validSpeedCount++;
                             }
@@ -1174,9 +971,6 @@ public class GUI {
                     }
                     long stepDuration = System.currentTimeMillis() - startTime;
 
-                    // If step took significantly longer than allowed (e.g. > currentDelay + 20ms
-                    // buffer)
-                    // and we are not in "Unlimited/Turbo" mode (delay != 0)
                     if (currentSimDelayMs > 0 && stepDuration > currentSimDelayMs + 50) {
                         LOG.info("System Overload: Step took " + stepDuration + "ms (Target: "
                                 + currentSimDelayMs + "ms)");
@@ -1193,8 +987,6 @@ public class GUI {
                     }
                     latest = new SimSnapshot(time, states, avg, avgTrvelTime, count, tlStates);
 
-
-                    // csv
                     if( csv != null && time - lastCsvWriteTime >= 1.0) {
                         csv.writeStep(
                                 time,
@@ -1204,7 +996,6 @@ public class GUI {
                                 statistics.getTrafficLightStates()
                         );
                         lastCsvWriteTime = time;
-
                     }
 
                     long elapsedTime = System.currentTimeMillis() - startTime;
@@ -1237,8 +1028,4 @@ public class GUI {
             simController.getConnection().close();
         }
     }
-
-
-
 }
-

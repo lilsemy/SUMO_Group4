@@ -215,25 +215,8 @@ public class Statistics {
         return congestedLanes;
     }
 
-    // CSV stuff
-    // call respective update methods before writing -> Call updateVehicles(currentTime) once per step and remove internal calls where possible
-    /* like:
-
-        stats.updateVehicles(time);
-        stats.updateTrafficLights();
-
-        csv.writeStep(
-        time,
-        stats.getVehicleCount(),
-        stats.getAverageSpeed(),
-        stats.isCongestionPresent(time),
-        stats.getTrafficLightStates()
-        );
-
-     */
-
     public int getVehicleCount() {
-        return currentVehicles.size();
+        return simCon.getVehicleController().getCurrentVehicles();
     }
 
     public boolean isCongestionPresent(double currentTime) {
@@ -242,27 +225,6 @@ public class Statistics {
 
     public Map<String, Integer> getTrafficLightStates() {
         return currentTrafficLightStates;
-    }
-
-
-
-
-
-    /**
-     * Testing purposes -> Prints all statistics data.
-     */
-    public void printAllStatistics(double currentTime) {
-    
-    updateVehicles(currentTime);
-    updateVehicleDensity();
-    updateTrafficLights();    
-        
-    System.out.println("=== Simulation Statistics ===");
-    System.out.println("Total vehicles: " + currentVehicles.size());
-    //System.out.println("Average speed: " + getAverageSpeed() + " m/s");
-    System.out.println("Vehicle density per edge: " + vehicleCountsPerEdge);
-    System.out.println("Travel times (for vehicles that have left the simulation): " + calculateTravelTimes(currentTime));
-    System.out.println("Traffic lights count per color: " + currentTrafficLightStates);
     }
 }
 
