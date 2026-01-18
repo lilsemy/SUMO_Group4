@@ -67,7 +67,7 @@ This project was developed as part of the **Object-Oriented Programming in Java*
 ![Simulation Dashboard](sumo_simulation_gui.png)  
 *Screenshot of the running application with live map, controls, and statistics.*
 
-![Simulation Dashboard](sumo_simulation_gui_close.png)
+![Simulation Dashboard](sumo_simulation_gui_close)
 *Screenshot of closing options.*
 
 ---
