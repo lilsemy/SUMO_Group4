@@ -597,6 +597,11 @@ public class GUI {
         timer.start();
     }
 
+    /**
+     * Creates a new spawning config
+     * @param selectedType allowed types
+     * @param selectedColor allowed colors
+     */
     public void updateSpawnConfig(TypeFilter selectedType, VehicleColor selectedColor){
 
         if(selectedType == TypeFilter.NONE && selectedColor == VehicleColor.NONE){
@@ -906,6 +911,10 @@ public class GUI {
         return s == null ? "-" : s;
     }
 
+    /**
+     * After button press, attempts vehicle appearance change
+     * @param e button is pressed
+     */
     @FXML
     private void commandChangeVehicleAppearance(ActionEvent e){
         if(pinnedVehicleInfoId != null){

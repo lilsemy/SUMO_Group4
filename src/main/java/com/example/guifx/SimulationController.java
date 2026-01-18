@@ -58,8 +58,8 @@ public class SimulationController {
      */
 
     public int startStressTest(int count, SpawnConfig config) {
-        int currenVehicles = vehicleController.getVehiclesMap().size();
-        int allowedToSpawn = MAX_VEHICLES - currenVehicles;
+        int currentVehicles = vehicleController.getVehiclesMap().size();
+        int allowedToSpawn = MAX_VEHICLES - currentVehicles;
 
         if (allowedToSpawn <= 0){
             LOG.warn("Stress test refused: Vehicle limit of " + MAX_VEHICLES + " reached.");
@@ -89,6 +89,13 @@ public class SimulationController {
         running = false;     // shutdown simulation
     }
 
+    /**
+     * Changes type and color values of a vehicle
+     * @param id vehicleId
+     * @param newType new Type
+     * @param newColor new Color
+     */
+
     public void changeVehicleAppearance(String id, TypeFilter newType, VehicleColor newColor){
         if(newType == TypeFilter.NONE && newColor == VehicleColor.NONE){
             LOG.error("Select a vehicle type or color before attempting editing!");
@@ -104,6 +111,12 @@ public class SimulationController {
         }
     }
 
+    /**
+     * Spawns a new vehicle and sets its attributes and starting lane
+     * @param config allowed vehicle attributes
+     * @param lane starting lane
+     * @return
+     */
     public String spawnVehicle(SpawnConfig config, String lane){
         try {
             TypeFilter type = config.pickType();
