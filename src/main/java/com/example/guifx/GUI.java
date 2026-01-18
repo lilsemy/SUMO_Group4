@@ -678,7 +678,8 @@ public class GUI {
     }
 
     /**
-     * Changes the traffic light phase
+     * Changes the traffic light phase, after User pressed the "Change Phase" Button.
+     * The User must first select a Traffic Light Group over the Dropdown menu and insert a new duration time.
      *
      * @param e ActionEvent from button click
      */

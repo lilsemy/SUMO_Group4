@@ -84,7 +84,7 @@ public class TrafficLightController {
     }
 
     /**
-     * Returns the time to the next Phase Switch of a given Traffic Light
+     * Returns the Simulation time, at which the Traffic Light phase changes
      * @param TlId
      * @return
      */
