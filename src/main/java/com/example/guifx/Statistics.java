@@ -20,8 +20,9 @@ public class Statistics {
     }
 
     /**
-    * Refresh vehicles list at a point in time of simulation
-    */
+     * Updates the list of currently active vehicles in the simulation. Newly detected vehicles have their departure time recorded
+     * @param currentTime the current simulation time
+     */
     public void updateVehicles(double currentTime) {
     Map<String, VehicleModel> latest = simCon.getVehicleController().getVehiclesMap();
 
@@ -33,7 +34,7 @@ public class Statistics {
   }
 
     /**
-     * Calculates global average speed of all vehicles.
+     * Calculates global average speed of all vehicles
      */
     public double getAverageSpeed() {
         if (currentVehicles.isEmpty()) return 0;
@@ -47,7 +48,10 @@ public class Statistics {
 
 
     /**
-     * Calculates travel times for vehicles that have left the simulation
+     * Calculates travel times for vehicles that have completed their journey.
+     * A vehicle is considered finished if it is no longer present in the current vehicle list
+     * @param currentTime the current simulation time
+     * @return a map of vehicle IDs and their total travel times
      */
     public Map<String, Double> calculateTravelTimes(double currentTime) {
         Map<String, Double> travelTimes = new HashMap<>();
@@ -72,14 +76,16 @@ public class Statistics {
     }
 
     /**
-     * Returns the real-time average travel time of all vehicles:
-     *  - finished vehicles contribute their final travel time
-     *  - active vehicles contribute time spent so far
+     * Updates travel time statistics and returns the current average travel time.
+     * Finished vehicles contribute their full travel time, while active vehicles contribute the time they have spent in the simulation so far
+     * @param currentTime the current simulation time
+     * @return the current average travel time of all vehicles
      */
     public double updateAndGetAverageTravelTime(double currentTime) {
 
         Map<String, Double> finishedTravelTimes = calculateTravelTimes(currentTime);
 
+        //sum of travel times (finished vehicles)
         for (double travelTime : finishedTravelTimes.values()) {
             totalTravelTime += travelTime;
             finishedVehicleCount++;
@@ -87,6 +93,7 @@ public class Statistics {
 
         double activeTravelTimeSum = 0.0;
 
+        //account for partial travel times (vehicles still driving)
         for (Map.Entry<String, Double> entry : departureTimes.entrySet()) {
             double departureTime = entry.getValue();
             activeTravelTimeSum += (currentTime - departureTime);
@@ -126,6 +133,12 @@ public class Statistics {
     this.currentTrafficLightStates = counts;
     }
 
+    /**
+     * Detects congested lanes in the simulation based on vehicle speeds
+     * A lane is considered congested if it contains multiple vehicles and the average speed on that lane falls below a defined threshold (<1.0)
+     * @param currentTime the current simulation time
+     * @return a map of congested lane IDs and their average speeds
+     */
     public Map<String, Double> detectCongestionHotspots(double currentTime) {
 
         updateVehicles(currentTime);
@@ -163,14 +176,27 @@ public class Statistics {
         return congestedLanes;
     }
 
+    /**
+     * Returns the current number of vehicles in the simulation
+     * @return the number of active vehicles
+     */
     public int getVehicleCount() {
         return simCon.getVehicleController().getCurrentVehicles();
     }
 
+    /**
+     * Checks whether congestion is currently present in the simulation
+     * @param currentTime the current simulation time
+     * @return true if congestion is present, false otherwise
+     */
     public boolean isCongestionPresent(double currentTime) {
         return !detectCongestionHotspots(currentTime).isEmpty();
     }
 
+    /**
+     * Returns the current count of traffic lights by state (R, Y, G)
+     * @return a map of traffic light states and their counts
+     */
     public Map<String, Integer> getTrafficLightStates() {
         return currentTrafficLightStates;
     }
