@@ -2,6 +2,9 @@ package com.example.guifx;
 
 import java.util.EnumSet;
 
+/**
+ * TypeFilter enum class is used for filtering and spawning
+ */
 public enum TypeFilter {
 
     NONE(""),

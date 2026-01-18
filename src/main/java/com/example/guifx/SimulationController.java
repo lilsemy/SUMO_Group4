@@ -20,6 +20,7 @@ public class SimulationController {
     private static List<String> routes = List.of("r1", "r2", "r3", "r4", "r6", "r7", "r8", "r9", "r10",
             "r11", "r12", "r13", "r14", "r16", "r17", "r18", "r19", "r20", "r21", "r22", "r23");
     private Random random = new Random();
+    private final int MAX_VEHICLES = 15000;
 
     /**
     *
@@ -56,8 +57,18 @@ public class SimulationController {
      * @param count the amount of cars for the stress test
      */
 
-    public void startStressTest(int count, SpawnConfig config) {
-        for(int i = count; i>0; i--){
+    public int startStressTest(int count, SpawnConfig config) {
+        int currentVehicles = vehicleController.getVehiclesMap().size();
+        int allowedToSpawn = MAX_VEHICLES - currentVehicles;
+
+        if (allowedToSpawn <= 0){
+            LOG.warn("Stress test refused: Vehicle limit of " + MAX_VEHICLES + " reached.");
+            return 0;
+        }
+        // If the user wants 1000 cars, but we only have space for 50,
+        // we only spawn 50. We take the smaller number.
+        int actualSpawnCount = Math.min(count, allowedToSpawn);
+        for(int i = actualSpawnCount; i>0; i--){
             TypeFilter type = config.pickType();
             VehicleColor color = config.pickColor();
             try{
@@ -68,6 +79,7 @@ public class SimulationController {
             }
 
         }
+        return actualSpawnCount;
     }
 
     /**
@@ -76,6 +88,13 @@ public class SimulationController {
     public void stopSimulation() {
         running = false;     // shutdown simulation
     }
+
+    /**
+     * Changes type and color values of a vehicle
+     * @param id vehicleId
+     * @param newType new Type
+     * @param newColor new Color
+     */
 
     public void changeVehicleAppearance(String id, TypeFilter newType, VehicleColor newColor){
         if(newType == TypeFilter.NONE && newColor == VehicleColor.NONE){
@@ -92,6 +111,12 @@ public class SimulationController {
         }
     }
 
+    /**
+     * Spawns a new vehicle and sets its attributes and starting lane
+     * @param config allowed vehicle attributes
+     * @param lane starting lane
+     * @return
+     */
     public String spawnVehicle(SpawnConfig config, String lane){
         try {
             TypeFilter type = config.pickType();

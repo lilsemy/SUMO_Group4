@@ -1,13 +1,13 @@
 package com.example.guifx;
 
     /**
-    *VehicleState is a model class for Vehicles in the Simulation
+    *VehicleModel mirrors Vehicles from Sumo
     */
 public class VehicleModel {
 
-    private double x;
-    private double y;
-    private double angle;
+    private volatile double x;
+    private volatile double y;
+    private volatile double angle;
 
     private String id;
     private String typeId;
@@ -16,8 +16,8 @@ public class VehicleModel {
     private VehicleColor color;
     private VehicleState state;
     private double depart;
-    private double pos;
-    private double speed;
+    private volatile double pos;
+    private volatile double speed;
 
     
     /**

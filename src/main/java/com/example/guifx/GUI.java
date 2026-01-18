@@ -70,6 +70,7 @@ public class GUI {
     private String pinnedVehicleInfoId;
     private String hoveredVehicleInfoId;
 
+
     //Initialization of FXML components
     @FXML
     private javafx.scene.image.ImageView stressAlarmIcon;
@@ -205,7 +206,7 @@ public class GUI {
             speedChart.setCreateSymbols(false);
 
             avgTravelTimeSeries = new XYChart.Series<>();
-            avgTravelTimeSeries.setName("Avg Travel Time (disappeared cars)");
+            avgTravelTimeSeries.setName("Avg Travel Time");
             travelTimeChart.getData().add(avgTravelTimeSeries);
             travelTimeChart.setCreateSymbols(false);
 
@@ -380,7 +381,7 @@ public class GUI {
             double dAngle = 0;
             switch (event.getCode()) {
                 case Q:
-                    dAngle = -3;
+                    dAngle = -5;
                     rotate = true;
                     break;
                 case E:
@@ -407,6 +408,7 @@ public class GUI {
                         zoomGroup.setTranslateX(zoomGroup.getTranslateX() - dx);
                         zoomGroup.setTranslateY(zoomGroup.getTranslateY() - dy);
                     } catch (Exception e) {
+                        LOG.error("Failer to Setup Zoom and Drag: " + e.getMessage());
                         e.printStackTrace();
                     }
                 }
@@ -481,11 +483,13 @@ public class GUI {
             scale = newScale;
             scaleTransform.setX(scale);
             scaleTransform.setY(scale);
+            LOG.error(e.getMessage());
         }
     }
 
     /**
-     * Starts the animation loop that updates simulation and visuals
+     * Starts the main rendering loop (AnimationTimer) and the simulation background
+     * thread.
      */
     private void startLoop() {
         timer = new AnimationTimer() {
@@ -546,16 +550,16 @@ public class GUI {
                                     zoomGroup.setTranslateY(currrentTy + (targetTy - currrentTy) * smoothFactor);
                                 }
                     } catch (Exception e) {
-
+                        LOG.error(e.getMessage());
                     }
                 }
                 // 4) Labels + Chart nur alle 200ms (throttled)
                     if (now - lastUiNow >= UI_UPDATE_NANOS){
                         lastUiNow = now;
-                        avgSpeedLabel.setText("Avg Speed: " + df0.format(snap.avgSpeed()) + "ms");
+                        avgSpeedLabel.setText("Avg speed: " + df0.format(snap.avgSpeed()) + "m/s");
                         timeLabel.setText("Time in simulation: " + (int) simController.getTime() + "s");
                         vehicleCountLabel.setText("Vehicles: " + snap.count());
-                        vehicleQueuedCountLabel.setText("Queued Vehicles: " + simController.getVehicleController().countQueuedVehicles(snap.count()));
+                        vehicleQueuedCountLabel.setText("Queued vehicles: " + simController.getVehicleController().countQueuedVehicles(snap.count()));
                         speedSeries.getData().add(new XYChart.Data<>(snap.time(), snap.avgSpeed()));
                         avgTravelTimeSeries.getData().add(new XYChart.Data<>(snap.time(), snap.avgTravelTime()));
 
@@ -581,14 +585,6 @@ public class GUI {
 
                     }
 
-//                    //TrafficLight Durations
-//                    java.text.DecimalFormat df = new java.text.DecimalFormat("#");
-//                    remainingTime = simController.getTlController().remainingTime("tl1") - time;
-//                    Tl1Dur.setText("Traffic Light 1: " + df.format(remainingTime) + "s");
-//                    remainingTime = simController.getTlController().remainingTime("tl4") - time;
-//                    Tl2Dur.setText("Traffic Light 2: " + df.format(remainingTime) + "s");
-//                    //synchronize TrafficLightModels with TL values in Simualtion
-//                    simController.getTlController().updateTLModel();
 
                 } catch (Exception e) {
                     LOG.fatal("Error in Simulation Loop: " + e.getMessage());
@@ -601,6 +597,11 @@ public class GUI {
         timer.start();
     }
 
+    /**
+     * Creates a new spawning config
+     * @param selectedType allowed types
+     * @param selectedColor allowed colors
+     */
     public void updateSpawnConfig(TypeFilter selectedType, VehicleColor selectedColor){
 
         if(selectedType == TypeFilter.NONE && selectedColor == VehicleColor.NONE){
@@ -682,7 +683,8 @@ public class GUI {
     }
 
     /**
-     * Changes the traffic light phase
+     * Changes the traffic light phase, after User pressed the "Change Phase" Button.
+     * The User must first select a Traffic Light Group over the Dropdown menu and insert a new duration time.
      *
      * @param e ActionEvent from button click
      */
@@ -696,7 +698,7 @@ public class GUI {
                     actionQueue.add(() -> {
                         simController.changePhase(newDur, tl);
                         LOG.info("Changing TrafficLight Phase of Traffic Light: " + tl + "with Phase Duration of: " + newDur + " seconds!");
-                        show("Changing TrafficLight Phase of Traffic Light: " + tl + "with Phase Duration of: " + newDur + " seconds!");
+                        javafx.application.Platform.runLater(() -> show("Changing TrafficLight Phase of Traffic Light: " + tl + "with Phase Duration of: " + newDur + " seconds!"));
                     });
                 } catch (Exception ex) {
                     LOG.error("Changing TrafficLight states failed");
@@ -730,20 +732,30 @@ public class GUI {
                 return;
             }
 
-            if (count > 15000) {
-                LOG.error("Maximum allowed vehicles for stress test is 15.000");
-                javafx.application.Platform.runLater(() ->
-                        show("Maximum allowed vehicles for stress test is 15.000")
-                );
-                setStressAlarmIcon(false);
-                return;
-            }
-
             LOG.info("Starting Stress Test with " + count + " vehicles");
             show("Starting Stress Test with " + count + " vehicles");
 
-            actionQueue.add(() -> simController.startStressTest(count, spawnConfig));
             startStressAlarmBlink(Duration.seconds(10));
+
+            actionQueue.add(() -> {
+                int spawned = simController.startStressTest(count, spawnConfig);
+                if(spawned == 0) {
+                    LOG.error("Limit Reached! Maximum vehicles allowed: 15000. No cars added.");
+                    javafx.application.Platform.runLater(() ->
+                            show("Limit Reached! Maximum vehicles allowed: 15000. No cars added."));
+
+                }else if (spawned < count) {
+                    javafx.application.Platform.runLater(() ->
+                            show("Limit Hit! Only spawned " + spawned + " cars instead of " + count + "."));
+                    LOG.info("Limit Hit! Only spawned " + spawned + " cars instead of " + count + ".");
+                }else {
+
+                    javafx.application.Platform.runLater(() ->
+                            show("Stress test started: " + spawned + " cars added."));
+                    LOG.info("Stress test started: " + spawned + " cars added.");
+                    javafx.application.Platform.runLater(() -> startStressAlarmBlink(Duration.seconds(10)));
+                }
+            });
 
         } catch (NumberFormatException ex) {
             show("Invalid number. Please enter a valid integer.");
@@ -899,6 +911,10 @@ public class GUI {
         return s == null ? "-" : s;
     }
 
+    /**
+     * After button press, attempts vehicle appearance change
+     * @param e button is pressed
+     */
     @FXML
     private void commandChangeVehicleAppearance(ActionEvent e){
         if(pinnedVehicleInfoId != null){
@@ -908,6 +924,9 @@ public class GUI {
         }
     }
 
+    /**
+     * Spawns a dedicated background thread for the simulation logic.
+     */
     private void startSimulationThread() {
         running = true;
         simThread = new Thread(() -> {
@@ -915,6 +934,7 @@ public class GUI {
             try {
                csv =  new CsvWriter("simulation.csv");
             }catch (Exception e) {
+                LOG.error("Failed to initialize CSV: " + e.getMessage());
                 e.printStackTrace();
             }
             double lastCsvWriteTime = 0.0;
@@ -928,6 +948,7 @@ public class GUI {
                         try {
                             task.run();
                         } catch (Exception ex) {
+                            LOG.error(ex.getMessage());
                             ex.printStackTrace();
                         }
 
@@ -950,7 +971,7 @@ public class GUI {
                                 validSpeedCount++;
                             }
                         } catch (Exception ex) {
-
+                            LOG.error("Failure in saving Vehicles in VehicleUIState: " + ex.getMessage());
                         }
                     }
                     double avg = (validSpeedCount > 0) ?  sumSpeed / validSpeedCount :0.0;
@@ -996,6 +1017,7 @@ public class GUI {
                         Thread.sleep(wait);
                     }
                 } catch (Exception e) {
+                    LOG.fatal("Failure in Simulation Thread start: " + e.getMessage());
                     e.printStackTrace();
                 }
             }
@@ -1007,6 +1029,11 @@ public class GUI {
         simThread.setDaemon(true);
         simThread.start();
     }
+
+    /**
+     * Shuts down the simulation, stopping the rendering timer, background thread,
+     * and closing the SUMO connection.
+     */
     public void stopAll(){
         running = false;
         if(timer != null){

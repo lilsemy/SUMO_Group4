@@ -130,8 +130,6 @@ public class VehicleController {
      */
     public void updateFromSimulation() throws Exception {
 
-
-
             long now = System.nanoTime();
             if (now - lastUiNow < UI_UPDATE_NANOS) {
                 return; // keep last cached values
@@ -165,11 +163,22 @@ public class VehicleController {
 
     }
 
+    /**
+     * Returns how many vehicles are in the queue for spawning
+     * @param activeCount Active vehicles in the simulation
+     * @return count of queued vehicles
+     */
     public int countQueuedVehicles(int activeCount){
         int countAll = vehiclesList.size();
         return countAll - activeCount;
     }
 
+    /**
+     * Returns a Collection of vehicles which meet filter requirements
+     * @param typeFilter selected type filter
+     * @param colorFilter selected color filter
+     * @return returns a filtered id list of vehicles
+     */
     public Collection<String> getFilteredVehicleIds(TypeFilter typeFilter, VehicleColor colorFilter) {
         Collection<String> result = new ArrayList<>();
 
@@ -187,6 +196,10 @@ public class VehicleController {
         return result;
     }
 
+    /**
+     * returns count of active vehicles;
+     * @return count of active vehicles
+     */
     public int getCurrentVehicles() {
         return currentVehicles;
     }

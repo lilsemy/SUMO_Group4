@@ -1,7 +1,6 @@
 package com.example.guifx;
 
 import java.util.*;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.eclipse.sumo.libtraci.Junction;
@@ -9,16 +8,15 @@ import org.eclipse.sumo.libtraci.TrafficLight;
 import org.eclipse.sumo.libtraci.TraCIPosition;
 
 /**
- * TrafficLightController controls traffic lights in the simulation
+ * TrafficLightController is a Controller to control, track and update all Traffic Lights in the simulation
  */
 public class TrafficLightController {
-
     private List<String> tlIds;
     private Map<String, TrafficLightModel> tlList;
     private static final Logger LOG = LogManager.getLogger(TrafficLightController.class.getName());
 
     /**
-     * Constructs a TrafficLightController and initializes all traffic lights
+     * Constructs a TrafficLightController and initializes all Traffic Lights in form of instances of the TrafficLightModel class
      */
     public TrafficLightController() {
         this.tlList = new HashMap<>();
@@ -33,16 +31,16 @@ public class TrafficLightController {
     }
 
     /**
-     * Returns the map of traffic lights
+     * Returns the HashMap, in which all Traffic Light Models are saved
      * 
-     * @return Map of traffic light IDs to TrafficLightModel
+     * @return Hashmap of traffic light IDs to TrafficLightModel
      */
     public Map<String, TrafficLightModel> getTlList() {
         return tlList;
     }
 
     /**
-     * Returns the list of traffic light IDs
+     * Returns the list of all Traffic Light IDs
      * 
      * @return List of traffic light IDs
      */
@@ -51,7 +49,9 @@ public class TrafficLightController {
     }
 
     /**
-     * Changes the phase of all traffic lights (green ↔ red)
+     * Changes the Traffic Light Phase of a given TrafficLight Group (TL1 or TL2) with a newly given duration
+     * @param duration
+     * @param GroupID
      */
     public void changePhase(double duration, String GroupID) {
         for (String id : tlIds) {
@@ -61,10 +61,10 @@ public class TrafficLightController {
                 if (currentPhase == 0) { // Phase 0 = green
                     tl1.setDuration(duration);
 
-                    //To change the real duration time, we have to change the Tllogic of the simulation, because there is no direct access to Phase durations
-                    var tllogic = TrafficLight.getAllProgramLogics(tl1.getId()).get(0); //.get(0) fetches the default Settings for the TrafficLights. .get(1) would fetch e.g. the Rush_Hour settings.
+                    //To change phase duration persistently, changing the TL Logic of SUMO is necessary
+                    var tllogic = TrafficLight.getAllProgramLogics(tl1.getId()).get(0);
                     tllogic.getPhases().get(2).setDuration(duration);
-                    TrafficLight.setProgramLogic(tl1.getId(), tllogic); //Pushing the new Simulation logic to Sumo.
+                    TrafficLight.setProgramLogic(tl1.getId(), tllogic);
 
                     tl1.setPhase(2); // Phase 2 = red
                     TrafficLight.setPhase(tl1.getId(), 2);
@@ -72,10 +72,9 @@ public class TrafficLightController {
                 } else if (currentPhase == 2) {
                     tl1.setDuration(duration);
 
-                    //To change the real duration time, we have to change the Tllogic of the simulation, because there is no direct access to Phase durations
-                    var tllogic = TrafficLight.getAllProgramLogics(tl1.getId()).get(0); //.get(0) fetches the default Settings for the TrafficLights. .get(1) would fetch e.g. the Rush_Hour settings.
+                    var tllogic = TrafficLight.getAllProgramLogics(tl1.getId()).get(0);
                     tllogic.getPhases().get(0).setDuration(duration);
-                    TrafficLight.setProgramLogic(tl1.getId(), tllogic); //Pushing the new Simulation logic to Sumo.
+                    TrafficLight.setProgramLogic(tl1.getId(), tllogic);
 
                     tl1.setPhase(0);
                     TrafficLight.setPhase(tl1.getId(), 0);
@@ -84,6 +83,11 @@ public class TrafficLightController {
         }
     }
 
+    /**
+     * Returns the Simulation time, at which the Traffic Light phase changes
+     * @param TlId
+     * @return
+     */
     public double remainingTime(String TlId){
         if (tlList.containsKey(TlId)){
             return TrafficLight.getNextSwitch(TlId);
