@@ -692,7 +692,7 @@ public class GUI {
                     actionQueue.add(() -> {
                         simController.changePhase(newDur, tl);
                         LOG.info("Changing TrafficLight Phase of Traffic Light: " + tl + "with Phase Duration of: " + newDur + " seconds!");
-                        show("Changing TrafficLight Phase of Traffic Light: " + tl + "with Phase Duration of: " + newDur + " seconds!");
+                        javafx.application.Platform.runLater(() -> show("Changing TrafficLight Phase of Traffic Light: " + tl + "with Phase Duration of: " + newDur + " seconds!"));
                     });
                 } catch (Exception ex) {
                     LOG.error("Changing TrafficLight states failed");
