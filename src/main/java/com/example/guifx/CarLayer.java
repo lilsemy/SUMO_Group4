@@ -180,8 +180,7 @@ public class CarLayer {
 
     /**
      * Creates a new car ImageView and adds it to the pane
-     *
-     *
+     * @param vs The initial UI state of the vehicle.
      */
     private void createCarImageViewFromSnapshot(VehicleUiState vs) {
         Image vehicleImage = getImageForVehicleType(vs.type(),vs.color() );
@@ -228,6 +227,7 @@ public class CarLayer {
         carImageViews.put(vs.id(), carView);
         carLayerPane.getChildren().add(carView);
     }
+
 
     private void refreshVehicleImageFromSnapshot(VehicleUiState vs){
         ImageView view = carImageViews.get(vs.id());

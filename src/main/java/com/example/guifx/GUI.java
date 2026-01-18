@@ -488,7 +488,8 @@ public class GUI {
     }
 
     /**
-     * Starts the animation loop that updates simulation and visuals
+     * Starts the main rendering loop (AnimationTimer) and the simulation background
+     * thread.
      */
     private void startLoop() {
         timer = new AnimationTimer() {
@@ -584,14 +585,6 @@ public class GUI {
 
                     }
 
-//                    //TrafficLight Durations
-//                    java.text.DecimalFormat df = new java.text.DecimalFormat("#");
-//                    remainingTime = simController.getTlController().remainingTime("tl1") - time;
-//                    Tl1Dur.setText("Traffic Light 1: " + df.format(remainingTime) + "s");
-//                    remainingTime = simController.getTlController().remainingTime("tl4") - time;
-//                    Tl2Dur.setText("Traffic Light 2: " + df.format(remainingTime) + "s");
-//                    //synchronize TrafficLightModels with TL values in Simualtion
-//                    simController.getTlController().updateTLModel();
 
                 } catch (Exception e) {
                     LOG.fatal("Error in Simulation Loop: " + e.getMessage());
@@ -921,6 +914,9 @@ public class GUI {
         }
     }
 
+    /**
+     * Spawns a dedicated background thread for the simulation logic.
+     */
     private void startSimulationThread() {
         running = true;
         simThread = new Thread(() -> {
@@ -1023,6 +1019,11 @@ public class GUI {
         simThread.setDaemon(true);
         simThread.start();
     }
+
+    /**
+     * Shuts down the simulation, stopping the rendering timer, background thread,
+     * and closing the SUMO connection.
+     */
     public void stopAll(){
         running = false;
         if(timer != null){
