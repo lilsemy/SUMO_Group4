@@ -1,7 +1,7 @@
 package com.example.guifx;
 
     /**
-    *VehicleState is a model class for Vehicles in the Simulation
+    *VehicleModel mirrors Vehicles from Sumo
     */
 public class VehicleModel {
 

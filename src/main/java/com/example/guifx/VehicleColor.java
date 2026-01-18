@@ -2,6 +2,9 @@ package com.example.guifx;
 
 import java.util.EnumSet;
 
+/**
+ *
+ */
 public enum VehicleColor {
 
     NONE,

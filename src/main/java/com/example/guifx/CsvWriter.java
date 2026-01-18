@@ -10,17 +10,17 @@ public class CsvWriter {
     private final PrintWriter writer;
 
     /**
-     * creating CsvWriter object -> new FileWriter(filePath)
+     * creating CsvWriter object -> new FileWriter(fileName)
      * If the file does not exist → it creates a new file in current working directory
      * If the file exists → it overwrites the file (by default)
      * PrintWriter allows for formatted writing
      *
-     * @param filePath
+     * @param fileName
      * @throws IOException
      */
 
-    public CsvWriter(String filePath) throws IOException {
-        this.writer = new PrintWriter(new FileWriter(filePath));
+    public CsvWriter(String fileName) throws IOException {
+        this.writer = new PrintWriter(new FileWriter(fileName));
 
         writer.println("time;vehicleCount;avgSpeed;congestionPresent;redLights;yellowLights;greenLights");
         writer.flush();

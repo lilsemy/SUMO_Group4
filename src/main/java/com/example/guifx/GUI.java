@@ -597,6 +597,11 @@ public class GUI {
         timer.start();
     }
 
+    /**
+     * Creates a new spawning config
+     * @param selectedType allowed types
+     * @param selectedColor allowed colors
+     */
     public void updateSpawnConfig(TypeFilter selectedType, VehicleColor selectedColor){
 
         if(selectedType == TypeFilter.NONE && selectedColor == VehicleColor.NONE){
@@ -678,7 +683,8 @@ public class GUI {
     }
 
     /**
-     * Changes the traffic light phase
+     * Changes the traffic light phase, after User pressed the "Change Phase" Button.
+     * The User must first select a Traffic Light Group over the Dropdown menu and insert a new duration time.
      *
      * @param e ActionEvent from button click
      */
@@ -905,6 +911,10 @@ public class GUI {
         return s == null ? "-" : s;
     }
 
+    /**
+     * After button press, attempts vehicle appearance change
+     * @param e button is pressed
+     */
     @FXML
     private void commandChangeVehicleAppearance(ActionEvent e){
         if(pinnedVehicleInfoId != null){
