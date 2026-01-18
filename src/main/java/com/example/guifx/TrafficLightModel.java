@@ -1,7 +1,7 @@
 package com.example.guifx;
 
 /**
- * TrafficLightState is a model class for Traffic Lights
+ * TrafficLightModel is the model class of Traffic Lights, which stores all necessary attributes of a Traffic Light. The instances are initialized over the TrafficLightController
  */
 
 public class TrafficLightModel {
@@ -11,10 +11,18 @@ public class TrafficLightModel {
     private String RedYellowGreenState;
     private String GroupID;
 
-
+    /**
+     * No argument Constructor for TrafficLightModel
+     */
     public TrafficLightModel() {
     }
 
+    /**
+     * Constructor
+     * @param id
+     * @param phase
+     * @param RedYellowGreenState
+     */
     public TrafficLightModel(String id, int phase, String RedYellowGreenState)
     {
         this.id = id;
@@ -36,32 +44,48 @@ public class TrafficLightModel {
         }
     }
 
+    /**
+     *
+     * @return Traffic Light ID
+     */
     public String getId() {
         return id;
     }
 
-    public int getPhase() {
-        return phase;
-    }
-
-    public double getDuration() {
-        return duration;
-    }
-
+    /**
+     * Setter method for Traffic Light Phase
+     * @param phase
+     */
     public void setPhase(int phase){
         this.phase = phase;
     }
 
+    /**
+     * Returns the current Traffic Light Phase in "RRYYGG" pattern
+     * @return RedYellowGreenState
+     */
     public String getRedYellowGreenState(){return RedYellowGreenState;}
 
+    /**
+     * Sets duration of current Phase
+     * @param duration
+     */
     public void setDuration(double duration){
         this.duration=duration;
     }
 
+    /**
+     * Traffic Lights are grouped into two clusters. This function returns the group ID
+     * @return GroupID of Traffic Light
+     */
     public String getGroupID(){
         return GroupID;
     }
 
+    /**
+     * Setter for the RedYellowGreenState Phase
+     * @param redYellowGreenState
+     */
     public void setRedYellowGreenState(String redYellowGreenState) {
         RedYellowGreenState = redYellowGreenState;
     }

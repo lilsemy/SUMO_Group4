@@ -408,6 +408,7 @@ public class GUI {
                         zoomGroup.setTranslateX(zoomGroup.getTranslateX() - dx);
                         zoomGroup.setTranslateY(zoomGroup.getTranslateY() - dy);
                     } catch (Exception e) {
+                        LOG.error("Failer to Setup Zoom and Drag: " + e.getMessage());
                         e.printStackTrace();
                     }
                 }
@@ -482,6 +483,7 @@ public class GUI {
             scale = newScale;
             scaleTransform.setX(scale);
             scaleTransform.setY(scale);
+            LOG.error(e.getMessage());
         }
     }
 
@@ -547,7 +549,7 @@ public class GUI {
                                     zoomGroup.setTranslateY(currrentTy + (targetTy - currrentTy) * smoothFactor);
                                 }
                     } catch (Exception e) {
-
+                        LOG.error(e.getMessage());
                     }
                 }
                 // 4) Labels + Chart nur alle 200ms (throttled)
@@ -731,15 +733,6 @@ public class GUI {
                 return;
             }
 
-//            if (count > 10000) {
-//                LOG.error("Maximum allowed vehicles for stress test is 10.000");
-//                javafx.application.Platform.runLater(() ->
-//                        show("Maximum allowed vehicles for stress test is 10.000")
-//                );
-//                setStressAlarmIcon(false);
-//                return;
-//            }
-
             LOG.info("Starting Stress Test with " + count + " vehicles");
             show("Starting Stress Test with " + count + " vehicles");
 
@@ -748,17 +741,19 @@ public class GUI {
             actionQueue.add(() -> {
                 int spawned = simController.startStressTest(count, spawnConfig);
                 if(spawned == 0) {
-                    //LOG.error("Limit Reached! Maximum vehicles allowed: 10000. No cars added.");
+                    LOG.error("Limit Reached! Maximum vehicles allowed: 15000. No cars added.");
                     javafx.application.Platform.runLater(() ->
-                            show("Limit Reached! Maximum vehicles allowed: 10000. No cars added."));
+                            show("Limit Reached! Maximum vehicles allowed: 15000. No cars added."));
 
                 }else if (spawned < count) {
                     javafx.application.Platform.runLater(() ->
                             show("Limit Hit! Only spawned " + spawned + " cars instead of " + count + "."));
+                    LOG.info("Limit Hit! Only spawned " + spawned + " cars instead of " + count + ".");
                 }else {
 
                     javafx.application.Platform.runLater(() ->
                             show("Stress test started: " + spawned + " cars added."));
+                    LOG.info("Stress test started: " + spawned + " cars added.");
                     javafx.application.Platform.runLater(() -> startStressAlarmBlink(Duration.seconds(10)));
                 }
             });
@@ -933,6 +928,7 @@ public class GUI {
             try {
                csv =  new CsvWriter("simulation.csv");
             }catch (Exception e) {
+                LOG.error("Failed to initialize CSV: " + e.getMessage());
                 e.printStackTrace();
             }
             double lastCsvWriteTime = 0.0;
@@ -946,6 +942,7 @@ public class GUI {
                         try {
                             task.run();
                         } catch (Exception ex) {
+                            LOG.error(ex.getMessage());
                             ex.printStackTrace();
                         }
 
@@ -968,7 +965,7 @@ public class GUI {
                                 validSpeedCount++;
                             }
                         } catch (Exception ex) {
-
+                            LOG.error("Failure in saving Vehicles in VehicleUIState: " + ex.getMessage());
                         }
                     }
                     double avg = (validSpeedCount > 0) ?  sumSpeed / validSpeedCount :0.0;
@@ -1014,6 +1011,7 @@ public class GUI {
                         Thread.sleep(wait);
                     }
                 } catch (Exception e) {
+                    LOG.fatal("Failure in Simulation Thread start: " + e.getMessage());
                     e.printStackTrace();
                 }
             }
