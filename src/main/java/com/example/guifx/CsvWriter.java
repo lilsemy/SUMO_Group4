@@ -1,5 +1,8 @@
 package com.example.guifx;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -8,6 +11,7 @@ import java.util.Map;
 public class CsvWriter {
 
     private final PrintWriter writer;
+    private static final Logger LOG = LogManager.getLogger(CsvWriter.class.getName());
 
     /**
      * creating CsvWriter object -> new FileWriter(fileName)
@@ -54,7 +58,7 @@ public class CsvWriter {
             );
         } catch (Exception e) {
 
-            System.err.println("Error writing CSV step at time " + time + ": " + e.getMessage());
+            LOG.error("Error writing CSV step at time " + time + ": " + e.getMessage());
         }
     }
 
